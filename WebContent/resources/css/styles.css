@@ -1,0 +1,27 @@
+body {
+	background-color: #242424;	
+}
+
+#search-button {
+	height: 34px;
+	color: white;
+	background-color: #339ccc;
+}
+#search-box {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	display: table;	
+}
+
+#search-box .row {
+	display: table-cell;
+	vertical-align: middle;
+	width: 50%;
+}
+
+#search-box p{
+	font-family: Verdana, Geneva, sans-serif;
+	color: #E88100;
+	padding-left: 15px;
+}

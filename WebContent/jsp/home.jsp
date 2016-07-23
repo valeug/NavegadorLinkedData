@@ -5,8 +5,26 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="resources/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="resources/css/bootstrap-theme.css" />
+<link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
 </head>
 <body>
-	<b>hello friend!</b>
+	
+	<div id="search-box" class="container">		
+		<div class="row">
+			<p>Ingrese su busqueda:</p>
+			<div class="col-md-12">
+	            <div class="input-group" id="adv-search">
+	                <input type="text" class="form-control" placeholder="Search" />
+	                <div class="input-group-btn">	                    
+                        <button id="search-button" type="button" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                    </div>
+	                </div>
+	            </div>
+	          </div>
+	        </div>
+		</div>
+	</div>
 </body>
 </html>
