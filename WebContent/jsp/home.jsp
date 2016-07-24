@@ -10,21 +10,24 @@
 <link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
 </head>
 <body>
-	
-	<div id="search-box" class="container">		
-		<div class="row">
-			<p>Ingrese su busqueda:</p>
-			<div class="col-md-12">
-	            <div class="input-group" id="adv-search">
-	                <input type="text" class="form-control" placeholder="Search" />
-	                <div class="input-group-btn">	                    
-                        <button id="search-button" type="button" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                    </div>
-	                </div>
-	            </div>
-	          </div>
-	        </div>
+
+	<form action="AppServlet" method="post">
+		<div id="search-box" class="container">		
+			<div class="row">
+				<p>Ingrese su busqueda:</p>
+				<div class="col-md-12">
+		            <div class="input-group" id="adv-search">
+		                <input name="concept" type="text" class="form-control" placeholder="Search" />
+		                <div class="input-group-btn">	                    
+	                        <button id="search-button" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+	                    </div>
+		                </div>
+		            </div>
+		          </div>
+		        </div>
+			</div>
 		</div>
-	</div>
+	</form>
+	
 </body>
 </html>
