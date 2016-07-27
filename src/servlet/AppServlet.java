@@ -37,6 +37,7 @@ public class AppServlet extends HttpServlet {
 		// devolveria una clase "concepto/termino" (tiene descripcion y lista de conceptos linkeados a el)
 		Concept term = SearchController.getConcept(cad);
 		
+		
 		request.setAttribute("term", term);
 		RequestDispatcher dispatcher = request.getRequestDispatcher("jsp/searchresult.jsp");
 	    dispatcher.forward( request, response);
