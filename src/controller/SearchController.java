@@ -19,14 +19,10 @@ public class SearchController {
 
 	public static Concept getConcept(String cad){
 		//demo (deberia obtener info de un query Sparql)
-		Concept c = new Concept();
-		c.setName(cad); // primero buscar si existe el termino en algun dataset (if)
-		c.setDescription("cute thing");
-		c.setLinkedTerms(null);
-		
+					
 		//JenaSparqlQuery("Neuron");
 		//List<String>ontoList = getAllOntologies();
-		searchTerm(cad);
+		Concept c = searchTerm(cad);
 		
 		return c;
 	}
@@ -43,7 +39,7 @@ public class SearchController {
 			    "   	omv:name ?name; "+
 			    "	    <http://bioportal.bioontology.org/metadata/def/hasDataGraph> ?dataGraph . " +
 				"	}"+
-			    "	LIMIT 5";
+			    "	LIMIT 10";
 		
 		Query query = QueryFactory.create(sparqlQueryString1);	
 		QueryEngineHTTP qexec = QueryExecutionFactory.createServiceRequest("http://sparql.bioontology.org/sparql", query);
@@ -52,8 +48,8 @@ public class SearchController {
 		ResultSet results = qexec.execSelect();
 		while (results.hasNext())
 		{
-			QuerySolution binding = results.nextSolution();
-			Resource subj = (Resource) binding.get("dataGraph");
+			QuerySolution sol = results.nextSolution();
+			Resource subj = (Resource) sol.get("dataGraph");
 		    //System.out.println("dataGraph: " + subj.getURI());
 			ontoList.add(""+subj.getURI());
 		} 
@@ -63,12 +59,12 @@ public class SearchController {
 		return ontoList;
 	}
 	
-	public static void searchTerm(String term){
+	public static Concept searchTerm(String term){
 		List<String>ontoList = getAllOntologies();
 		String uriS = ontolgiesGraphNames(ontoList);
 		System.out.println("uriS:");
 		System.out.println(uriS);
-		String x = "	FROM <http://bioportal.bioontology.org/ontologies/XAO> FROM <http://bioportal.bioontology.org/ontologies/ICF>";
+		//String x = "	FROM <http://bioportal.bioontology.org/ontologies/XAO> FROM <http://bioportal.bioontology.org/ontologies/ICF>";
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
 		        "   SELECT DISTINCT *" +
 		        //uriS +
@@ -82,7 +78,7 @@ public class SearchController {
 			    //"	    FILTER (CONTAINS ( UCASE(str(?label)), \""+term+"\")) " +
 			    "	    FILTER (CONTAINS ( UCASE(str(?label)), \""+term.toUpperCase()+"\")) " +
 				"	}" +
-			    "LIMIT 100";
+			    "LIMIT 10";
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);	
@@ -90,21 +86,23 @@ public class SearchController {
 		qexec.addParam("apikey", "8525c5a4-8bd8-4824-bb62-d3785c367f06");
 		
 		ResultSet results = qexec.execSelect();
-		ResultSetFormatter.out(System.out, results, query);     
-		/*
+		//ResultSetFormatter.out(System.out, results, query);     
+		
 		System.out.println("antes");
 		while (results.hasNext())
 		{
-			QuerySolution binding = results.nextSolution();
-			Resource subj = (Resource) binding.get("label");
-			System.out.println("1.");
-		    System.out.println("label: " + subj.getURI());
-		    
+			QuerySolution sol = results.nextSolution();	
+		    System.out.println("label: " + sol.getLiteral("label"));
 		} 
 		System.out.println("despues");
-		*/
+		
+		
+		Concept c = new Concept();
+		c.setName(term);
 		
 		qexec.close();
+		
+		return c;
 	}
 	
 	public static String ontolgiesGraphNames(List<String> ontoList){

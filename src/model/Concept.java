@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Concept {
 
+	private String uri;
 	private String name;
 	private String description;
 	private List<Concept> linkedTerms;
@@ -25,6 +26,12 @@ public class Concept {
 	}
 	public void setLinkedTerms(List<Concept> linkedTerms) {
 		this.linkedTerms = linkedTerms;
+	}
+	public String getUri() {
+		return uri;
+	}
+	public void setUri(String uri) {
+		this.uri = uri;
 	}
 	
 }
