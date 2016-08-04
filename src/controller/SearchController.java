@@ -99,10 +99,49 @@ public class SearchController {
 		
 		Concept c = new Concept();
 		c.setName(term);
-		
+		//demo: harcodeado 
+		getSuperClassesURIs("<http://purl.obolibrary.org/obo/XAO_0003023>");
 		qexec.close();
 		
 		return c;
+	}
+	public static List<String> getSuperClassesURIs(String seedURI){
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+		        "   SELECT DISTINCT *" +		       
+		        "   WHERE { " +
+		        "       "+ seedURI +" <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass ." +
+			    "   	OPTIONAL { ?superclass <http://www.w3.org/2002/07/owl#someValuesFrom>  ?someValuesFrom .}" +
+				"	}" +
+			    "LIMIT 10";
+		
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);	
+		QueryEngineHTTP qexec = QueryExecutionFactory.createServiceRequest("http://sparql.bioontology.org/sparql", query);
+		qexec.addParam("apikey", "8525c5a4-8bd8-4824-bb62-d3785c367f06");
+		
+		
+		ResultSet results = qexec.execSelect();
+		List<String> uriList= new ArrayList<String>();
+		int i=0;
+		//ResultSetFormatter.out(System.out, results, query);   
+		
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			if(qsol.contains("someValuesFrom")) 	
+				uriList.add("<"+qsol.get("someValuesFrom")+">");
+				//System.out.println("someValuesFrom: "+qsol.get("someValuesFrom"));
+			else 
+				uriList.add("<"+qsol.get("superclass")+">");
+				//System.out.println("superclass: "+qsol.get("superclass"));
+			System.out.println("Superclass URI: " + uriList.get(i++));
+		} 
+		
+		qexec.close();
+		
+		return uriList;		
 	}
 	
 	public static String ontolgiesGraphNames(List<String> ontoList){
