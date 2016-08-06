@@ -17,19 +17,24 @@ import model.Concept;
 
 public class SearchController {
 
+	static List<String>ontoList;
+	
 	public static Concept getConcept(String cad){
 		//demo (deberia obtener info de un query Sparql)
 					
 		//JenaSparqlQuery("Neuron");
 		//List<String>ontoList = getAllOntologies();
+		ontoList = getAllOntologies();
+		
 		Concept c = searchTerm(cad);
+		c.setSimilarTerms(searchSimilarTerms(cad));
+		c.setLinkedTerms(searchSuperClassesURIs(c.getUri()));
 		
 		return c;
 	}
 	
 	public static List<String> getAllOntologies(){
-		List<String> ontoList = new ArrayList<String>();
-		
+		ontoList = new ArrayList<String>();
 	
 		String sparqlQueryString1 = "PREFIX omv: <http://omv.ontoware.org/2005/05/ontology#> " +
 		        "   SELECT ?ont ?name ?acr ?dataGraph" +
@@ -60,12 +65,13 @@ public class SearchController {
 	}
 	
 	public static Concept searchTerm(String term){
-		List<String>ontoList = getAllOntologies();
+		
 		String uriS = ontolgiesGraphNames(ontoList);
 		System.out.println("uriS:");
 		System.out.println(uriS);
 		//String x = "	FROM <http://bioportal.bioontology.org/ontologies/XAO> FROM <http://bioportal.bioontology.org/ontologies/ICF>";
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+				"	PREFIX skos:<http://www.w3.org/2004/02/skos/core>"+
 		        "   SELECT DISTINCT *" +
 		        //uriS +
 		        //"	FROM <http://bioportal.bioontology.org/ontologies/XAO>"+
@@ -75,10 +81,10 @@ public class SearchController {
 		        "       ?x rdfs:label ?label . " +
 			    "   	?x rdfs:subClassOf ?parent . "+
 			    "   	?parent rdfs:label ?parentLabel . "+
-			    //"	    FILTER (CONTAINS ( UCASE(str(?label)), \""+term+"\")) " +
-			    "	    FILTER (CONTAINS ( UCASE(str(?label)), \""+term.toUpperCase()+"\")) " +
+			    "		{ ?x <http://purl.obolibrary.org/obo/def> ?obodef } UNION { ?x skos:definition ?skosdef }"+
+			    "	    FILTER (UCASE(str(?label)) = '"+ term.toUpperCase() + "') " +
 				"	}" +
-			    "LIMIT 10";
+			    "LIMIT 100";
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);	
@@ -89,59 +95,137 @@ public class SearchController {
 		//ResultSetFormatter.out(System.out, results, query);     
 		
 		System.out.println("antes");
+		Concept c = new Concept();
+		int i=0;
 		while (results.hasNext())
 		{
-			QuerySolution sol = results.nextSolution();	
-		    System.out.println("label: " + sol.getLiteral("label"));
+			QuerySolution qsol = results.nextSolution();	
+			String uri = qsol.get("x").toString();
+			String name = qsol.getLiteral("label").toString();
+			System.out.println("uri: " + uri);
+		    System.out.println("label: " + name);
+		    
+		    // el termino devuelto es el primer resultado de la busqueda por ahora		    
+		    if(i==0){
+		    	c.setUri("<"+uri+">");
+				c.setName(name);
+				if(qsol.contains("obodef")){
+			    	System.out.println("definition type: " + qsol.get("obodef"));
+			    	c.setDefinition(""+qsol.get("obodef"));
+				}
+				else {
+					System.out.println("definition type: " + qsol.get("skosdef"));
+					c.setDefinition(""+qsol.get("skosdef"));
+				}
+				i++;
+		    }
+		    
 		} 
 		System.out.println("despues");
 		
+		if(i==0){
+			c.setUri(null);
+			c.setName(null);
+			c.setDefinition(null);
+		}
 		
-		Concept c = new Concept();
-		c.setName(term);
 		//demo: harcodeado 
-		getSuperClassesURIs("<http://purl.obolibrary.org/obo/XAO_0003023>");
+		//searchSuperClassesURIs("<http://purl.obolibrary.org/obo/XAO_0003023>");
 		qexec.close();
 		
 		return c;
 	}
-	public static List<String> getSuperClassesURIs(String seedURI){
+	
+	public static List<Concept> searchSimilarTerms(String term){
 		
+		String uriS = ontolgiesGraphNames(ontoList);
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
-		        "   SELECT DISTINCT *" +		       
+		        "   SELECT DISTINCT *" +
+		        //uriS +
+		        //"	FROM <http://bioportal.bioontology.org/ontologies/XAO>"+
+		        //"	FROM <http://bioportal.bioontology.org/ontologies/ICF>" +
+		        uriS+
 		        "   WHERE { " +
-		        "       "+ seedURI +" <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass ." +
-			    "   	OPTIONAL { ?superclass <http://www.w3.org/2002/07/owl#someValuesFrom>  ?someValuesFrom .}" +
+		        "       ?x rdfs:label ?label . " +
+			    "   	?x rdfs:subClassOf ?parent . "+
+			    "   	?parent rdfs:label ?parentLabel . "+
+			    "	    FILTER (CONTAINS ( UCASE(str(?label)), \""+term.toUpperCase()+"\")) " +
+			    //"	    FILTER (UCASE(str(?label)) = '"+ term.toUpperCase() + "') " +
 				"	}" +
-			    "LIMIT 10";
+			    "LIMIT 100";
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);	
 		QueryEngineHTTP qexec = QueryExecutionFactory.createServiceRequest("http://sparql.bioontology.org/sparql", query);
 		qexec.addParam("apikey", "8525c5a4-8bd8-4824-bb62-d3785c367f06");
 		
+		ResultSet results = qexec.execSelect();
+		/*PARA EVITAR MULTIPLES BUSQUEDAS, DEVOLVER CONCEPT(nombre y URI) en lugar de STRING*/
+		List<Concept> termList= new ArrayList<Concept>();
+		int i=0;		
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			Concept c = new Concept();
+			c.setUri("<"+qsol.get("x")+">");
+			c.setName(""+qsol.get("label"));
+			c.setDefinition(null);
+			c.setSimilarTerms(null);
+			c.setLinkedTerms(null);
+			
+			System.out.println("similiar terms uri:"+qsol.get("x"));
+			System.out.println("similiar terms label:"+qsol.get("label"));
+			termList.add(c);
+		} 
+		qexec.close();
+		
+		return termList;
+	}
+	
+	public static List<Concept> searchSuperClassesURIs(String seedURI){
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+		        "   SELECT DISTINCT *" +		       
+		        "   WHERE { " +
+		        "       "+ seedURI +" <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass ." +
+			    "   	OPTIONAL { ?superclass rdfs:label ?label. }" +
+		        "		OPTIONAL { ?superclass <http://www.w3.org/2002/07/owl#someValuesFrom>  ?someValuesFrom ." +
+			    "				   ?someValuesFrom rdfs:label ?label ." +
+		        "				 }"+
+				"	}" +
+			    "LIMIT 10";
+		
+		//System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);	
+		QueryEngineHTTP qexec = QueryExecutionFactory.createServiceRequest("http://sparql.bioontology.org/sparql", query);
+		qexec.addParam("apikey", "8525c5a4-8bd8-4824-bb62-d3785c367f06");
+		
 		
 		ResultSet results = qexec.execSelect();
-		List<String> uriList= new ArrayList<String>();
+		List<Concept> termList= new ArrayList<Concept>();
 		int i=0;
 		//ResultSetFormatter.out(System.out, results, query);   
 		
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
+			Concept c = new Concept();
 			
-			if(qsol.contains("someValuesFrom")) 	
-				uriList.add("<"+qsol.get("someValuesFrom")+">");
-				//System.out.println("someValuesFrom: "+qsol.get("someValuesFrom"));
-			else 
-				uriList.add("<"+qsol.get("superclass")+">");
-				//System.out.println("superclass: "+qsol.get("superclass"));
-			System.out.println("Superclass URI: " + uriList.get(i++));
+			if(qsol.contains("someValuesFrom")){	
+				c.setUri("<"+qsol.get("someValuesFrom")+">");
+				System.out.println("someValuesFrom: "+qsol.get("someValuesFrom"));
+			}
+			else { 
+				c.setUri("<"+qsol.get("superclass")+">");
+				System.out.println("superclass: "+qsol.get("superclass"));
+			}
+			c.setName(""+qsol.get("label"));
 		} 
 		
 		qexec.close();
 		
-		return uriList;		
+		return termList;		
 	}
 	
 	public static String ontolgiesGraphNames(List<String> ontoList){
