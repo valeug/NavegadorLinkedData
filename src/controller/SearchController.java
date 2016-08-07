@@ -220,7 +220,9 @@ public class SearchController {
 				c.setUri("<"+qsol.get("superclass")+">");
 				System.out.println("superclass: "+qsol.get("superclass"));
 			}
+			System.out.println("label: "+qsol.get("label"));
 			c.setName(""+qsol.get("label"));
+			termList.add(c);
 		} 
 		
 		qexec.close();
