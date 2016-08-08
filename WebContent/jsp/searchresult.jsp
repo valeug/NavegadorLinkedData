@@ -9,6 +9,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
+<script language="JavaScript" type="text/javascript" src="resources/js/jquery-3.1.0.min.js"></script>
 <script type="text/javascript" src="resources/js/main.js"></script>
 </head>
 <body>
@@ -25,7 +26,7 @@
 	<br>
 	Terminos Similares:<br> 
 	<c:forEach items="${term.similarTerms}" var="i">
-		<c:out value="${i.name}" /><br>
+		<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>
 	</c:forEach>
 	<br>
 	<br>
