@@ -15,6 +15,25 @@
 <body>
 	it worked!
 	<br>
+	
+	<form action="AppServlet" method="get">
+		<div id="search-box" class="container">		
+			<div class="row">
+				<p>Ingrese su busqueda:</p>
+				<div class="col-md-12">
+		            <div class="input-group" id="adv-search">
+		                <input name="concept" type="text" class="form-control" placeholder="Search" />
+		                <div class="input-group-btn">	                    
+	                        <button id="search-button" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+	                    </div>
+		                </div>
+		            </div>
+		          </div>
+		        </div>
+			</div>
+		</div>
+	</form>
+	
 	Term: ${term.name}<br>
 	Description: ${term.definition}<br>
 	<!-- 
@@ -25,14 +44,21 @@
 	<br>
 	<br>
 	Terminos Similares:<br> 
-	<c:forEach items="${term.similarTerms}" var="i">
-		<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>
-	</c:forEach>
+	<form action="AppServlet" method="post">
+		<c:forEach items="${term.similarTerms}" var="i">
+			<!-- 
+			<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
+			 -->
+			<a href="#" type="submit" ><c:out value="${i.name}" /></a><br>
+		</c:forEach>
+	</form>
 	<br>
 	<br>
 	Terminos enlazados:<br> 
 	<c:forEach items="${term.linkedTerms}" var="i">
 		<c:out value="${i.name}" /><br>
 	</c:forEach>
+	<div id="mydiv"></div>
+	
 </body>
 </html>

@@ -11,7 +11,7 @@
 </head>
 <body>
 
-	<form action="AppServlet" method="post">
+	<form action="AppServlet" method="get">
 		<div id="search-box" class="container">		
 			<div class="row">
 				<p>Ingrese su busqueda:</p>
