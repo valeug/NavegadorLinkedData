@@ -2,26 +2,36 @@ body {
 	background-color: #242424;	
 }
 
-#search-button {
+#search-button-home, #search-button-results {
 	height: 34px;
 	color: white;
 	background-color: #339ccc;
 }
-#search-box {
+#search-box-home {
 	position: absolute;
 	height: 100%;
 	width: 100%;
 	display: table;	
 }
 
-#search-box .row {
+#search-box-home .row {
 	display: table-cell;
 	vertical-align: middle;
 	width: 50%;
 }
 
-#search-box p{
+#search-box-home p{
 	font-family: Verdana, Geneva, sans-serif;
 	color: #E88100;
 	padding-left: 15px;
+}
+
+.result-col{
+	width: 800px;
+	margin-right: auto;
+	margin-left:auto;
+}
+
+#search-box-results{
+	margin-top: 50px;
 }

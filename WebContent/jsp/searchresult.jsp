@@ -7,24 +7,24 @@
 
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
-<script language="JavaScript" type="text/javascript" src="resources/js/jquery-3.1.0.min.js"></script>
-<script type="text/javascript" src="resources/js/main.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Insert title here</title>
+	<link rel="stylesheet" type="text/css" href="resources/css/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="resources/css/bootstrap-theme.css" />
+	<link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
+	<script language="JavaScript" type="text/javascript" src="resources/js/jquery-3.1.0.min.js"></script>
+	<script type="text/javascript" src="resources/js/main.js"></script>
 </head>
 <body>
-	it worked!
-	<br>
 	
 	<form action="AppServlet" method="get">
-		<div id="search-box" class="container">		
+		<div id="search-box-results" class="container">		
 			<div class="row">
-				<p>Ingrese su busqueda:</p>
-				<div class="col-md-12">
+				<div class="result-col">
 		            <div class="input-group" id="adv-search">
-		                <input name="concept" type="text" class="form-control" placeholder="Search" />
+		                <input id="searchbox" name="concept" type="text" class="form-control" placeholder="Search" />
 		                <div class="input-group-btn">	                    
-	                        <button id="search-button" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+	                        <button id="search-button-results" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 	                    </div>
 		                </div>
 		            </div>
@@ -49,7 +49,7 @@
 			<!-- 
 			<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
 			 -->
-			<a href="#" type="submit" ><c:out value="${i.name}" /></a><br>
+			<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
 		</c:forEach>
 	</form>
 	<br>

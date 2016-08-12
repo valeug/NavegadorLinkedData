@@ -3,6 +3,8 @@ package controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -19,20 +21,109 @@ public class SearchController {
 
 	static List<String>ontoList;
 	
-	public static Concept getConcept(String cad){
-		//demo (deberia obtener info de un query Sparql)
-					
-		//JenaSparqlQuery("Neuron");
-		//List<String>ontoList = getAllOntologies();
+	public static Concept searchConcept(HttpServletRequest request) {
+		Concept term = null;
+		String input = request.getParameter("concept");
+		if(input!=null){
+			if(InputSearchProcessor.isUri(input)==1){
+				System.out.println("es uri :)");
+				term = SearchController.getConcept(input,1);
+			}
+			else{
+				System.out.println("es cadena :)");
+				term = SearchController.getConcept(input,2);
+			}			
+		}
+		return term;
+	}	
+	
+	public static Concept getConcept(String cad, int type){
+		Concept c = new Concept();
+		
 		ontoList = getAllOntologies();
 		
-		Concept c = searchTerm(cad);
-		c.setSimilarTerms(searchSimilarTerms(cad));
+		if(type==1){			
+			System.out.println("TYPE 1");
+			c = searchUri(cad);
+		}
+		else if(type==2)
+			c = searchWord(cad);
+		if(c.getName()==null) System.out.println("NOMBRE NULO!!!!! D:");
+		c.setSimilarTerms(searchSimilarTerms(c.getName()));
 		c.setLinkedTerms(searchSuperClassesURIs(c.getUri()));
 		
 		return c;
 	}
 	
+	public static Concept searchUri(String cad){
+		String uriS = ontolgiesGraphNames(ontoList);
+		System.out.println("uriS:");
+		System.out.println(uriS);
+		//String x = "	FROM <http://bioportal.bioontology.org/ontologies/XAO> FROM <http://bioportal.bioontology.org/ontologies/ICF>";
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+				"	PREFIX skos:<http://www.w3.org/2004/02/skos/core>"+
+		        "   SELECT DISTINCT *" +
+		        //uriS +
+		        //"	FROM <http://bioportal.bioontology.org/ontologies/XAO>"+
+		        //"	FROM <http://bioportal.bioontology.org/ontologies/ICF>" +
+		        uriS+
+		        "   WHERE { " +
+		        "       <" + cad + "> rdfs:label ?label . " +
+			    "   	<" + cad + "> rdfs:subClassOf ?parent . " +
+			    "   	?parent rdfs:label ?parentLabel . " +
+			    "		{ <" + cad + "> <http://purl.obolibrary.org/obo/def> ?obodef } UNION { <" + cad + "> skos:definition ?skosdef }"+
+				"	}" +
+			    "LIMIT 100";
+		
+		//falta reutilizar funciones
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);	
+		QueryEngineHTTP qexec = QueryExecutionFactory.createServiceRequest("http://sparql.bioontology.org/sparql", query);
+		qexec.addParam("apikey", "8525c5a4-8bd8-4824-bb62-d3785c367f06");
+		
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query);     
+		
+		System.out.println("antes");
+		Concept c = new Concept();
+		int i=0;
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			String uri = "<" + cad + ">";
+			String name = qsol.getLiteral("label").toString();
+			System.out.println("uri: " + uri);
+		    System.out.println("label: " + name);
+		    
+		    // el termino devuelto es el primer resultado de la busqueda por ahora		    
+		    if(i==0){
+		    	c.setUri(uri);
+				c.setName(name);
+				if(qsol.contains("obodef")){
+			    	System.out.println("definition type: " + qsol.get("obodef"));
+			    	c.setDefinition(""+qsol.get("obodef"));
+				}
+				else {
+					System.out.println("definition type: " + qsol.get("skosdef"));
+					c.setDefinition(""+qsol.get("skosdef"));
+				}
+				i++;
+		    }
+		    
+		} 
+		System.out.println("despues");
+		
+		if(i==0){
+			c.setUri(null);
+			c.setName(null);
+			c.setDefinition(null);
+		}
+		
+		qexec.close();
+		
+		return c;
+		
+	}
 	public static List<String> getAllOntologies(){
 		ontoList = new ArrayList<String>();
 	
@@ -64,7 +155,7 @@ public class SearchController {
 		return ontoList;
 	}
 	
-	public static Concept searchTerm(String term){
+	public static Concept searchWord(String term){
 		
 		String uriS = ontolgiesGraphNames(ontoList);
 		System.out.println("uriS:");
@@ -289,5 +380,6 @@ public class SearchController {
 		ResultSetFormatter.out(System.out, results, query);       
 
 		qexec.close();		
-	}	
+	}
+		
 }
