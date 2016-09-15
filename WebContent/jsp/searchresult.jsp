@@ -44,14 +44,14 @@
 	<br>
 	<br>
 	Terminos Similares:<br> 
-	<form action="AppServlet" method="post">
+	<div>
 		<c:forEach items="${term.similarTerms}" var="i">
 			<!-- 
 			<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
 			 -->
 			<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
 		</c:forEach>
-	</form>
+	</div>
 	<br>
 	<br>
 	Terminos enlazados:<br> 
