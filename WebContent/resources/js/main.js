@@ -25,7 +25,8 @@ $(document).ready(function() {
 	*/
 	
 	
-	
+	//Para iniciar navegacion a terminos parecidos
+	// al dar click, se agrega el termino a la barra de busqueda 
 	$(".term").click(function(){
 	    alert("The term was clicked.");
 		var uri = $(this).text();
@@ -33,6 +34,29 @@ $(document).ready(function() {
 	});
 	
 	
+	
+	
+	//save selected ontologies
+	$("#saveOntoBtn").click(function(){
+		var arr = [];
+		$("input:checkbox[name=checkboxList]:checked").each(function(){
+			var element = $(this);
+			arr.push(element.attr('id'));
+			alert(element.attr('id'));
+			alert('asd');
+		});
+		//alert('ontoBtn');
+		//var arr=[1,2,3,4];
+		$.ajax({
+			url:'RetrieveOntologies',
+			type:'POST',
+			dataType:'json',
+			data:{arr:arr},
+	        success : function(data){
+	            alert('success post');
+	        }
+	    });
+	});
 	
 			
 });

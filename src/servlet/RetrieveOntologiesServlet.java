@@ -50,8 +50,13 @@ public class RetrieveOntologiesServlet extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		
+		String[] results = request.getParameterValues("arr[]");		
+		System.out.println("tamano: " + results.length);
+		
+		for (int i = 0; i < results.length; i++) {
+		    System.out.println(results[i]); 			
+		}				
 	}
 
 }

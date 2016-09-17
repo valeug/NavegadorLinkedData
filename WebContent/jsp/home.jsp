@@ -40,7 +40,7 @@
 					</div>
 				</c:forEach>
 				 -->			  
-		    <button id="ontoButton">Aceptar</button>
+		    <button type="submit" class="btn" id="saveOntoBtn">Aceptar</button>
 		  </div>
 	
 	</div>
@@ -65,6 +65,7 @@
 	
 	
 	<script>
+				
 		// Get the modal
 		var modal = document.getElementById('myModal');
 		
@@ -82,12 +83,13 @@
 		    $("#ontologydiv").hide();
 		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
 		    $.get('RetrieveOntologies',function(responseJson){
-		    	alert('x2');
+		    	//alert('x2');
 				if(responseJson!=null){					
 					$("#ontologytable").find("tr:gt(0)").remove();
 					var table = $("#ontologytable");
-					alert('no entro');
-					alert("gg");
+					//alert('no entro');
+					//alert("gg");
+					var cont = 1;
 					$.each(responseJson, function(key, value){
 						/*
 						var rowNew = $("<tr><td></td><td></td></tr>");
@@ -99,11 +101,12 @@
 						var row = $("<tr />");
                         $("<td />").text(value['name']).appendTo(row);
                         $("<td />").text(value['description']).appendTo(row);
-                        $("<td />").html('<input type="checkbox"/>').appendTo(row);
+                        var inpStr = '<input type="checkbox" id="'+ cont +'" name="checkboxList"/>'; 
+                        $("<td />").html(inpStr).appendTo(row);
                         row.appendTo(table);
-					});			
-					
-					alert('wp');
+                        cont = cont + 1;
+					});					
+					//alert('wp');
 				}			
 			});
 			$("#ontologydiv").show();
