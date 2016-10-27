@@ -43,7 +43,7 @@ public class RetrieveOntologiesServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String[] results = request.getParameterValues("arr[]");		
-
+		
 		int [] ids = new int [results.length];
 		
 		for (int i = 0; i < results.length; i++) {

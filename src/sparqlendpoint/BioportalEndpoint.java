@@ -80,6 +80,7 @@ static List<String>ontoList;
 		Concept term = null;
 		String input = request.getParameter("concept");
 		if(input!=null){
+			/*
 			if(InputSearchProcessor.isUri(input)==1){
 				//System.out.println("es uri :)");
 				//term = SearchController.getConcept(input,1);
@@ -87,7 +88,8 @@ static List<String>ontoList;
 			else{
 				//System.out.println("es cadena :)");
 				//term = SearchController.getConcept(input,2);
-			}			
+			}
+			*/			
 		}
 		return term;
 	}	

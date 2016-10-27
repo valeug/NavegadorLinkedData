@@ -7,7 +7,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<title>Insert title here</title>
+	<title>Linked data navigator</title>
 	<link rel="stylesheet" type="text/css" href="resources/css/bootstrap.css" />
 	<link rel="stylesheet" type="text/css" href="resources/css/bootstrap-theme.css" />
 	<link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
@@ -59,6 +59,12 @@
 		          </div>
 		        </div>
 			</div>
+		</div>
+		<div>
+			<p>	Tipo de busqueda</p>
+			<label class="radio-inline"><input type="radio" name="optradio" value="1" checked="checked">Nombre exacto</label>
+			<label class="radio-inline"><input type="radio" name="optradio" value="2">Coincidencia en nombre</label>
+			<label class="radio-inline"><input type="radio" name="optradio" value="3">Coincidencia en propiedades</label>
 		</div>
 	</form>
 	

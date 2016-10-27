@@ -9,12 +9,12 @@ public class InputSearchProcessor {
 		return 0;
 	} 
 	
-	public static int isUri(String input){
+	public static boolean isUri(String input){
 		String regex = "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);
 		
-		if(m.find()) return 1;
-		return 0;
+		if(m.find()) return true;
+		return false;
 	}
 }

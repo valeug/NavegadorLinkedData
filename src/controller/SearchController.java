@@ -15,7 +15,9 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 
+import dao.DatasetDAO;
 import model.Concept;
+import model.Dataset;
 import sparqlendpoint.Bio2RdfEndpoint;
 import sparqlendpoint.BioportalEndpoint;
 import sparqlendpoint.DbpediaEndpoint;
@@ -40,6 +42,31 @@ public class SearchController {
 	public static Concept searchConcept(HttpServletRequest request) {
 		Concept term = null;
 		String input = request.getParameter("concept");
+		
+		//int searchType = request.getParameter("optradio").charAt(0)-'0';		
+		//System.out.println("TIPO DE BUSQUEDA: "+searchType);
+				
+		/* Consultar los datasets que selcciono el usuario*/
+		List<Dataset> datasetList = DatasetDAO.getDatasetByStatus(1);	
+		
+		//buscar si usuario selecciono dbpedia
+		for(int i=0; i< datasetList.size(); i++){
+			System.out.println(datasetList.get(i).getName());			
+			if(datasetList.get(i).getId() == 1){ // usuario selecciono dataset dbpedia					
+				if(!InputSearchProcessor.isUri(input)){ //o en el request podria asignarle 4 al optradio
+					//DbpediaEndpoint.JenaSparqlQuery(input);
+					term = DbpediaEndpoint.searchTermByExactMatch(input);
+				}
+				else{
+					
+					term = DbpediaEndpoint.searchByUri(input);
+				}
+			}			
+		}
+		
+		// datasets de bio2rdf
+
+		/*
 		if(input!=null){
 			if(InputSearchProcessor.isUri(input)==1){
 				//System.out.println("es uri :)");
@@ -50,7 +77,20 @@ public class SearchController {
 				term = SearchController.getConcept(input,2);
 			}			
 		}
+		*/
 		return term;
+	}
+	
+	public static List<Concept> getTermsList(HttpServletRequest request) {
+		List<Concept> tlist = null;
+		String input = request.getParameter("concept");
+		
+		tlist = DbpediaEndpoint.searchTermBySimilarName(input);
+		
+		
+		
+		return tlist;
+		
 	}
 	
 	public static Concept getConcept(String cad, int type){
@@ -253,4 +293,6 @@ public class SearchController {
 		return null;
 	}
 		
+	
+	
 }

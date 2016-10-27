@@ -13,15 +13,15 @@ import model.Dataset;
 
 public class DatasetDAO {
 	
-	Connection myConnec;
-    Statement myStat;
+	static Connection myConnec;
+    static Statement myStat;
 	
     private static Connection getConnection() {        
     	Connection con = JDBCMySQLConnection.getInstance().getConnection();		
         return con;
     }
 	
-    public List<Dataset> getAllDatasets(){
+    public static List<Dataset> getAllDatasets(){
     	
     	String query = "SELECT * FROM dataset";
     	List<Dataset> datasetList = new ArrayList<Dataset>();
@@ -55,7 +55,7 @@ public class DatasetDAO {
     	return datasetList;
     }
     
-    public List<Dataset> getDatasetByStatus(int status){
+    public static List<Dataset> getDatasetByStatus(int status){
     	
     	String query = "SELECT * "
     				+ " FROM dataset"
@@ -88,7 +88,7 @@ public class DatasetDAO {
     }
     
     //update status to 0 or 1, indicated in the parameter
-    public void updateStatusById(int [] ids, int status){
+    public static void updateStatusById(int [] ids, int status){
     	//(id1,id2)
     	String idCad ="(";
     	for(int i=0; i<ids.length; i++){
@@ -115,7 +115,7 @@ public class DatasetDAO {
     	
     }
         
-    public void updateOthersStatusById(int [] ids, int status){
+    public static void updateOthersStatusById(int [] ids, int status){
     	//(id1,id2)
     	String idCad ="(";
     	for(int i=0; i<ids.length; i++){
@@ -143,7 +143,7 @@ public class DatasetDAO {
     }
     
     //update status to 1
-    public void enableDatasets(int [] ids){
+    public static void enableDatasets(int [] ids){
     	
     	updateStatusById(ids, 1);
     	updateOthersStatusById(ids,0);

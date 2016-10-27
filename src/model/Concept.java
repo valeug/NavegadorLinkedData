@@ -4,8 +4,8 @@ import java.util.List;
 
 public class Concept {
 
-	private String uri;
-	private String name;
+	public String uri;
+	public String name;
 	private String definition;
 	private String classType;
 	private List<Property> properties; //podria incluir "name", "definition" (aunque son propiedades importantes)
