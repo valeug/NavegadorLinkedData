@@ -64,6 +64,10 @@ public class DbpediaEndpoint {
 	}
 	
 	
+	/*************************************************************************/
+		/*	BUSQUEDA POR COINCIDENCIA EXACTA	*/
+	/*************************************************************************/
+	
 	public static Concept searchTermByExactMatch(String cad){
 		
 		System.out.println(cad);
@@ -312,8 +316,10 @@ public class DbpediaEndpoint {
 		return i; 
 	}
 	
-	
-	/* LISTA DE CONCEPTOS */
+	/*************************************************************************/
+	/* LISTA DE CONCEPTOS: COINCIDENCIA SIMILAR EN NOMBRE */
+	/*************************************************************************/
+
 	public static List<Concept> searchTermBySimilarName(String input){
 		
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
@@ -556,4 +562,86 @@ public class DbpediaEndpoint {
 		
 		return c;
 	}
+	
+	
+	
+	
+	/*************************************************************************/
+	/* BUSQUEDA POR COINCIDENCIA EN PROPIEDAD */
+	/*************************************************************************/
+
+	
+	public static List<Concept> searchTermByPropertyMatch(String input){
+		
+		String classesQuery = concatenateClassesForSimilarMatch(1);
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+					"   SELECT DISTINCT ?x ?label    " +
+					"   WHERE { " +		
+					"		?x ?prop ?p . " +
+					"		?x rdfs:label ?label . " +
+					classesQuery +
+					"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
+					"   } " +
+					"LIMIT 10";
+					
+		
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://dbpedia.org/sparql/", query);
+		
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query);
+				
+				
+		List<Concept> termsList = new ArrayList<Concept>();		
+		String aux = null;
+		
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+
+			if(qsol.contains("x") && qsol.contains("label")){				
+				Concept c = new Concept();
+				
+		    	aux = qsol.get("x").toString();	   	
+		    	c.setUri(aux);
+		    	System.out.println("resource uri: " + aux);
+		    	
+		    	aux = qsol.get("label").toString();	   	
+		    	c.setName(aux);
+		    	System.out.println("resource label: " + aux);
+		    	
+		    	termsList.add(c);		    			    		    	
+			}
+			
+		} 
+							
+		return termsList;
+	}
+	
+	
+	private static String concatenateClassesForSimilarMatch(int dataset){
+		String cad = null;
+		
+		List<Class> cList = new ArrayList<Class>();
+		
+		cList = ClassDAO.getAllClassesByDataset(dataset); // clases de DBPEDIA
+		
+		int tam = cList.size();
+		
+		cad = "{";		
+		for(int i=0; i< 2; i++){
+			cad += " ?x rdf:type <" + cList.get(i).getUri() + "> . ";
+			cad += " } ";
+			if( i < 2 - 1 ){
+				cad += " UNION ";
+				cad += " { ";
+			}
+		}
+				
+		return cad;		
+	}
+	
 }

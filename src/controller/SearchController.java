@@ -81,16 +81,18 @@ public class SearchController {
 		return term;
 	}
 	
-	public static List<Concept> getTermsList(HttpServletRequest request) {
+	public static List<Concept> getTermsList(HttpServletRequest request, int searchType) {
 		List<Concept> tlist = null;
 		String input = request.getParameter("concept");
 		
-		tlist = DbpediaEndpoint.searchTermBySimilarName(input);
-		
-		
-		
-		return tlist;
-		
+		if(searchType==2){
+			tlist = DbpediaEndpoint.searchTermBySimilarName(input);
+		}
+		else if(searchType == 3){
+			tlist = DbpediaEndpoint.searchTermByPropertyMatch(input);
+		}
+				
+		return tlist;		
 	}
 	
 	public static Concept getConcept(String cad, int type){
@@ -106,8 +108,6 @@ public class SearchController {
 			String uri =transformTermToURI(cad);
 		}
 		if(c.getName()==null) System.out.println("NOMBRE NULO!!!!! D:");
-		//c.setSimilarTerms(searchSimilarTerms(c.getName()));
-		//c.setLinkedTerms(searchSuperClassesURIs(c.getUri()));
 		
 		return c;
 	}

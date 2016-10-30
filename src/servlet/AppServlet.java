@@ -51,19 +51,18 @@ public class AppServlet extends HttpServlet {
 			
 			view = "searchresult.jsp";
 		}
-		else if (searchType == 2 || searchType == 3) { 
+		else if (searchType == 2 || searchType == 3) {  // por coincidencia similar en nombre o por coincidencia en propiedades
 			
-			if(searchType==2){
-				
-			}
-			termList = SearchController.getTermsList(request);
+			termList = SearchController.getTermsList(request, searchType);
 			
+			/*
 			System.out.println("------------------------\n        SERVLET");
 			System.out.println("Terms list size: " + termList.size());
 			for(int i=0; i<termList.size(); i++){
 				System.out.println("URI: " + termList.get(i).getUri());
 				System.out.println("LABEL: " + termList.get(i).getName());
 			}
+			*/
 			
 			request.setAttribute("termList", termList);
 			request.setAttribute("optradio", "1");
