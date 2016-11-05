@@ -1,16 +1,18 @@
 package servlet;
 
 import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Servlet implementation class HomeServlet
- */
-@WebServlet("/HomeServlet")
+import dao.DatasetDAO;
+
+
+@WebServlet({"/HomeServlet",""})
 public class HomeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -29,6 +31,15 @@ public class HomeServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 		
+		/* SETEAR TODOS LOS DATASETS A ELEGIDOS*/
+		
+		int ids [] = {1,2,3};
+		DatasetDAO.updateStatusById(ids, 1);
+		
+		/* Llamar a la vista principal de busqueda*/
+		RequestDispatcher dispatcher;
+		dispatcher = request.getRequestDispatcher("jsp/home.jsp");
+	    dispatcher.forward( request, response);
 	}
 
 	/**
