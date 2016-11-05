@@ -20,7 +20,7 @@ import controller.InputSearchProcessor;
 //@WebServlet({"/AppServlet", ""})
 public class AppServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+    
     public AppServlet() {
         super();
     }

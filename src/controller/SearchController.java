@@ -39,6 +39,10 @@ public class SearchController {
 	}
 	*/
 	
+	
+	
+	/*		FUNCION PRINCIPAL QUE INICIA LA BUSQUEDA	*/
+	
 	public static Concept searchConcept(HttpServletRequest request) {
 		Concept term = null;
 		String input = request.getParameter("concept");
@@ -55,7 +59,8 @@ public class SearchController {
 			if(datasetList.get(i).getId() == 1){ // usuario selecciono dataset dbpedia					
 				if(!InputSearchProcessor.isUri(input)){ //o en el request podria asignarle 4 al optradio
 					//DbpediaEndpoint.JenaSparqlQuery(input);
-					term = DbpediaEndpoint.searchTermByExactMatch(input);
+					//term = DbpediaEndpoint.searchTermByExactMatch(input);
+					term = Bio2RdfEndpoint.searchTermByExactMatch(input);					
 				}
 				else{
 					
@@ -82,14 +87,17 @@ public class SearchController {
 	}
 	
 	public static List<Concept> getTermsList(HttpServletRequest request, int searchType) {
+		
 		List<Concept> tlist = null;
 		String input = request.getParameter("concept");
 		
 		if(searchType==2){
-			tlist = DbpediaEndpoint.searchTermBySimilarName(input);
+			//tlist = DbpediaEndpoint.searchTermBySimilarName(input);
+			tlist = Bio2RdfEndpoint.searchTermBySimilarName(input);
 		}
 		else if(searchType == 3){
-			tlist = DbpediaEndpoint.searchTermByPropertyMatch(input);
+			//tlist = DbpediaEndpoint.searchTermByPropertyMatch(input);
+			tlist = Bio2RdfEndpoint.searchTermByPropertyMatch(input);
 		}
 				
 		return tlist;		
