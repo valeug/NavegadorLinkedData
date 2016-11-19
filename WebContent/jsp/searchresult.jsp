@@ -65,7 +65,7 @@
 	<br>
 	Terminos similares:<br> 
 	<c:forEach items="${term.similarTerms}" var="i">
-		<c:out value="${i.uri}" /><br>
+		<c:out value="${i.name}" /><br>
 	</c:forEach>
 	<div id="mydiv"></div>
 	

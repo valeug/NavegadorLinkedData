@@ -3,16 +3,20 @@ body {
 }
 
 #search-button-home, #search-button-results {
-	height: 34px;
+	height: 40px;
 	color: white;
 	background-color: #339ccc;
 }
+
 #search-box-home {
-	position: absolute;
-	height: 100%;
 	width: 100%;
+	/*
+	position: absolute;
+	height: 100%;	
 	display: table;	
+	*/
 }
+
 
 #search-box-home .row {
 	display: table-cell;
@@ -34,4 +38,38 @@ body {
 
 #search-box-results{
 	margin-top: 50px;
+}
+
+#search-input, #searchbox{
+	height: 40px;
+}
+
+
+.home-page-search{
+	float: none;
+	margin: auto;	
+}
+
+.home-page-type{
+	float: left;
+	margin: auto;	
+}
+
+.home-page-modal{
+	float: right;
+	margin: auto;	
+}
+
+#myBtn {
+	float: right;
+	padding: 5px;
+	font-size: 16px
+}
+
+.center-vertical {
+	margin-top:320px;
+}
+
+.row{
+	margin-bottom:10px;
 }

@@ -23,9 +23,10 @@ public class HomeServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
 		/* SETEAR TODOS LOS DATASETS A ELEGIDOS*/		
-		int ids [] = {1,2,3};
+		int ids [] = {1,2,3,4,5};
 		DatasetDAO.updateStatusById(ids, 1);
 		
+		System.out.println("inicializo datasets");
 		/* Llamar a la vista principal de busqueda*/
 		RequestDispatcher dispatcher;
 		dispatcher = request.getRequestDispatcher("jsp/home.jsp");

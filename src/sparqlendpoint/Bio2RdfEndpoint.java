@@ -407,17 +407,6 @@ public class Bio2RdfEndpoint {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	/*************************************************************************/
 	/* LISTA DE CONCEPTOS: COINCIDENCIA SIMILAR EN NOMBRE */
 	/*************************************************************************/
@@ -441,8 +430,7 @@ public class Bio2RdfEndpoint {
 				"       ?s <http://purl.org/dc/terms/title> ?label . " +		
 				"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
 				"   } "+
-				"	LIMIT 5";
-				
+				"	LIMIT 5";				
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
@@ -619,9 +607,13 @@ public class Bio2RdfEndpoint {
 		
 		List<Concept> cList = new ArrayList<Concept>();
 		
-		for(int i=0; i < posBio.length; i++){
-			List<Concept> aux = searchTermBySimilarName(input, datasetList.get(posBio[i]));
-			cList.addAll(aux);
+		for(int i=0; i < datasetList.size(); i++){
+			Dataset dat = datasetList.get(i);
+			if(dat.getId() != 1){ // DBPEDIA
+				List<Concept> aux = searchTermBySimilarName(input, dat);
+				cList.addAll(aux);
+			}
+			
 		}
 
 		return cList;
