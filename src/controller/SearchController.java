@@ -90,12 +90,19 @@ public class SearchController {
 			
 			if(found==1){ // Se encontro el termino en DBPedia -> se busca lista de terminos en Bio2rdf
 
-				printConcept(term);
+				//printConcept(term);
+				System.out.println("term name: " + term.name);
+				System.out.println("term properties: " + term.getProperties().size());
+				System.out.println("dataset LIST: " + datasetList.size());
 				
-				termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, cant, posBio, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
+				termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
 				similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, cant, posBio, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
 				
+				
 				if(term==null) System.out.println("term null!");
+				
+				//System.out.println("termsMappingList size: " + termsMappingList.size());
+				System.out.println("ANTES term properties: " + term.getProperties().size());
 				addInfoToTerm(term, termsMappingList, similarTerms);
 			}
 			else {
@@ -145,7 +152,7 @@ public class SearchController {
 	private static void addInfoToTerm(Concept term, List<Concept> termsMappingList, List<Concept> similarTerms){
 		
 		//pasar las propiedades de los terminos mapeados -> a el termino de DBPedia
-		List<Property> props = new ArrayList<Property>();
+		List<Property> props = term.getProperties();
 		if(termsMappingList != null && term != null){
 			for(int i=0; i<termsMappingList.size(); i++){
 				Concept c = termsMappingList.get(i);
@@ -156,13 +163,16 @@ public class SearchController {
 				}			
 			}
 		}
-		term.setProperties(props);
+		
+		System.out.println("addInfoToTerm - props size: " + props.size());
+		//term.setProperties(props);
 		
 		System.out.println("similarTerms.size(): "+similarTerms.size());
 		for(int k=0; k<similarTerms.size(); k++){
 			System.out.println("" + similarTerms.get(k).getUri());
 		}
 		
+		/*
 		List<Concept> cList = new ArrayList<Concept>();		
 		// terminos linkeados
 		if(similarTerms != null && term != null){
@@ -170,7 +180,11 @@ public class SearchController {
 				cList.add(similarTerms.get(k));
 			}
 		}
-		term.setSimilarTerms(cList);		
+		term.setSimilarTerms(cList);	
+		*/
+		if(similarTerms != null && term != null){
+			term.setSimilarTerms(similarTerms);
+		}
 	}
 	
 	
@@ -468,6 +482,7 @@ public class SearchController {
 		
 		if(c.getProperties() != null){
 			System.out.println("Propiedades: ");
+			System.out.println("Propiedades size: " + c.getProperties().size());
 			for(int i=0; i<c.getProperties().size(); i++){
 				System.out.println(i+") uri: " + c.getProperties().get(i).getUri());
 				System.out.println(i+") value: " + c.getProperties().get(i).getValue());
@@ -478,7 +493,7 @@ public class SearchController {
 		if(c.getSimilarTerms() != null){
 			System.out.println("Similar terms: ");
 			for(int i=0; i<c.getSimilarTerms().size(); i++){
-				System.out.println(i+") " + c.getSimilarTerms().get(i).name);
+				System.out.println(i+") " + c.getSimilarTerms().get(i).getName());
 			}
 		}
 		else System.out.println("Similar terms null :/");
@@ -486,7 +501,7 @@ public class SearchController {
 		if(c.getLinkedTerms() != null){
 			System.out.println("Linked terms: ");
 			for(int i=0; i<c.getLinkedTerms().size(); i++){
-				System.out.println(i+") " + c.getLinkedTerms().get(i).name);
+				System.out.println(i+") " + c.getLinkedTerms().get(i).getName());
 			}
 		}
 		else System.out.println("Linked terms null :/");

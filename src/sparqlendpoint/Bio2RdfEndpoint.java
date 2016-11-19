@@ -555,7 +555,7 @@ public class Bio2RdfEndpoint {
 	 * 		PARA DBPEDIA: OBTENER TERMINOS MAPPING y sus propiedades
 	 ****************************************************************/
 	
-	static public List<Concept> getMappingPropertiesValues(Concept term, int cant, int [] posBio, List<Dataset> datasetList){
+	static public List<Concept> getMappingPropertiesValues(Concept term, List<Dataset> datasetList){
 
 		//Buscar si dentro de las propiedades del recurso hay mapping a mesh
 		List<Property> pList = term.getProperties();
@@ -563,7 +563,7 @@ public class Bio2RdfEndpoint {
 		
 		for(int j=0; j < pList.size(); j++){
 			Property p = pList.get(j);
-			if(p.getIs_mapping() == 1){
+			if(p.getIs_mapping() == 1 && p.getValue() != null){
 				Dataset dataset = DatasetDAO.getDatasetById(p.getTarget());
 				
 				if(dataset.getId() != 1){ // SOLO MAPPING A DATASETS DE BIO2RDF
@@ -588,7 +588,9 @@ public class Bio2RdfEndpoint {
 								break;
 						case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + p.getValue();	// PHARMGKB
 								break;
-						case 4: inputUri = "http://bio2rdf.org/ncbi:" + p.getValue();	// NCBI
+						case 4: inputUri = "http://bio2rdf.org/goa:" + p.getValue();	// NCBI
+								break;
+						case 5: inputUri = "http://bio2rdf.org/ncbi:" + p.getValue();	// NCBI
 								break;
 					}
 					

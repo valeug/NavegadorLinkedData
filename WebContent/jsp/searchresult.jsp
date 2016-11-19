@@ -43,7 +43,7 @@
 	 -->
 	<br>
 	<br>
-	Terminos Similares:<br> 
+	Propiedades:<br> 
 	<div>
 		<c:forEach items="${term.properties}" var="i">
 			<!-- 
@@ -59,6 +59,13 @@
 	Terminos enlazados:<br> 
 	<c:forEach items="${term.linkedTerms}" var="i">
 		<c:out value="${i.name}" /><br>
+	</c:forEach>
+	<div id="mydiv"></div>
+	<br>
+	<br>
+	Terminos similares:<br> 
+	<c:forEach items="${term.similarTerms}" var="i">
+		<c:out value="${i.uri}" /><br>
 	</c:forEach>
 	<div id="mydiv"></div>
 	
