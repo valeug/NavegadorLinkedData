@@ -8,7 +8,15 @@ public class Property {
 	String description;
 	String value;
 	int is_mapping;
+	int target;
 	
+	
+	public int getTarget() {
+		return target;
+	}
+	public void setTarget(int target) {
+		this.target = target;
+	}
 	public String getValue() {
 		return value;
 	}

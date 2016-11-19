@@ -42,8 +42,8 @@ $(document).ready(function() {
 		$("input:checkbox[name=checkboxList]:checked").each(function(){
 			var element = $(this);
 			arr.push(element.attr('id'));
-			alert(element.attr('id'));
-			alert('asd');
+			//alert(element.attr('id'));
+			//alert('asd');
 		});
 		//alert('ontoBtn');
 		//var arr=[1,2,3,4];

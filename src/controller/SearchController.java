@@ -18,6 +18,7 @@ import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import dao.DatasetDAO;
 import model.Concept;
 import model.Dataset;
+import model.Property;
 import sparqlendpoint.Bio2RdfEndpoint;
 import sparqlendpoint.BioportalEndpoint;
 import sparqlendpoint.DbpediaEndpoint;
@@ -52,7 +53,58 @@ public class SearchController {
 				
 		/* Consultar los datasets que selcciono el usuario*/
 		List<Dataset> datasetList = DatasetDAO.getDatasetByStatus(1);	
+		List<Concept> tList = null;
 		
+		
+		/**/
+		int posBio [] = new int [5]; //posiciones de datasets de bio2rdf en la lista de datasets(datasetList)
+		int cant = 0, found = 0;
+		
+		for(int i=0; i<datasetList.size(); i++){
+			int idDat = datasetList.get(i).getId();
+			if(idDat == 1){ //DBPedia
+				if(!InputSearchProcessor.isUri(input)){					
+					term = DbpediaEndpoint.searchTermByExactMatch(input); 
+				}
+				else {					
+					term = DbpediaEndpoint.searchByUri(input);					
+				}	
+				if(term!=null) found = 1;
+				//break;
+			}
+			else { //Bio2RDF
+				//term = Bio2RdfEndpoint.searchTermByExactMatch(input);
+				posBio[cant++] = i;
+			}
+		}
+		
+		
+		
+		if(cant>0){ // Se seleccionaron datasets de Bio2RDF
+			
+			List <Concept> termsMappingList = new ArrayList<Concept>();		
+			List <Concept> similarTerms = new ArrayList<Concept>();
+			List <Concept> exactTerms = new ArrayList<Concept>();
+			
+			//Se seleccionaron datasets de Bio2rdf y Dbpedia		
+			
+			if(found==1){ // Se encontro el termino en DBPedia -> se busca lista de terminos en Bio2rdf
+
+				printConcept(term);
+				
+				termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, cant, posBio, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
+				similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, cant, posBio, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
+				
+				if(term==null) System.out.println("term null!");
+				addInfoToTerm(term, termsMappingList, similarTerms);
+			}
+			else {
+				// No se encontro el concepto en DBPediam, se busca en bio2rdf
+				exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match			
+			}
+		}
+		
+		/*
 		//buscar si usuario selecciono dbpedia
 		for(int i=0; i< datasetList.size(); i++){
 			System.out.println(datasetList.get(i).getName());			
@@ -60,7 +112,7 @@ public class SearchController {
 				if(!InputSearchProcessor.isUri(input)){ //o en el request podria asignarle 4 al optradio
 					//DbpediaEndpoint.JenaSparqlQuery(input);
 					//term = DbpediaEndpoint.searchTermByExactMatch(input);
-					term = Bio2RdfEndpoint.searchTermByExactMatch(input);					
+					term = Bio2RdfEndpoint.searchTermByExactMatch(input,null);					
 				}
 				else{
 					
@@ -68,7 +120,7 @@ public class SearchController {
 				}
 			}			
 		}
-		
+		*/
 		// datasets de bio2rdf
 
 		/*
@@ -83,8 +135,45 @@ public class SearchController {
 			}			
 		}
 		*/
-		return term;
+		
+		printConcept(term);
+		
+		return term; //DEVUELVE TERMINO SOLO DE DBPEDIA
 	}
+	
+	
+	private static void addInfoToTerm(Concept term, List<Concept> termsMappingList, List<Concept> similarTerms){
+		
+		//pasar las propiedades de los terminos mapeados -> a el termino de DBPedia
+		List<Property> props = new ArrayList<Property>();
+		if(termsMappingList != null && term != null){
+			for(int i=0; i<termsMappingList.size(); i++){
+				Concept c = termsMappingList.get(i);
+				List<Property> pList = c.getProperties();
+				for(int j=0; j < pList.size(); j++){
+					// agregar las propiedades al termino
+					props.add(pList.get(j));
+				}			
+			}
+		}
+		term.setProperties(props);
+		
+		System.out.println("similarTerms.size(): "+similarTerms.size());
+		for(int k=0; k<similarTerms.size(); k++){
+			System.out.println("" + similarTerms.get(k).getUri());
+		}
+		
+		List<Concept> cList = new ArrayList<Concept>();		
+		// terminos linkeados
+		if(similarTerms != null && term != null){
+			for(int k=0; k < similarTerms.size(); k++){
+				cList.add(similarTerms.get(k));
+			}
+		}
+		term.setSimilarTerms(cList);		
+	}
+	
+	
 	
 	public static List<Concept> getTermsList(HttpServletRequest request, int searchType) {
 		
@@ -93,11 +182,11 @@ public class SearchController {
 		
 		if(searchType==2){
 			//tlist = DbpediaEndpoint.searchTermBySimilarName(input);
-			tlist = Bio2RdfEndpoint.searchTermBySimilarName(input);
+			tlist = Bio2RdfEndpoint.searchTermBySimilarName(input, null);
 		}
 		else if(searchType == 3){
 			//tlist = DbpediaEndpoint.searchTermByPropertyMatch(input);
-			tlist = Bio2RdfEndpoint.searchTermByPropertyMatch(input);
+			tlist = Bio2RdfEndpoint.searchTermByPropertyMatch(input, null);
 		}
 				
 		return tlist;		
@@ -202,7 +291,69 @@ public class SearchController {
 		
 	}
 	
-	
+	public static Concept searchUriBio2RDF(String cad){
+
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+				"	PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
+				"	PREFIX dc:<http://purl.org/dc/terms>"+
+		        "   SELECT DISTINCT *" +
+		        //"	FROM <http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3>"+
+		        //"	FROM <http://bio2rdf.org/pharmgkb_resource:bio2rdf.dataset.pharmgkb.R3>" +
+		        //"	FROM <http://bio2rdf.org/ncbigene_resource:bio2rdf.dataset.ncbigene.R3>" +
+		        //"	FROM <http://bio2rdf.org/goa_resource:bio2rdf.dataset.goa.R3>" +
+		        "   WHERE { " +
+		        "       <"+ cad+ "> ?prop ?value . " +
+			    "	} "+
+			    "LIMIT 100";
+		
+		//falta reutilizar funciones
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);	
+		QueryEngineHTTP qexec = QueryExecutionFactory.createServiceRequest("http://bio2rdf.org/sparql/", query);
+		
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query);     
+		
+		System.out.println("antes");
+		Concept c = new Concept();
+		int i=0;
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			String uri = "<" + cad + ">";
+			String name = qsol.getLiteral("label").toString();
+			System.out.println("uri: " + uri);
+		    System.out.println("label: " + name);
+		    
+		    // el termino devuelto es el primer resultado de la busqueda por ahora		    
+		    if(i==0){
+		    	c.setUri(uri);
+				c.setName(name);
+				if(qsol.contains("obodef")){
+			    	System.out.println("definition type: " + qsol.get("obodef"));
+			    	c.setDefinition(""+qsol.get("obodef"));
+				}
+				else {
+					System.out.println("definition type: " + qsol.get("skosdef"));
+					c.setDefinition(""+qsol.get("skosdef"));
+				}
+				i++;
+		    }
+		    
+		} 
+		System.out.println("despues");
+		
+		if(i==0){
+			c.setUri(null);
+			c.setName(null);
+			c.setDefinition(null);
+		}
+		
+		qexec.close();
+		
+		return c;
+		
+	}
 	
 	
 	
@@ -283,8 +434,7 @@ public class SearchController {
 				else {
 					System.out.println("definition type: " + qsol.get("label1"));
 					return ""+qsol.get("label1");
-				}
-		    	
+				}	
 		    }
 		    
 		} 
@@ -301,6 +451,47 @@ public class SearchController {
 		return null;
 	}
 		
+	
+	private static void printConcept (Concept c){
+		
+		System.out.println("==============================");
+		System.out.println("	CONCEPTO FINAL");
+		System.out.println("==============================");
+		
+		if(c.getName() != null)
+			System.out.println("name: " + c.getName());
+		else System.out.println("Nombre null :/");
+		
+		if(c.getUri() != null)
+			System.out.println("uri: " + c.getUri());
+		else System.out.println("Uri null :/");
+		
+		if(c.getProperties() != null){
+			System.out.println("Propiedades: ");
+			for(int i=0; i<c.getProperties().size(); i++){
+				System.out.println(i+") uri: " + c.getProperties().get(i).getUri());
+				System.out.println(i+") value: " + c.getProperties().get(i).getValue());
+			}
+		}
+		else System.out.println("Propiedades null :/");
+		
+		if(c.getSimilarTerms() != null){
+			System.out.println("Similar terms: ");
+			for(int i=0; i<c.getSimilarTerms().size(); i++){
+				System.out.println(i+") " + c.getSimilarTerms().get(i).name);
+			}
+		}
+		else System.out.println("Similar terms null :/");
+		
+		if(c.getLinkedTerms() != null){
+			System.out.println("Linked terms: ");
+			for(int i=0; i<c.getLinkedTerms().size(); i++){
+				System.out.println(i+") " + c.getLinkedTerms().get(i).name);
+			}
+		}
+		else System.out.println("Linked terms null :/");
+		
+	}
 	
 	
 }

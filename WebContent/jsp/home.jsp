@@ -89,12 +89,12 @@
 		    $("#ontologydiv").hide();
 		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
 		    $.get('RetrieveOntologies',function(responseJson){
-		    	alert('x2');
+		    	//alert('x2');
 				if(responseJson!=null){					
 					$("#ontologytable").find("tr:gt(0)").remove();
 					var table = $("#ontologytable");
 					//alert('no entro');
-					alert("gg");
+					//alert("gg");
 					var cont = 1;
 					$.each(responseJson, function(key, value){
 						/*
@@ -104,8 +104,8 @@
 						rowNew.children().eq(1).text(value['description']);
 						rowNew.appendTo(table);
 						*/
-						alert('entro each');
-						alert(value['name']);
+						//alert('entro each');
+						//alert(value['name']);
 						var row = $("<tr />");
                         $("<td />").text(value['name']).appendTo(row);
                         $("<td />").text(value['description']).appendTo(row);

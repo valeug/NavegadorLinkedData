@@ -10,10 +10,13 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 
+import controller.InputSearchProcessor;
 import dao.ClassDAO;
+import dao.DatasetDAO;
 import dao.PropertyDAO;
 import model.Class;
 import model.Concept;
+import model.Dataset;
 import model.Property;
 
 public class Bio2RdfEndpoint {
@@ -41,39 +44,236 @@ public class Bio2RdfEndpoint {
 		/*	BUSQUEDA POR COINCIDENCIA EXACTA	*/
 	/*************************************************************************/
 	
-	public static Concept searchTermByExactMatch(String cad){
+	public static Concept searchTermByExactMatch(String cad, Dataset dataset){
+		System.out.println("DATASET : " + dataset.getName());
+		System.out.println("DATASET id: " + dataset.getId());
+		
+		String fromQ = "";
+		
+		if(dataset!=null)
+			fromQ = "	FROM <" + dataset.getUri() + "> ";
+		
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+						" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+						" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+			"	SELECT DISTINCT * " +
+			fromQ +
+			"	WHERE {"+
+			"		?s rdf:type ?type . " +
+			//"		?s ?property ?value . " + //obtener propiedades
+			"		?s <http://purl.org/dc/terms/title> ?label . " +
+			"	FILTER (UCASE(str(?label)) = \"" + cad.toUpperCase() +"\")" +
+			"	} "+
+			"	LIMIT 10";
+		
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+	
+		ResultSet results = qexec.execSelect();
+		ResultSet raux = results;
+		//ResultSetFormatter.out(System.out, raux, query);    
+	
+		// Informacion del resultado		
+		
+		
+		String uri = null;
+		String aux = null;	
+
+		
+		List<Class> classesDataset = ClassDAO.getAllClassesByDataset(dataset.getId());
+		
+		//List<Property> pList = new ArrayList<Property>();
+
+		int i=0;
+		
+		List<String> uris = new ArrayList<String>();
+		List<String> types = new ArrayList<String>(); // clase del recurso
+		
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			aux = qsol.get("s").toString();
+			uris.add(aux);
+			aux = qsol.get("type").toString();
+			System.out.println("aux : "+aux);
+			types.add(aux);
+
+		} 
+	
+		// faltaria obtener la DEFINICION del concepto -> DEPENDE DE CADA DATASET
+		
+		System.out.println("size TYPES: " +types.size());
+		System.out.println("size classesDataset: " +classesDataset.size());
+		// ELEGIR URI
+		int posUri = selectUriMatchClass(types, classesDataset);
+		
+		List<Property> pList = PropertyDAO.getAllPropertiesByClass(classesDataset.get(posUri).getIdClass());
+
+		getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+		
+		
+		qexec.close();		
+		Concept c = new Concept();
+		c.setProperties(pList);
+		c.setProperties(pList);
+		
+		return c;
+	}
+
+	private static void getPropertiesValues(String uri, List<Property> pList){
+		
+		//String apQuery = appendPropertiesInQuery(uri,pList,1); // Navegables, 0:no navegables
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
+			"   SELECT DISTINCT * " +
+			"   WHERE { " +		
+			"		<"+uri+"> ?property ?value ."+
+			"   } "+
+			"	LIMIT 200";
+		
+		Query query = QueryFactory.create(sparqlQueryString1);
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+
+		
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query); 
+		
+		List<String> urisList= new ArrayList<String>(), valuesList = new ArrayList<String>();
+		String propUri, propValue;
+		int cont=0;
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			propUri = qsol.get("property").toString();
+			System.out.println("|property: ");
+			System.out.println(propUri);
+						
+			propValue = qsol.get("value").toString();
+			System.out.println("|value: ");			
+			System.out.println(propValue);
+			
+			urisList.add(propUri);
+			valuesList.add(propValue);
+			cont++;
+		}
+				
+		for(int i=0; i < pList.size(); i++){
+			
+			for(int j=0; j < urisList.size(); j++){
+				
+				if(pList.get(i).getUri().compareTo(urisList.get(j)) == 0){
+					pList.get(i).setValue(valuesList.get(j));
+				}					
+			}			
+		}
+		
+		System.out.println("cant: " + cont);
+	}
+		
+	private static int selectUriMatchClass(List<String> types, List<Class> classesDataset){
+		int i=0;
+		boolean found = false;
+		for(i=0; i< types.size(); i++){
+			
+			for(int k = 0; k < classesDataset.size(); k++){
+				if(classesDataset.get(k).getUri().compareTo(types.get(i))==0){
+					found = true;
+					break;
+				}
+			}
+			
+			if(found) break;
+		}		
+		return i; 
+	}
+	
+	
+	
+	public static Concept searchTermByExactMatchUri(String cad, Dataset dataset){
 		
 		System.out.println(cad);
-		char []lowcad = cad.toLowerCase().toCharArray();
-		lowcad[0] = Character.toUpperCase(lowcad[0]);		
-		String cad2 = new String(lowcad);
 		
-		System.out.println(lowcad);
+		System.out.println("DATASET : " + dataset.getName());
 		
-		/*
-		 SELECT DISTINCT ?s1, ?label1
-FROM <http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3>
-WHERE {
-   ?s1   <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>   ?type1 .
-   ?s1   <http://www.w3.org/2000/01/rdf-schema#label>   ?label1 .
-   FILTER (CONTAINS ( UCASE(str(?label1)), "NEURON"))
-}
-		 */
+		String fromQ = "";
+		if(dataset!=null)
+			fromQ = "	FROM <" + dataset.getUri() + "> ";
 		
-		/*
-		 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-		PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-		PREFIX owl: <http://www.w3.org/2002/07/owl#> 
-		SELECT DISTINCT ?s1, ?label1
-		FROM <http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3>
-		WHERE {
-		   ?s1  rdf:type ?type1 .
-		   ?s1   <http://purl.org/dc/terms/title>  ?label1 .
-		   FILTER (UCASE(str(?label1)) = "MOTOR NEURON DISEASE")
-		}
-		LIMIT 100
-		 * */
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+						" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+						" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+			"	SELECT DISTINCT * " +
+			fromQ +
+			"	WHERE {"+
+			"	<" + cad + "> rdf:type ?type . " +
+			" 	<" + cad + "> ?property ?value ." +
+			"	<" + cad + "> <http://purl.org/dc/terms/title> ?label1 . " +
+			"	}"+
+			"	LIMIT 100";
+
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+	
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query);    
+	
+		// Informacion del resultado
 		
+		String uri = null;
+		String aux = null;	
+
+		List<Property> pList = new ArrayList<Property>();
+		Concept c = new Concept();
+		int i=0;
+		
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			if(i==0){
+				uri = qsol.get("s1").toString();
+				c.setUri(uri);
+				aux = qsol.get("label1").toString();
+				c.setName(aux);
+			}
+			
+			Property p = new Property();
+			
+			aux = qsol.get("property").toString();
+			p.setUri(aux);
+			aux = qsol.get("value").toString();
+			p.setValue(aux);
+	
+			i++;
+		} 
+	
+		// faltaria obtener la DEFINICION del concepto -> DEPENDE DE CADA DATASET
+		
+		qexec.close();			
+		c.setProperties(pList);
+		
+		return c;
+	}
+	
+	/****************************************************************
+	 * 		PARA DBPEDIA: LISTA DE TERMINOS POR COINCIDENCIA "EXACTA" O "SIMILAR"
+	 ****************************************************************/
+	
+	public static List<Concept> getRelatedTermsList(Concept cad, int cant, int posBio [], List<Dataset> datasetList){
+		
+		System.out.println(cad);
+		//char []lowcad = cad.toLowerCase().toCharArray();
+		//lowcad[0] = Character.toUpperCase(lowcad[0]);		
+		//String cad2 = new String(lowcad);
+		
+		//System.out.println(lowcad);
+				
 		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 						" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 						" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
@@ -82,39 +282,11 @@ WHERE {
 			"	WHERE {"+
 			"		?s1 rdf:type ?type1 . "+
 			"		?s1 <http://purl.org/dc/terms/title> ?label1 . "+
-			"	FILTER (UCASE(str(?label1)) = \"" + cad.toUpperCase() +"\")"+
+			//"	FILTER (UCASE(str(?label1)) = \"" + cad.toUpperCase() +"\")"+
 			"	}"+
 			"	LIMIT 100";
 		
-		/*
-		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
-									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
-									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
-		"   SELECT DISTINCT * " +
-		"   WHERE { " +				
-		"       ?x rdfs:label ?label . " +		
-		"		{ "+
-		"			?x rdf:type ?class . "+
-		"			?x rdf:type owl:Thing . "+
-		"		} "+
-		"		UNION"+
-		" 		{ "+
-		"			?x <http://dbpedia.org/ontology/wikiPageRedirects> ?redirected . "+
-		//"			OPTIONAL { }"+
-		"			?redirected rdf:type ?class . "+
-		"		} "+
-		"		UNION { "+
-		"			?x <http://dbpedia.org/ontology/wikiPageDisambiguates> ?amb . "+
-		"			?amb rdf:type ?type ."+
-		"		FILTER (CONTAINS(str(?type), \"http://dbpedia.org/ontology/\" ))"+		//http://dbpedia.org/ontology/Disease
-		"		}"+
-		"		FILTER ( ?label = \""+ cad2 +"\"@en ) " +
-		//"		FILTER regex(str(?x), \"http://dbpedia.org/resource/\" )"+
-		//"		FILTER (CONTAINS(str(?x), \"http://dbpedia.org/resource/\" )) "+
-		"		FILTER (CONTAINS(str(?x), \"http://dbpedia.org/\" )) "+
-		"   } ";
-		*/
-		
+				
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
@@ -145,17 +317,6 @@ WHERE {
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
-			
-			// el termino devuelto es el primer resultado de la busqueda por ahora	
-			/*
-		    if(i==0){		    	
-				uri = qsol.get("x").toString();
-				name = qsol.getLiteral("label").toString();
-				System.out.println("uri: " + uri);
-			    System.out.println("label: " + name);
-			    
-		    }
-		    */
 	    	
 			if(qsol.contains("class") && !qsol.contains("redirected") && !qsol.contains("amb")){				
 		    	//System.out.println("class type: " + qsol.get("x")); //uri
@@ -240,31 +401,34 @@ WHERE {
 		qexec.close();	
 		Concept c = new Concept();
 		c.setProperties(pList);
-		return c;
+		
+		return null;
 	}
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/*************************************************************************/
 	/* LISTA DE CONCEPTOS: COINCIDENCIA SIMILAR EN NOMBRE */
 	/*************************************************************************/
 
-	public static List<Concept> searchTermBySimilarName(String input){
+	public static List<Concept> searchTermBySimilarName(String input, Dataset dataset){
 		
+		System.out.println("DATASET : " + dataset.getName());
 		
-		/*
-		 * 
-		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
-				" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-				" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
-	"	SELECT DISTINCT * " +
-	"	FROM <http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3> "+
-	"	WHERE {"+
-	"		?s1 rdf:type ?type1 . "+
-	"		?s1 <http://purl.org/dc/terms/title> ?label1 . "+
-	"	FILTER (UCASE(str(?label1)) = \"" + cad.toUpperCase() +"\")"+
-	"	}"+
-	"	LIMIT 100";
-		*/
+		String fromQ = "";
+		if(dataset!=null)
+			fromQ = "	FROM <" + dataset.getUri() + "> ";
 		
 		System.out.println("TERMINO A BUSCAR: " + input);
 		
@@ -272,21 +436,20 @@ WHERE {
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
 									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
 				"   SELECT DISTINCT * " +
-				"	FROM <http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3>" +
+				fromQ +
 				"   WHERE { " +				
 				"       ?s <http://purl.org/dc/terms/title> ?label . " +		
 				"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
 				"   } "+
-				"	LIMIT 20";
-		
-		
+				"	LIMIT 5";
+				
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
 		
 		ResultSet results = qexec.execSelect();
-		ResultSetFormatter.out(System.out, results, query); 
+		//ResultSetFormatter.out(System.out, results, query); 
 		
 		List<Concept> concepts = new ArrayList<>();
 		String aux;
@@ -297,16 +460,16 @@ WHERE {
 			
 			Concept c = new Concept();
 			
-			aux = qsol.get("x").toString();
+			aux = qsol.get("s").toString();
 			System.out.println("uri: "+aux);
 			c.setUri(aux);
-			
-						
+									
 			aux = qsol.get("label").toString();
 			System.out.println("label: "+aux);
 			c.setName(aux);			
 			
 			concepts.add(c);
+			
 			i++;
 		}
 				
@@ -319,7 +482,12 @@ WHERE {
 	/*************************************************************************/
 
 	
-	public static List<Concept> searchTermByPropertyMatch(String input){
+	public static List<Concept> searchTermByPropertyMatch(String input, String dataset){
+		
+		
+		String fromQ = "";
+		if(dataset!=null)
+			fromQ = "	FROM <" + dataset + "> ";
 		
 		//String classesQuery = concatenateClassesForSimilarMatch(1);
 		
@@ -334,12 +502,12 @@ WHERE {
 		"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
 		"   } "+
 		"	LIMIT 20";
-		
 		*/
 		
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
 					"   SELECT DISTINCT * " +
+					fromQ +
 					"   WHERE { " +		
 					"		?s <http://purl.org/dc/terms/title> ?label . " +
 					"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
@@ -380,4 +548,103 @@ WHERE {
 							
 		return termsList;
 	}
+	
+	
+	/****************************************************************
+	 * 				VERSION 	FINAL
+	 * 		PARA DBPEDIA: OBTENER TERMINOS MAPPING y sus propiedades
+	 ****************************************************************/
+	
+	static public List<Concept> getMappingPropertiesValues(Concept term, int cant, int [] posBio, List<Dataset> datasetList){
+
+		//Buscar si dentro de las propiedades del recurso hay mapping a mesh
+		List<Property> pList = term.getProperties();
+		List<Concept> cList = null;
+		
+		for(int j=0; j < pList.size(); j++){
+			Property p = pList.get(j);
+			if(p.getIs_mapping() == 1){
+				Dataset dataset = DatasetDAO.getDatasetById(p.getTarget());
+				
+				if(dataset.getId() != 1){ // SOLO MAPPING A DATASETS DE BIO2RDF
+					/*
+					String input = p.getValue();
+					String dataset = null;
+									
+					switch(p.getTarget()){
+						case 2: dataset = "http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3";
+								break;
+						case 3: dataset = "http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3";	
+								break;
+						case 4: dataset = "http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3";	
+								break;
+					}
+					*/
+					
+					String inputUri = null;
+					switch(p.getTarget()){
+					
+						case 2: inputUri = "http://bio2rdf.org/mesh:" + p.getValue(); // MESH
+								break;
+						case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + p.getValue();	// PHARMGKB
+								break;
+						case 4: inputUri = "http://bio2rdf.org/ncbi:" + p.getValue();	// NCBI
+								break;
+					}
+					
+					Concept c = null;
+					
+					if(inputUri != null) 
+						c = searchTermByExactMatchUri(inputUri, dataset);
+					if(c != null) 
+						continue;
+					
+					//System.out.println("getMappingPropertiesValues : " +  dataset);
+					if(term !=null){
+						c = searchTermByExactMatch(term.name, dataset);
+					}
+					else System.out.println("Termino nulo D:");
+					
+					cList.add(c);
+				}
+			}		
+		}
+				
+		return cList;
+	}
+	
+	static public List<Concept> searchTermBySimilarName_Datasets(String input, int cant, int [] posBio, List<Dataset> datasetList){
+		
+		List<Concept> cList = new ArrayList<Concept>();
+		
+		for(int i=0; i < posBio.length; i++){
+			List<Concept> aux = searchTermBySimilarName(input, datasetList.get(posBio[i]));
+			cList.addAll(aux);
+		}
+
+		return cList;
+	}
+	
+	static public List<Concept> searchTermByExactMatch_Datasets(String input, List<Dataset> datasetList){
+		
+		List<Concept> cList = new ArrayList<Concept>();
+		
+		for(int i=0; i < datasetList.size() ; i++){
+			Dataset dat = datasetList.get(i);
+			if(dat.getId() != 1){ // DBPEDIA
+				if(!InputSearchProcessor.isUri(input)){
+					Concept aux = searchTermByExactMatch(input, dat);
+					cList.add(aux);
+				}
+				else { //es uri
+					Concept aux = searchTermByExactMatchUri(input, dat);
+					cList.add(aux);
+				}			
+			}
+		}
+
+		return cList;
+	}
+	
+	
 }

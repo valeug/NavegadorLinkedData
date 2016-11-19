@@ -127,7 +127,8 @@ public class DbpediaEndpoint {
 		List<String> uris = new ArrayList<String>();
 		List<String> types = new ArrayList<String>(); // clase del recurso
 		String aux = null;
-		String pattern = "http://dbpedia.org/ontology/"; 
+		String pattern1 = "http://dbpedia.org/ontology/"; 
+		String pattern2 = "http://www.w3.org/2002/07/owl#Thing";
 		
 		System.out.println("\nCLASES: \n");
 		while (results.hasNext())
@@ -144,12 +145,14 @@ public class DbpediaEndpoint {
 			    
 		    }
 		    */
-	    	
-			if(qsol.contains("class") && !qsol.contains("redirected") && !qsol.contains("amb")){				
+			System.out.println("entro :)");
+			if(qsol.contains("class") && !qsol.contains("redirected") && !qsol.contains("amb")){	
+				System.out.println("entro 11! ");
 		    	//System.out.println("class type: " + qsol.get("x")); //uri
 		    	//c.setDefinition(""+qsol.get("obodef"));		    	
 		    	aux = qsol.get("class").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia		    	
-		    	if(aux.contains(pattern)){
+		    	if(aux.contains(pattern1) || aux.contains(pattern2)){
+		    		System.out.println("entro 11! ");
 		    		System.out.println("class: " + aux);
 		    		types.add(aux);	
 		    		aux = qsol.get("x").toString(); //uri del recurso
@@ -159,9 +162,10 @@ public class DbpediaEndpoint {
 			}
 			else if(qsol.contains("redirected") && !qsol.contains("amb")){
 				//System.out.println("redirected type: " + qsol.get("redirected")); //uri			
-		    	
+				System.out.println("entro 21! ");
 				aux = qsol.get("class").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia
-		    	if(aux.contains(pattern)){	
+		    	if(aux.contains(pattern1) || aux.contains(pattern2)){	
+		    		System.out.println("entro 22! ");
 		    		System.out.println("class: " + aux);
 					types.add(aux);
 					aux = qsol.get("redirected").toString(); //uri del recurso
@@ -170,9 +174,10 @@ public class DbpediaEndpoint {
 			} 
 			else if(qsol.contains("amb")){
 				//System.out.println("ambiguos type: " + qsol.get("amb")); //uri
-				
+				System.out.println("entro 31! ");
 				aux = qsol.get("type").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia				
-				if(aux.contains(pattern)){	
+				if(aux.contains(pattern1) || aux.contains(pattern2)){	
+					System.out.println("entro 32! ");
 					System.out.println("class: " + aux);
 					types.add(aux);		
 					aux = qsol.get("amb").toString();
@@ -184,7 +189,15 @@ public class DbpediaEndpoint {
 			i++;
 		} 
 		
+		//mostrar las clases en type (verificar si se lleno)
+		System.out.println("clases del recurso! ");
+		for(int w=0; w<types.size(); w++){
+			System.out.println(types.get(w));
+		}
+		
 		int posUri = -1;
+		
+		System.out.println("Types size dbpedia: " + types.size());
 		if(uris.size()>0 && types.size()>0){
 			posUri = selectUriMatchClass(types,classesDataset); //obtener uri cuya clase este definida en DBPedia (creo que tambien deberia pasarle "label" y verificar que sean iguales)
 		}
@@ -210,7 +223,7 @@ public class DbpediaEndpoint {
 		// 
 		
 		System.out.println(" \nMY PROPERTIES! ");
-		getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+		String conceptName = getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
 		
 		System.out.println(" \nPROPERTIES! WITH VALUES");
 		for(int h=0; h< pList.size(); h++){
@@ -227,11 +240,12 @@ public class DbpediaEndpoint {
 	    
 		qexec.close();	
 		Concept c = new Concept();
+		c.setName(conceptName);
 		c.setProperties(pList);
 		return c;
 	}
 	
-	private static void getPropertiesValues(String uri, List<Property> pList){
+	private static String getPropertiesValues(String uri, List<Property> pList){
 		
 		//String apQuery = appendPropertiesInQuery(uri,pList,1); // Navegables, 0:no navegables
 		
@@ -239,8 +253,10 @@ public class DbpediaEndpoint {
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
 									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
 			"   SELECT DISTINCT * " +
-			"   WHERE { " +		
+			"   WHERE { " +	
+			//"       <"+uri+"> rdfs:label ?label . " +	
 			"		<"+uri+"> ?property ?value ."+
+			"		FILTER (langMatches(lang(?value), \"en\"))"+
 			"   } "+
 			"	LIMIT 200";
 		
@@ -254,6 +270,7 @@ public class DbpediaEndpoint {
 		List<String> urisList= new ArrayList<String>(), valuesList = new ArrayList<String>();
 		String propUri, propValue;
 		int cont=0;
+		String name = null;
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
@@ -268,6 +285,10 @@ public class DbpediaEndpoint {
 			
 			urisList.add(propUri);
 			valuesList.add(propValue);
+			
+			if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label")==0){
+				name = propValue;
+			}
 			cont++;
 		}
 				
@@ -282,6 +303,10 @@ public class DbpediaEndpoint {
 		}
 		
 		System.out.println("cant: " + cont);
+		
+		System.out.println("***NAME DBPEDIA: " + name);
+		
+		return name;
 	}
 	
 	

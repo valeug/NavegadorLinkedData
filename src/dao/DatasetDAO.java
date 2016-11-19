@@ -21,6 +21,40 @@ public class DatasetDAO {
         return con;
     }
 	
+    
+    public static Dataset getDatasetById(int id){
+    	
+    	String query = "SELECT * "
+    				+ " FROM dataset"
+    				+ " WHERE id_dataset=" + id;
+    	
+    	Dataset dataset = null;
+    	
+    	try {
+    		myConnec = getConnection();
+    		myStat = myConnec.createStatement();
+			ResultSet myres = myStat.executeQuery(query);
+			
+			while(myres.next()){
+				dataset = new Dataset();
+				dataset.setId(myres.getInt("id_dataset"));
+				dataset.setName(myres.getString("name"));
+				dataset.setDescription(myres.getString("description"));
+				dataset.setSparqlEndpoint(myres.getString("sparql_endpoint"));
+				dataset.setUri(myres.getString("uri"));
+				dataset.setStatus(myres.getInt("status"));			
+				//System.out.println("Nombre: " + myres.getString("name"));
+			}
+			myres.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return dataset;
+    }
+
     public static List<Dataset> getAllDatasets(){
     	
     	String query = "SELECT * FROM dataset";
@@ -40,6 +74,7 @@ public class DatasetDAO {
 				dataset.setDescription(myres.getString("description"));
 				dataset.setSparqlEndpoint(myres.getString("sparql_endpoint"));
 				dataset.setStatus(myres.getInt("status"));
+				dataset.setUri(myres.getString("uri"));
 				datasetList.add(dataset);
 				System.out.println("Nombre: " + myres.getString("name"));
 			}
@@ -74,6 +109,8 @@ public class DatasetDAO {
 				dataset.setName(myres.getString("name"));
 				dataset.setDescription(myres.getString("description"));
 				dataset.setSparqlEndpoint(myres.getString("sparql_endpoint"));
+				dataset.setStatus(myres.getInt("status"));
+				dataset.setUri(myres.getString("uri"));
 				datasetList.add(dataset);				
 				//System.out.println("Nombre: " + myres.getString("name"));
 			}

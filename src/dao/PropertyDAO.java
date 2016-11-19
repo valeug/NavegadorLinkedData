@@ -44,7 +44,8 @@ public class PropertyDAO {
 				p.setId(myres.getInt("id_property"));
 				p.setName(myres.getString("name"));
 				p.setUri(myres.getString("uri"));
-				p.setIs_mapping(myres.getInt("is_mapping"));		
+				p.setIs_mapping(myres.getInt("is_mapping"));	
+				p.setTarget(myres.getInt("target"));
 				pList.add(p);
 				//System.out.println("Nombre: " + myres.getString("name"));
 			}
