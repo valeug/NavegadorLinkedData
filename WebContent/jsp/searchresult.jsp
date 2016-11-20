@@ -34,40 +34,43 @@
 		</div>
 	</form>
 	
-	Term: ${term.name}<br>
-	Description: ${term.definition}<br>
-	<!-- 
-	<c:forEach var="i" begin="1" end="5" step="1">
-		<c:out value="${i}" />
-	</c:forEach>
-	 -->
-	<br>
-	<br>
-	Propiedades:<br> 
-	<div>
-		<c:forEach items="${term.properties}" var="i">
-			<!-- 
-			<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
-			 -->
-			<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
-			<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
-			<a href="#" class="term" ><c:out value="${i.value}" /></a><br>
+	<div class="container">
+		Term: ${term.name}<br>
+		<!--  
+		Description: ${term.definition}<br>
+		-->
+		<!-- 
+		<c:forEach var="i" begin="1" end="5" step="1">
+			<c:out value="${i}" />
 		</c:forEach>
+		 -->
+		<br>
+		<br>
+		Propiedades:<br> 
+		<div>
+			<c:forEach items="${term.properties}" var="i">
+				<!-- 
+				<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
+				 -->
+				<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
+				<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
+				<a href="#" class="term" ><c:out value="${i.value}" /></a><br>
+			</c:forEach>
+		</div>
+		<br>
+		<br>
+		Terminos enlazados:<br> 
+		<c:forEach items="${term.linkedTerms}" var="i">
+			<c:out value="${i.name}" /><br>
+		</c:forEach>
+		<div id="mydiv"></div>
+		<br>
+		<br>
+		Terminos similares:<br> 
+		<c:forEach items="${term.similarTerms}" var="i">
+			<c:out value="${i.name}" /><br>
+		</c:forEach>
+		<div id="mydiv"></div>
 	</div>
-	<br>
-	<br>
-	Terminos enlazados:<br> 
-	<c:forEach items="${term.linkedTerms}" var="i">
-		<c:out value="${i.name}" /><br>
-	</c:forEach>
-	<div id="mydiv"></div>
-	<br>
-	<br>
-	Terminos similares:<br> 
-	<c:forEach items="${term.similarTerms}" var="i">
-		<c:out value="${i.name}" /><br>
-	</c:forEach>
-	<div id="mydiv"></div>
-	
 </body>
 </html>
