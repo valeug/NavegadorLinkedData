@@ -48,20 +48,34 @@
 		<br>
 		Propiedades:<br> 
 		<div>
+			Descriptivas<br>
 			<c:forEach items="${term.properties}" var="i">
 				<!-- 
 				<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
 				 -->
+				<c:if test="${i.value != null}">
+					<c:out value="${i.uri}" /><br>
+					<c:out value="${i.name}" /><br>
+					<c:out value="${i.value}" /><br>
+				</c:if>
+			</c:forEach>
+			
+			Referenciables<br>
+			<!--  
+			<c:forEach items="${term.properties}" var="i">
 				<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
 				<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
 				<a href="#" class="term" ><c:out value="${i.value}" /></a><br>
 			</c:forEach>
+			-->
+			
 		</div>
 		<br>
 		<br>
 		Terminos enlazados:<br> 
 		<c:forEach items="${term.linkedTerms}" var="i">
 			<c:out value="${i.name}" /><br>
+			<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
 		</c:forEach>
 		<div id="mydiv"></div>
 		<br>
@@ -69,6 +83,7 @@
 		Terminos similares:<br> 
 		<c:forEach items="${term.similarTerms}" var="i">
 			<c:out value="${i.name}" /><br>
+			<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
 		</c:forEach>
 		<div id="mydiv"></div>
 	</div>
