@@ -75,6 +75,7 @@ public class DbpediaEndpoint {
 		lowcad[0] = Character.toUpperCase(lowcad[0]);		
 		String cad2 = new String(lowcad);
 		
+		/* 	ENCONTRAR URI DEL RECURSO  */
 		System.out.println(lowcad);
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
@@ -247,8 +248,8 @@ public class DbpediaEndpoint {
 	
 	private static String getPropertiesValues(String uri, List<Property> pList){
 		
-		//String apQuery = appendPropertiesInQuery(uri,pList,1); // Navegables, 0:no navegables
-		
+		String apQuery = appendPropertiesInQuery(uri,pList,1); // Navegables, 0:no navegables
+		/*
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
 									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
@@ -256,9 +257,32 @@ public class DbpediaEndpoint {
 			"   WHERE { " +	
 			//"       <"+uri+"> rdfs:label ?label . " +	
 			"		<"+uri+"> ?property ?value ."+
-			"		FILTER (langMatches(lang(?value), \"en\"))"+
 			"   } "+
 			"	LIMIT 200";
+		*/
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+				"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
+		"   SELECT DISTINCT * " +
+		"   WHERE { " +	
+		"		{"+
+		"			OPTIONAL { "+
+		"					<"+uri+">  rdfs:label ?label . " +
+		"					FILTER (langMatches(lang(?label), \"en\"))" +
+		"			}"+
+		"			OPTIONAL { "+
+		"					<"+uri+">  <http://dbpedia.org/ontology/abstract>  ?abstract . " +
+		"					FILTER (langMatches(lang(?abstract), \"en\")) " +
+		"			}"+
+		"		}"+
+		"		UNION"+
+		"		{"+
+		"			<"+uri+"> ?property ?value ."+
+		"   	} "+
+		"	}"+
+		"	LIMIT 100";
+		
 		
 		Query query = QueryFactory.create(sparqlQueryString1);
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://dbpedia.org/sparql/", query);
@@ -271,24 +295,66 @@ public class DbpediaEndpoint {
 		String propUri, propValue;
 		int cont=0;
 		String name = null;
+		String abst = null;
+		
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
 			
-			propUri = qsol.get("property").toString();
-			System.out.println("|property: ");
-			System.out.println(propUri);
-						
-			propValue = qsol.get("value").toString();
-			System.out.println("|value: ");			
-			System.out.println(propValue);
 			
-			urisList.add(propUri);
-			valuesList.add(propValue);
-			
-			if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label")==0){
-				name = propValue;
+			if(qsol.contains("property") && qsol.contains("value")){	
+				System.out.println("entro ***! ");
+
+				propUri = qsol.get("property").toString();
+				System.out.println("|property: ");
+				System.out.println(propUri);
+							
+				propValue = qsol.get("value").toString();
+				System.out.println("|value: ");			
+				System.out.println(propValue);
+				
+				urisList.add(propUri);
+				valuesList.add(propValue);
+		    		    	
 			}
+			
+			if(qsol.contains("label")){
+				System.out.println("entro label***! ");
+				
+				name = "" + qsol.get("label");
+				System.out.println(name);
+			}
+			if(qsol.contains("abstract")){
+				System.out.println("entro abstract***! ");
+				abst = "" + qsol.get("abstract");
+				System.out.println(abst);
+			}
+			
+			
+			/*
+			if(propValue.contains("@")){ // tiene lenguaje
+				if(propValue.matches("@en")){ // ingles
+					System.out.println("agrego en ingles!!!!!!");	
+					urisList.add(propUri);
+					valuesList.add(propValue);
+				}				
+			}
+			else if(!propValue.contains("@")){
+				urisList.add(propUri);
+				valuesList.add(propValue);
+			}
+			*/		
+			
+			
+			/*
+			if(qsol.get("label") != null){
+				name = "" + qsol.get("label");
+			}
+			if(qsol.get("abstract") != null){
+				abst = "" + qsol.get("abstract");
+			}
+			*/
+			
 			cont++;
 		}
 				
@@ -296,9 +362,20 @@ public class DbpediaEndpoint {
 			
 			for(int j=0; j < urisList.size(); j++){
 				
-				if(pList.get(i).getUri().compareTo(urisList.get(j)) == 0){
-					pList.get(i).setValue(valuesList.get(j));
-				}					
+				if(pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") != 0){
+						if(pList.get(i).getUri().compareTo(urisList.get(j)) == 0){						
+							pList.get(i).setValue(valuesList.get(j));
+						}		
+					
+				}
+				else if (pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
+					System.out.println("name final: " + name);
+					pList.get(i).setValue(name);
+				}
+				else if (pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") == 0){
+					System.out.println("abstract final: " + abst);
+					pList.get(i).setValue(abst);
+				}
 			}			
 		}
 		

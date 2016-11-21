@@ -58,19 +58,29 @@ public class SearchController {
 		
 		/**/
 		int posBio [] = new int [5]; //posiciones de datasets de bio2rdf en la lista de datasets(datasetList)
-		int cant = 0, found = 0;
-		
+		int cant = 0, found = 0, seleccDbpedia=0;
+
+		/*
+		if(!InputSearchProcessor.isUri(input)){
+			
+		}
+		*/
 		for(int i=0; i<datasetList.size(); i++){
 			int idDat = datasetList.get(i).getId();
 			if(idDat == 1){ //DBPedia
 				if(!InputSearchProcessor.isUri(input)){					
 					term = DbpediaEndpoint.searchTermByExactMatch(input); 
 				}
-				else {					
-					term = DbpediaEndpoint.searchByUri(input);					
+				else {		
+					// DBPEDIA
+					if(input.matches("http://dbpedia.org/")){
+						term = DbpediaEndpoint.searchByUri(input);
+					}
+											
 				}	
 				if(term!=null) found = 1;
 				//break;
+				seleccDbpedia = 1;
 			}
 			else { //Bio2RDF
 				//term = Bio2RdfEndpoint.searchTermByExactMatch(input);
@@ -87,28 +97,34 @@ public class SearchController {
 			List <Concept> exactTerms = new ArrayList<Concept>();
 			
 			//Se seleccionaron datasets de Bio2rdf y Dbpedia		
-			
-			if(found==1){ // Se encontro el termino en DBPedia -> se busca lista de terminos en Bio2rdf
+			if(seleccDbpedia == 1){
+				if(found==1){ // Se encontro el termino en DBPedia -> se busca lista de terminos en Bio2rdf
 
-				//printConcept(term);
-				System.out.println("term name: " + term.name);
-				System.out.println("term properties: " + term.getProperties().size());
-				System.out.println("dataset LIST: " + datasetList.size());
-				
-				termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
-				similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, cant, posBio, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
-				
-				
-				if(term==null) System.out.println("term null!");
-				
-				//System.out.println("termsMappingList size: " + termsMappingList.size());
-				System.out.println("ANTES term properties: " + term.getProperties().size());
-				addInfoToTerm(term, termsMappingList, similarTerms);
+					//printConcept(term);
+					System.out.println("term name: " + term.name);
+					System.out.println("term properties: " + term.getProperties().size());
+					System.out.println("dataset LIST: " + datasetList.size());
+					
+					termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
+					similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, cant, posBio, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
+					
+					
+					if(term==null) System.out.println("term null!");
+					
+					//System.out.println("termsMappingList size: " + termsMappingList.size());
+					System.out.println("ANTES term properties: " + term.getProperties().size());
+					addInfoToTerm(term, termsMappingList, similarTerms);
+				}
+				else {
+					// No se encontro el concepto en DBPediam, se busca en bio2rdf
+					exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match			
+				}
 			}
 			else {
-				// No se encontro el concepto en DBPediam, se busca en bio2rdf
-				exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match			
+				// No se selecciono, se busca en bio2rdf
+				exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match	 //VERIFICAR SI SE DEBE DEVOLVER LISTA O CONCEPTO
 			}
+			
 		}
 		
 		/*
@@ -143,6 +159,7 @@ public class SearchController {
 		}
 		*/
 		
+		//term.setName("basurita");
 		printConcept(term);
 		
 		return term; //DEVUELVE TERMINO SOLO DE DBPEDIA

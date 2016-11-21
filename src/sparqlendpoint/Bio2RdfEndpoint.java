@@ -237,18 +237,24 @@ public class Bio2RdfEndpoint {
 			QuerySolution qsol = results.nextSolution();	
 			
 			if(i==0){
-				uri = qsol.get("s1").toString();
-				c.setUri(uri);
-				aux = qsol.get("label1").toString();
-				c.setName(aux);
+				if(qsol.contains("label1")){
+					aux = qsol.get("label1").toString();
+					c.setName(aux);
+				}				
 			}
 			
 			Property p = new Property();
 			
-			aux = qsol.get("property").toString();
-			p.setUri(aux);
-			aux = qsol.get("value").toString();
-			p.setValue(aux);
+			if(qsol.contains("label1")){
+				aux = qsol.get("label1").toString();
+				p.setUri(aux);
+			}
+			
+			if(qsol.contains("value")){
+				aux = qsol.get("value").toString();
+				p.setValue(aux);
+			}
+			
 	
 			i++;
 		} 
@@ -626,13 +632,15 @@ public class Bio2RdfEndpoint {
 		for(int i=0; i < datasetList.size() ; i++){
 			Dataset dat = datasetList.get(i);
 			if(dat.getId() != 1){ // DBPEDIA
-				if(!InputSearchProcessor.isUri(input)){
+				if(!InputSearchProcessor.isUri(input)){					
 					Concept aux = searchTermByExactMatch(input, dat);
-					cList.add(aux);
+					cList.add(aux);					
 				}
 				else { //es uri
-					Concept aux = searchTermByExactMatchUri(input, dat);
-					cList.add(aux);
+					if(input.matches("http://bio2rdf.org/")){
+						Concept aux = searchTermByExactMatchUri(input, dat);
+						cList.add(aux);
+					}
 				}			
 			}
 		}

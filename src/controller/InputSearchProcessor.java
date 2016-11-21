@@ -14,7 +14,12 @@ public class InputSearchProcessor {
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);
 		
-		if(m.find()) return true;
+		if(m.find()){
+			System.out.println("es uri!");
+			return true;
+		}
+
+		System.out.println("NO es uri!");
 		return false;
 	}
 }
