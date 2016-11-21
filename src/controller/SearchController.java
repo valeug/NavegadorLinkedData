@@ -60,72 +60,91 @@ public class SearchController {
 		int posBio [] = new int [5]; //posiciones de datasets de bio2rdf en la lista de datasets(datasetList)
 		int cant = 0, found = 0, seleccDbpedia=0;
 
-		/*
+		
 		if(!InputSearchProcessor.isUri(input)){
 			
-		}
-		*/
-		for(int i=0; i<datasetList.size(); i++){
-			int idDat = datasetList.get(i).getId();
-			if(idDat == 1){ //DBPedia
-				if(!InputSearchProcessor.isUri(input)){					
-					term = DbpediaEndpoint.searchTermByExactMatch(input); 
+			for(int i=0; i<datasetList.size(); i++){
+				int idDat = datasetList.get(i).getId();
+				if(idDat == 1){ //DBPedia
+					if(!InputSearchProcessor.isUri(input)){					
+						term = DbpediaEndpoint.searchTermByExactMatch(input); 
+					}
+					
+					if(term!=null) found = 1;
 				}
-				else {		
-					// DBPEDIA
-					if(input.matches("http://dbpedia.org/")){
+				else { //Bio2RDF
+					//term = Bio2RdfEndpoint.searchTermByExactMatch(input);
+					posBio[cant++] = i;
+				}
+			}
+			
+			
+			
+			if(cant>0){ // Se seleccionaron datasets de Bio2RDF
+				
+				List <Concept> termsMappingList = new ArrayList<Concept>();		
+				List <Concept> similarTerms = new ArrayList<Concept>();
+				List <Concept> exactTerms = new ArrayList<Concept>();
+				
+				//Se seleccionaron datasets de Bio2rdf y Dbpedia		
+					if(found==1){ // Se encontro el termino en DBPedia -> se busca lista de terminos en Bio2rdf
+
+						//printConcept(term);
+						System.out.println("term name: " + term.name);
+						System.out.println("term properties: " + term.getProperties().size());
+						System.out.println("dataset LIST: " + datasetList.size());
+						
+						termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
+						similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, cant, posBio, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
+						
+						
+						if(term==null) System.out.println("term null!");
+						
+						//System.out.println("termsMappingList size: " + termsMappingList.size());
+						System.out.println("ANTES term properties: " + term.getProperties().size());
+						addInfoToTerm(term, termsMappingList, similarTerms);
+					}
+					else {
+						// No se encontro el concepto en DBPediam, se busca en bio2rdf
+						exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match			
+					}
+				
+			}
+		}
+		else {
+			System.out.println("BUSCA URI!");
+			
+			System.out.println("input: " + input);
+			int idDatasetMatch = findUriOrigin(input);
+			System.out.println("idDatasetMatch: " + idDatasetMatch);	
+			
+			System.out.println("datasetList.size(): " + datasetList.size());
+			for(int i=0; i<datasetList.size(); i++){
+				int idDat = datasetList.get(i).getId();
+				if(idDat == 1){ //DBPedia					
+					if(input.contains("http://dbpedia.org/")){
 						term = DbpediaEndpoint.searchByUri(input);
 					}
-											
-				}	
-				if(term!=null) found = 1;
-				//break;
-				seleccDbpedia = 1;
-			}
-			else { //Bio2RDF
-				//term = Bio2RdfEndpoint.searchTermByExactMatch(input);
-				posBio[cant++] = i;
-			}
+				}
+				else if(idDat == idDatasetMatch){ //Bio2RDF
+					System.out.println("dataset origin uri: " + idDat);
+					if(input.contains("http://bio2rdf.org/")){
+						System.out.println("entro a uri bio2rdf");
+						term = Bio2RdfEndpoint.searchTermByExactMatchUri(input, datasetList.get(i));
+						
+						if(term == null) System.out.println("null wtf");
+						else System.out.println("NOT null wtf");
+						
+						break;
+					}
+					System.out.println("hallo termino by uri BIO2RDF ;) " + idDat);
+				}
+			}	
+			
 		}
 		
-		
-		
-		if(cant>0){ // Se seleccionaron datasets de Bio2RDF
-			
-			List <Concept> termsMappingList = new ArrayList<Concept>();		
-			List <Concept> similarTerms = new ArrayList<Concept>();
-			List <Concept> exactTerms = new ArrayList<Concept>();
-			
-			//Se seleccionaron datasets de Bio2rdf y Dbpedia		
-			if(seleccDbpedia == 1){
-				if(found==1){ // Se encontro el termino en DBPedia -> se busca lista de terminos en Bio2rdf
-
-					//printConcept(term);
-					System.out.println("term name: " + term.name);
-					System.out.println("term properties: " + term.getProperties().size());
-					System.out.println("dataset LIST: " + datasetList.size());
-					
-					termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
-					similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, cant, posBio, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
-					
-					
-					if(term==null) System.out.println("term null!");
-					
-					//System.out.println("termsMappingList size: " + termsMappingList.size());
-					System.out.println("ANTES term properties: " + term.getProperties().size());
-					addInfoToTerm(term, termsMappingList, similarTerms);
-				}
-				else {
-					// No se encontro el concepto en DBPediam, se busca en bio2rdf
-					exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match			
-				}
-			}
-			else {
-				// No se selecciono, se busca en bio2rdf
-				exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match	 //VERIFICAR SI SE DEBE DEVOLVER LISTA O CONCEPTO
-			}
-			
-		}
+		if(term == null) System.out.println("TERM ES NULO DDDD:");
+		else System.out.println("lo encontro :)");
 		
 		/*
 		//buscar si usuario selecciono dbpedia
@@ -163,6 +182,23 @@ public class SearchController {
 		printConcept(term);
 		
 		return term; //DEVUELVE TERMINO SOLO DE DBPEDIA
+	}
+	private static int findUriOrigin(String input){
+		
+		if(input.contains("http://bio2rdf.org/mesh")){			
+			return 2;
+		}
+		else if(input.contains("http://bio2rdf.org/pharmgkb")){
+			return 3;
+		}
+		else if(input.contains("http://bio2rdf.org/uniprot") || input.contains("http://bio2rdf.org/go") || input.contains("http://bio2rdf.org/goa")){
+			return 4;
+		}
+		else if(input.contains("http://bio2rdf.org/ncbigene")){
+			return 5;
+		}
+		
+		return -1;
 	}
 	
 	

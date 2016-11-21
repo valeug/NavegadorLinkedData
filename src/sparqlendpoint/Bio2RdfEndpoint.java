@@ -221,7 +221,7 @@ public class Bio2RdfEndpoint {
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
 	
 		ResultSet results = qexec.execSelect();
-		//ResultSetFormatter.out(System.out, results, query);    
+		ResultSetFormatter.out(System.out, results, query);    
 	
 		// Informacion del resultado
 		
