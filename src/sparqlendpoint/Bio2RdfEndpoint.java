@@ -204,6 +204,7 @@ public class Bio2RdfEndpoint {
 		if(dataset!=null)
 			fromQ = "	FROM <" + dataset.getUri() + "> ";
 		
+			/*
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 						" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 						" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
@@ -215,13 +216,38 @@ public class Bio2RdfEndpoint {
 			"	<" + cad + "> <http://purl.org/dc/terms/title> ?label1 . " +
 			"	}"+
 			"	LIMIT 100";
-
+			*/
+		
+		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+									" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+									" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+				"   SELECT DISTINCT * " +
+				"   WHERE { " +	
+				"		{"+
+				"			OPTIONAL { "+
+				"					<"+cad+">  <http://purl.org/dc/terms/title> ?title . " +
+				"			}"+
+				"			OPTIONAL { "+
+				"					<"+cad+">  <http://purl.org/dc/terms/description>  ?description . " +
+				"			}"+
+				"			OPTIONAL { "+
+				"					<"+cad+">  rdfs:label ?label . " +
+				"					FILTER (langMatches(lang(?label), \"en\")) " +
+				"			}"+
+				"		}"+
+				"		UNION"+
+				"		{"+
+				"			<"+cad+"> ?property ?value ."+
+				"   	} "+
+				"	}"+
+				"	LIMIT 100";
+		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
 	
 		ResultSet results = qexec.execSelect();
-		ResultSetFormatter.out(System.out, results, query);    
+		//ResultSetFormatter.out(System.out, results, query);    
 	
 		// Informacion del resultado
 		
@@ -231,30 +257,47 @@ public class Bio2RdfEndpoint {
 		List<Property> pList = new ArrayList<Property>();
 		Concept c = new Concept();
 		int i=0;
-		
+		String name = null;
+		String descr = null;
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
 			
-			if(i==0){
-				if(qsol.contains("label1")){
-					aux = qsol.get("label1").toString();
+			
+			if(qsol.contains("title")){
+				aux = qsol.get("title").toString();
+				c.setName(aux);
+				name = aux;
+			}
+			else if(qsol.contains("label")){
+					aux = qsol.get("label").toString();
 					c.setName(aux);
 				}				
+			
+			if(qsol.contains("description")){
+				aux = qsol.get("description").toString();
+				c.setDefinition(aux);
+				descr = aux;
 			}
 			
-			Property p = new Property();
-			
-			if(qsol.contains("label1")){
-				aux = qsol.get("label1").toString();
+						
+			if(qsol.contains("property") && qsol.contains("value")){	
+				System.out.println("entro ***! ");
+				
+				Property p = new Property();
+				
+				aux = qsol.get("property").toString();
+				System.out.println("|property: ");
+				System.out.println(aux);
 				p.setUri(aux);
-			}
-			
-			if(qsol.contains("value")){
+							
 				aux = qsol.get("value").toString();
+				System.out.println("|value: ");			
+				System.out.println(aux);
 				p.setValue(aux);
+				p.setName("gg "+i);
+				pList.add(p);		    		    	
 			}
-			
 	
 			i++;
 		} 

@@ -56,7 +56,7 @@
 				<c:if test="${i.value != null}">
 					<c:out value="${i.uri}" /><br>
 					<c:out value="${i.name}" /><br>
-					<c:out value="${i.value}" /><br>
+					<c:out value="${i.value}" /><br>--------------<br>
 				</c:if>
 			</c:forEach>
 			
