@@ -146,37 +146,6 @@ public class SearchController {
 		if(term == null) System.out.println("TERM ES NULO DDDD:");
 		else System.out.println("lo encontro :)");
 		
-		/*
-		//buscar si usuario selecciono dbpedia
-		for(int i=0; i< datasetList.size(); i++){
-			System.out.println(datasetList.get(i).getName());			
-			if(datasetList.get(i).getId() == 1){ // usuario selecciono dataset dbpedia					
-				if(!InputSearchProcessor.isUri(input)){ //o en el request podria asignarle 4 al optradio
-					//DbpediaEndpoint.JenaSparqlQuery(input);
-					//term = DbpediaEndpoint.searchTermByExactMatch(input);
-					term = Bio2RdfEndpoint.searchTermByExactMatch(input,null);					
-				}
-				else{
-					
-					term = DbpediaEndpoint.searchByUri(input);
-				}
-			}			
-		}
-		*/
-		// datasets de bio2rdf
-
-		/*
-		if(input!=null){
-			if(InputSearchProcessor.isUri(input)==1){
-				//System.out.println("es uri :)");
-				term = SearchController.getConcept(input,1);
-			}
-			else{
-				System.out.println("es cadena :)");
-				term = SearchController.getConcept(input,2);
-			}			
-		}
-		*/
 		
 		//term.setName("basurita");
 		printConcept(term);

@@ -255,15 +255,17 @@ public class Bio2RdfEndpoint {
 		String aux = null;	
 
 		List<Property> pList = new ArrayList<Property>();
+		List<String> classTypeList = new ArrayList<String>();
 		Concept c = new Concept();
+		
 		int i=0;
 		String name = null;
 		String descr = null;
+	
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
-			
-			
+
 			if(qsol.contains("title")){
 				aux = qsol.get("title").toString();
 				c.setName(aux);
@@ -282,19 +284,27 @@ public class Bio2RdfEndpoint {
 			
 						
 			if(qsol.contains("property") && qsol.contains("value")){	
+				
+				
+				
 				System.out.println("entro ***! ");
 				
 				Property p = new Property();
 				
 				aux = qsol.get("property").toString();
+				
 				System.out.println("|property: ");
 				System.out.println(aux);
 				p.setUri(aux);
-							
+				
+				if(aux.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){					
+					classTypeList.add(qsol.get("value").toString());
+				}
 				aux = qsol.get("value").toString();
 				System.out.println("|value: ");			
 				System.out.println(aux);
 				p.setValue(aux);
+				
 				p.setName("gg "+i);
 				pList.add(p);		    		    	
 			}
@@ -302,7 +312,39 @@ public class Bio2RdfEndpoint {
 			i++;
 		} 
 	
-		// faltaria obtener la DEFINICION del concepto -> DEPENDE DE CADA DATASET
+		System.out.println("classTypeList size: " + classTypeList.size());
+		/*
+		for(int t=0; t<classTypeList.size(); t++){
+			System.out.println(t+") " + classTypeList.get(t));
+		}
+		*/
+		
+		// obtener las propiedades de las clases del recurso
+		List<Property> propsTotal = new ArrayList<Property>();
+		System.out.println("LAS CLASES del recurso: baia baia");
+		for(int w=0; w < classTypeList.size(); w++){
+			System.out.println("clase "+w +": " + classTypeList.get(w));
+			List<Property> props = PropertyDAO.getAllPropertiesByClassUri(uri);
+			propsTotal.addAll(props);
+		}
+		
+		System.out.println("pList size ANTES: " + pList.size());
+		// asignar aquellas propiedades que hagan match
+		boolean found = false;
+		for(int k=0; k < pList.size(); k++){
+			String pUri = pList.get(k).getUri();
+			for(int h=0; h<propsTotal.size(); h++){
+				if(pUri.compareTo(propsTotal.get(h).getUri())==0){
+					found = true;
+					break;
+				}
+			}
+			if(!found) 
+				pList.remove(k);
+			found = false;
+		}
+
+		System.out.println("pList size ANTES: " + pList.size());
 		
 		qexec.close();			
 		c.setProperties(pList);
