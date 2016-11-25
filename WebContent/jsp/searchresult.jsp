@@ -35,57 +35,86 @@
 	</form>
 	
 	<div class="container">
-		Term: ${term.name}<br>
-		<!--  
-		Description: ${term.definition}<br>
-		-->
-		<!-- 
-		<c:forEach var="i" begin="1" end="5" step="1">
-			<c:out value="${i}" />
-		</c:forEach>
-		 -->
-		<br>
-		<br>
-		Propiedades:<br> 
-		<div>
-			Descriptivas<br>
-			<c:forEach items="${term.properties}" var="i">
+		<div class = "row"> 
+			<div class="col-md-12 term-info-row" >
+				Term: ${term.name}<br>
+				<!--  
+				Description: ${term.definition}<br>
+				-->
 				<!-- 
-				<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
+				<c:forEach var="i" begin="1" end="5" step="1">
+					<c:out value="${i}" />
+				</c:forEach>
 				 -->
-				<c:if test="${i.value != null}">
-					<c:out value="${i.uri}" /><br>
-					<c:out value="${i.name}" /><br>
-					<c:out value="${i.value}" /><br>--------------<br>
-				</c:if>
-			</c:forEach>
-			
-			Referenciables<br>
-			<!--  
-			<c:forEach items="${term.properties}" var="i">
-				<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
-				<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
-				<a href="#" class="term" ><c:out value="${i.value}" /></a><br>
-			</c:forEach>
-			-->
-			
+				<br>
+				<br>
+			</div>
 		</div>
-		<br>
-		<br>
-		Terminos enlazados:<br> 
-		<c:forEach items="${term.linkedTerms}" var="i">
-			<c:out value="${i.name}" /><br>
-			<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
-		</c:forEach>
-		<div id="mydiv"></div>
-		<br>
-		<br>
-		Terminos similares:<br> 
-		<c:forEach items="${term.similarTerms}" var="i">
-			<c:out value="${i.name}" /><br>
-			<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
-		</c:forEach>
-		<div id="mydiv"></div>
+		<div class = "row"> 
+			<div class="col-md-12 property-info-row" >
+				Propiedades:<br> 
+			</div>
+		</div>
+		<div class = "row"> 
+			<div class="col-md-12 desc-info-row" >
+				Descriptivas<br>
+				<ul class="list-group">
+					<c:forEach items="${term.properties}" var="i">
+						<!-- 
+						<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
+						 -->
+						<c:if test="${i.value != null}">
+							<li class="list-group-item">						
+								<!-- <c:out value="${i.uri}" /><br> -->
+								<c:out value="${i.name}" /><br>
+								<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+									<img src="${i.value}}" alt="Smiley face" >
+								</c:if>
+								<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+									<c:out value="${i.value}" />
+								</c:if>		
+							</li>
+						</c:if>
+					</c:forEach>
+				</ul>
+			</div>
+		</div>
+		<div class = "row"> 
+			<div class="col-md-12 ref-info-row" >
+				Referenciables<br>
+				<!--  
+				<c:forEach items="${term.properties}" var="i">
+					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
+					<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
+					<a href="#" class="term" ><c:out value="${i.value}" /></a><br>
+				</c:forEach>
+				-->			
+				<br>
+				<br>
+			</div>
+		</div>
+		<div class = "row"> 
+			<div class="col-md-12 en-info-row" >
+				Terminos enlazados:<br> 
+				<c:forEach items="${term.linkedTerms}" var="i">
+					<c:out value="${i.name}" /><br>
+					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
+				</c:forEach>
+				<div id="mydiv"></div>
+				<br>
+				<br>
+			</div>
+		</div>
+		<div class = "row"> 
+			<div class="col-md-12 sim-info-row" >
+				Terminos similares:<br> 
+				<c:forEach items="${term.similarTerms}" var="i">
+					<c:out value="${i.name}" /><br>
+					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
+				</c:forEach>
+				<div id="mydiv"></div>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

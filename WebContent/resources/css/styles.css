@@ -78,3 +78,36 @@ body {
 	margin-top: 40px;
 	margin-bottom: 40px;
 }
+
+
+.term-info-row {
+	border-radius: 10px;
+	background-color: #DABFDE;
+}
+
+.property-info-row {
+	border-radius: 10px;
+	background-color: #FFAAA5;
+}
+
+.desc-info-row {
+	border-radius: 10px;
+	background-color: #FFAAA5;
+}
+
+.ref-info-row {
+	border-radius: 10px;
+	background-color: #FFAAA5;
+}
+
+.en-info-row{
+	border-radius: 10px;
+	background-color: #FF8B94;
+}
+
+.sim-info-row{
+	border-radius: 10px;
+	background-color: #B3E8FF;
+}
+
+
