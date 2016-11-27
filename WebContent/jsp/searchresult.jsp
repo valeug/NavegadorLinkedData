@@ -101,8 +101,10 @@
 					<c:out value="${i.name}" /><br>
 					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
 					-->
-					<a href="#" style="display: none;" class="linked-t-uris" ><c:out value="${i.uri}" /><br></a>
-					<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
+					<li class="list-group-item">
+                         <a href="#" style="display: none;" class="linked-t-uris" ><c:out value="${i.uri}" /><br></a>
+                         <a href="#" class="term" ><c:out value="${i.name}" /></a><br>
+                    </li>
 				</c:forEach>
 				<div id="mydiv"></div>
 				<br>

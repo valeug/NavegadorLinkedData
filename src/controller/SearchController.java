@@ -95,7 +95,7 @@ public class SearchController {
 						System.out.println("dataset LIST: " + datasetList.size());
 						
 						termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
-						similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, cant, posBio, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
+						similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
 						
 						
 						if(term==null) System.out.println("term null!");
@@ -216,9 +216,12 @@ public class SearchController {
 		List<Concept> tlist = null;
 		String input = request.getParameter("concept");
 		
+		 List<Dataset> datasetList = DatasetDAO.getDatasetByStatus(1);
+		 
 		if(searchType==2){
 			//tlist = DbpediaEndpoint.searchTermBySimilarName(input);
-			tlist = Bio2RdfEndpoint.searchTermBySimilarName(input, null);
+			//tlist = Bio2RdfEndpoint.searchTermBySimilarName(input, null);
+			tlist = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input,datasetList);
 		}
 		else if(searchType == 3){
 			//tlist = DbpediaEndpoint.searchTermByPropertyMatch(input);

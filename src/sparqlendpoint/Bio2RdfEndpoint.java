@@ -694,7 +694,7 @@ public class Bio2RdfEndpoint {
 		return cList;
 	}
 	
-	static public List<Concept> searchTermBySimilarName_Datasets(String input, int cant, int [] posBio, List<Dataset> datasetList){
+	static public List<Concept> searchTermBySimilarName_Datasets(String input, List<Dataset> datasetList){
 		
 		List<Concept> cList = new ArrayList<Concept>();
 		

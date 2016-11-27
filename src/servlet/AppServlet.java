@@ -63,7 +63,7 @@ public class AppServlet extends HttpServlet {
 				System.out.println("LABEL: " + termList.get(i).getName());
 			}
 			*/
-			
+			session.setAttribute("optradio", "" + 1);
 			request.setAttribute("termList", termList);
 			request.setAttribute("optradio", "1");
 			view = "termslistresult.jsp";
