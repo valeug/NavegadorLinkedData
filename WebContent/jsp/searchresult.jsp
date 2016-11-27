@@ -97,8 +97,12 @@
 			<div class="col-md-12 en-info-row" >
 				Terminos enlazados:<br> 
 				<c:forEach items="${term.linkedTerms}" var="i">
+					<!--   
 					<c:out value="${i.name}" /><br>
 					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
+					-->
+					<a href="#" style="display: none;" class="linked-t-uris" ><c:out value="${i.uri}" /><br></a>
+					<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
 				</c:forEach>
 				<div id="mydiv"></div>
 				<br>
@@ -108,10 +112,14 @@
 		<div class = "row"> 
 			<div class="col-md-12 sim-info-row" >
 				Terminos similares:<br> 
-				<c:forEach items="${term.similarTerms}" var="i">
-					<c:out value="${i.name}" /><br>
-					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
-				</c:forEach>
+				<ul class="list-group">
+					<c:forEach items="${term.similarTerms}" var="i">
+						<li class="list-group-item">
+							<a href="#" style="display: none;" class="linked-t-uris" ><c:out value="${i.uri}" /><br></a>
+							<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
+						</li>
+					</c:forEach>
+				</ul>
 				<div id="mydiv"></div>
 			</div>
 		</div>

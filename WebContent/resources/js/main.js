@@ -29,8 +29,12 @@ $(document).ready(function() {
 	// al dar click, se agrega el termino a la barra de busqueda 
 	$(".term").click(function(){
 	    alert("The term was clicked.");
-		var uri = $(this).text();
-	    $("#searchbox").val(uri);
+		var parent = $(this).parent();
+		console.log(parent);
+		alert(parent.text());
+		var sib = parent.find( ".linked-t-uris" );
+	    $("#searchbox").val(sib.text());
+	    $("#searchbox").click();
 	});
 	
 	
