@@ -225,7 +225,7 @@ public class SearchController {
 		}
 		else if(searchType == 3){
 			//tlist = DbpediaEndpoint.searchTermByPropertyMatch(input);
-			tlist = Bio2RdfEndpoint.searchTermByPropertyMatch(input, null);
+			tlist = Bio2RdfEndpoint.searchTermByPropertyMatch_Datasets(input, datasetList);
 		}
 				
 		return tlist;		

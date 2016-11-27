@@ -561,12 +561,12 @@ public class Bio2RdfEndpoint {
 	/*************************************************************************/
 
 	
-	public static List<Concept> searchTermByPropertyMatch(String input, String dataset){
+public static List<Concept> searchTermByPropertyMatch(String input, Dataset dataset){
 		
 		
 		String fromQ = "";
 		if(dataset!=null)
-			fromQ = "	FROM <" + dataset + "> ";
+			fromQ = "	FROM <" + dataset.getUri() + "> ";
 		
 		//String classesQuery = concatenateClassesForSimilarMatch(1);
 		
@@ -583,15 +583,31 @@ public class Bio2RdfEndpoint {
 		"	LIMIT 20";
 		*/
 		
+		/*
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
 					"   SELECT DISTINCT * " +
 					fromQ +
 					"   WHERE { " +		
 					"		?s <http://purl.org/dc/terms/title> ?label . " +
-					"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
+					"		?s ?property ?value . "+
+					"	    FILTER (CONTAINS ( UCASE(str(?value)), \"" + input.toUpperCase() + "\")) " +
 					"   } " +
-					"LIMIT 20";
+					"LIMIT 5";
+		*/
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+				"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
+		"   SELECT DISTINCT * " +
+		fromQ +
+		"   WHERE { " +				
+		"       ?s <http://purl.org/dc/terms/title> ?label . " +
+		"		?s <http://purl.org/dc/terms/description> ?value"+
+		"	    FILTER (CONTAINS ( UCASE(str(?value)), \"" + input.toUpperCase() + "\")) " +
+		"   } "+
+		"	LIMIT 5";
+		
 					
 		
 		System.out.println(sparqlQueryString1);
@@ -599,7 +615,7 @@ public class Bio2RdfEndpoint {
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
 		
 		ResultSet results = qexec.execSelect();
-		ResultSetFormatter.out(System.out, results, query);
+		//ResultSetFormatter.out(System.out, results, query);
 				
 				
 		List<Concept> termsList = new ArrayList<Concept>();		
@@ -609,22 +625,28 @@ public class Bio2RdfEndpoint {
 		{
 			QuerySolution qsol = results.nextSolution();	
 
-			if(qsol.contains("x") && qsol.contains("label")){				
+			if(qsol.contains("s") && qsol.contains("value") ){				
 				Concept c = new Concept();
 				
-		    	aux = qsol.get("x").toString();	   	
+		    	aux = qsol.get("s").toString();	   	
 		    	c.setUri(aux);
 		    	System.out.println("resource uri: " + aux);
+		    	
 		    	
 		    	aux = qsol.get("label").toString();	   	
 		    	c.setName(aux);
 		    	System.out.println("resource label: " + aux);
 		    	
+		    	aux = qsol.get("value").toString();	   	
+		    	c.setDefinition(aux);
+		    	System.out.println("resource descr: " + aux);
+		    	
 		    	termsList.add(c);		    			    		    	
 			}
 			
 		} 
-							
+		
+		System.out.println("Property match - termList size: " + termsList.size());
 		return termsList;
 	}
 	
@@ -730,6 +752,22 @@ public class Bio2RdfEndpoint {
 			}
 		}
 
+		return cList;
+	}
+	
+	static public List<Concept> searchTermByPropertyMatch_Datasets(String input, List<Dataset> datasetList){
+		
+		List<Concept> cList = new ArrayList<Concept>();
+		
+		for(int i=0; i < datasetList.size(); i++){
+			Dataset dat = datasetList.get(i);
+			if(dat.getId() != 1){ // DBPEDIA
+				List<Concept> aux = searchTermByPropertyMatch(input, dat);
+				cList.addAll(aux);
+			}
+			
+		}
+		
 		return cList;
 	}
 	
