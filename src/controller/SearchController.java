@@ -114,6 +114,7 @@ public class SearchController {
 		else {
 			System.out.println("BUSCA URI!");
 			
+			/*
 			System.out.println("input: " + input);
 			int idDatasetMatch = findUriOrigin(input);
 			System.out.println("idDatasetMatch: " + idDatasetMatch);	
@@ -140,6 +141,35 @@ public class SearchController {
 					System.out.println("hallo termino by uri BIO2RDF ;) " + idDat);
 				}
 			}	
+			*/
+			
+			if(input.contains("http://bio2rdf.org/")){
+				int idDatasetMatch = findUriOrigin(input);
+				
+				System.out.println("idDatasetMatch: " + idDatasetMatch);				
+				System.out.println("datasetList.size(): " + datasetList.size());
+				
+				for(int i=0; i<datasetList.size(); i++){
+					Dataset dat = datasetList.get(i);					
+					if(dat.getId() == idDatasetMatch){ // el dataset del uri clickeado si esta seleccionado -> si se puede navegar a ese dataset de Bio2RDF
+						System.out.println("dataset origin uri: " + dat.getId());
+					
+						System.out.println("entro a uri bio2rdf");
+						term = Bio2RdfEndpoint.searchTermByExactMatchUri(input, dat);
+						
+						if(term == null) System.out.println("null wtf");
+						else System.out.println("NOT null wtf");
+						
+						break;						
+					}
+				}
+			}
+			else if(input.contains("http://dbpedia.org/")){
+				//SI ES TERMINO
+				term = DbpediaEndpoint.searchByUri(input);
+				
+				//SI ES CLASE
+			}
 			
 		}
 		
