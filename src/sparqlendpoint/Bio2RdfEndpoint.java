@@ -333,28 +333,34 @@ public class Bio2RdfEndpoint {
 		System.out.println("propsTotal size DESPUES: " + propsTotal.size());
 		// asignar aquellas propiedades que hagan match
 		boolean found = false;
+		List<Property> pFinal = new ArrayList<Property>();
 		for(int k=0; k < pList.size(); k++){
 			String pUri = pList.get(k).getUri();
-			System.out.println("pUri: " + pUri);
+			//System.out.println("pUri: " + pUri);
 			for(int h=0; h<propsTotal.size(); h++){
 				//System.out.println("prop(h): "+propsTotal.get(h).getUri());
 				if(pUri.compareTo(propsTotal.get(h).getUri())==0){
 					System.out.println("/n/n/nprop is mapping: " + propsTotal.get(h).getIs_mapping());
+					System.out.println("pUri: " + pUri);
+					System.out.println("prop(h): "+propsTotal.get(h).getUri());					
 					pList.get(k).setIs_mapping(propsTotal.get(h).getIs_mapping()); //mapping
 					pList.get(k).setName(propsTotal.get(h).getName()); //name
-					found = true;
+					pFinal.add(pList.get(k));
+					//found = true;
 					break;
 				}
 			}
+			/*
 			if(!found) 
 				pList.remove(k);
 			found = false;
+			*/
 		}
 
 		System.out.println("pList size DESPUES: " + pList.size());
-		
+		System.out.println("pFinal size DESPUES: " + pFinal.size());
 		qexec.close();			
-		c.setProperties(pList);
+		c.setProperties(pFinal);
 		
 		return c;
 	}
