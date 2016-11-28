@@ -155,7 +155,11 @@ public class SearchController {
 						System.out.println("dataset origin uri: " + dat.getId());
 					
 						System.out.println("entro a uri bio2rdf");
+						// si no es goa
 						term = Bio2RdfEndpoint.searchTermByExactMatchUri(input, dat);
+						
+						//si es goa 
+						
 						
 						if(term == null) System.out.println("null wtf");
 						else System.out.println("NOT null wtf");

@@ -305,7 +305,7 @@ public class Bio2RdfEndpoint {
 				System.out.println(aux);
 				p.setValue(aux);
 				
-				p.setName("gg "+i);
+				//p.setName("gg "+i);
 				pList.add(p);		    		    	
 			}
 	
@@ -324,17 +324,24 @@ public class Bio2RdfEndpoint {
 		System.out.println("LAS CLASES del recurso: baia baia");
 		for(int w=0; w < classTypeList.size(); w++){
 			System.out.println("clase "+w +": " + classTypeList.get(w));
-			List<Property> props = PropertyDAO.getAllPropertiesByClassUri(uri);
+			List<Property> props = PropertyDAO.getAllPropertiesByClassUri(classTypeList.get(w));
+			System.out.println("props size : " + props.size());
 			propsTotal.addAll(props);
 		}
 		
 		System.out.println("pList size ANTES: " + pList.size());
+		System.out.println("propsTotal size DESPUES: " + propsTotal.size());
 		// asignar aquellas propiedades que hagan match
 		boolean found = false;
 		for(int k=0; k < pList.size(); k++){
 			String pUri = pList.get(k).getUri();
+			System.out.println("pUri: " + pUri);
 			for(int h=0; h<propsTotal.size(); h++){
+				//System.out.println("prop(h): "+propsTotal.get(h).getUri());
 				if(pUri.compareTo(propsTotal.get(h).getUri())==0){
+					System.out.println("/n/n/nprop is mapping: " + propsTotal.get(h).getIs_mapping());
+					pList.get(k).setIs_mapping(propsTotal.get(h).getIs_mapping()); //mapping
+					pList.get(k).setName(propsTotal.get(h).getName()); //name
 					found = true;
 					break;
 				}
@@ -344,7 +351,7 @@ public class Bio2RdfEndpoint {
 			found = false;
 		}
 
-		System.out.println("pList size ANTES: " + pList.size());
+		System.out.println("pList size DESPUES: " + pList.size());
 		
 		qexec.close();			
 		c.setProperties(pList);

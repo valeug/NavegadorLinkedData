@@ -46,8 +46,7 @@ public class PropertyDAO {
 				p.setUri(myres.getString("uri"));
 				p.setIs_mapping(myres.getInt("is_mapping"));	
 				p.setTarget(myres.getInt("target"));
-				pList.add(p);
-				//System.out.println("Nombre: " + myres.getString("name"));
+				pList.add(p);				
 			}
 			myres.close();
 			
@@ -69,8 +68,9 @@ public class PropertyDAO {
 											"  FROM class_x_property" + 
 											"  WHERE id_class IN (SELECT id_class "+
 																	"  FROM class" + 
-																	"  WHERE uri = " + uri + "))";
+																	"  WHERE uri = \"" + uri + "\" ))";
 		
+		System.out.println("QUERY DAO: " + query);
     	List<Property> pList = new ArrayList<Property>();
     	Property p = null;
 
@@ -88,6 +88,7 @@ public class PropertyDAO {
 				p.setIs_mapping(myres.getInt("is_mapping"));	
 				p.setTarget(myres.getInt("target"));
 				pList.add(p);
+				System.out.println("DAO - Nombre: " + p.getName());
 				//System.out.println("Nombre: " + myres.getString("name"));
 			}
 			myres.close();
