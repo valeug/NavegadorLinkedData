@@ -358,15 +358,30 @@ public class DbpediaEndpoint {
 			cont++;
 		}
 				
+		//pList esta vacio, se llenara con los valores de uriList y valueList
 		for(int i=0; i < pList.size(); i++){
 			
 			for(int j=0; j < urisList.size(); j++){
 				
 				if(pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") != 0){
-						if(pList.get(i).getUri().compareTo(urisList.get(j)) == 0){						
-							pList.get(i).setValue(valuesList.get(j));
-						}		
-					
+						if(pList.get(i).getUri().compareTo(urisList.get(j)) == 0){	
+							if(pList.get(i).getIs_mapping() == 1 && pList.get(i).getTarget()>1){ // mapping a dataset en Bio2rdf
+								String inputUri = null;
+								switch(pList.get(i).getTarget()){								
+									case 2: inputUri = "http://bio2rdf.org/mesh:" + valuesList.get(j); // MESH
+											break;
+									case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + valuesList.get(j);	// PHARMGKB
+											break;
+									case 4: inputUri = "http://bio2rdf.org/goa:" + valuesList.get(j);	// NCBI
+											break;
+									case 5: inputUri = "http://bio2rdf.org/ncbi:" + valuesList.get(j);	// NCBI
+											break;
+								}
+								
+								pList.get(i).setValue(inputUri);
+							}
+							else pList.get(i).setValue(valuesList.get(j));
+						}					
 				}
 				else if (pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
 					System.out.println("name final: " + name);

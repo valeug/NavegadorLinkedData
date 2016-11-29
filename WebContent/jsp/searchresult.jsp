@@ -50,11 +50,13 @@
 				<br>
 			</div>
 		</div>
+		<!--  
 		<div class = "row"> 
 			<div class="col-md-12 property-info-row" >
 				Propiedades:<br> 
 			</div>
 		</div>
+		-->
 		<div class = "row"> 
 			<div class="col-md-12 desc-info-row" >
 				Descriptivas<br>
@@ -71,7 +73,12 @@
 									<img src="${i.value}}" alt="Smiley face" >
 								</c:if>
 								<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-									<c:out value="${i.value}" />
+									<c:if test="${i.is_mapping == 1}">
+										<a href="#" onclick=""><c:out value="${i.value}" /></a>
+									</c:if>
+									<c:if test="${i.is_mapping != 1}">
+										<c:out value="${i.value}" />
+									</c:if>									
 								</c:if>		
 							</li>
 						</c:if>
