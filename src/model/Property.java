@@ -9,8 +9,15 @@ public class Property {
 	String value;
 	int is_mapping;
 	int target;
+	int show_default; //configuration
 	
 	
+	public int getShow_default() {
+		return show_default;
+	}
+	public void setShow_default(int show_default) {
+		this.show_default = show_default;
+	}
 	public int getTarget() {
 		return target;
 	}
@@ -23,7 +30,6 @@ public class Property {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
 	
 	public int getId() {
 		return id;

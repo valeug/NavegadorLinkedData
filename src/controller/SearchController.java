@@ -545,6 +545,7 @@ public class SearchController {
 			for(int i=0; i<c.getProperties().size(); i++){
 				System.out.println(i+") uri: " + c.getProperties().get(i).getUri());
 				System.out.println(i+") value: " + c.getProperties().get(i).getValue());
+				System.out.println(i+") show_default: " + c.getProperties().get(i).getShow_default());
 			}
 		}
 		else System.out.println("Propiedades null :/");

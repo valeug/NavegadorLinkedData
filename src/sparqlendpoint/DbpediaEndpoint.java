@@ -212,7 +212,7 @@ public class DbpediaEndpoint {
 		System.out.println("Concept Class:" + types.get(posUri));
 		System.out.println("\n******************************");
 		
-		/* AHORA DEVUELVO SOLO UNA CLASE, PODRIA DEVOLVER VARIAS (EJ: BONE Y ANATOMICAL STRUCTURE)*/
+		/* AHORA DEVUELVO  propiedades de SOLO UNA CLASE, PODRIA DEVOLVER VARIAS (EJ: BONE Y ANATOMICAL STRUCTURE)*/
 		
 		List<Property> pList = PropertyDAO.getAllPropertiesByClass(classesDataset.get(posUri).getIdClass());
 		
@@ -224,15 +224,20 @@ public class DbpediaEndpoint {
 		// 
 		
 		System.out.println(" \nMY PROPERTIES! ");
-		String conceptName = getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+		System.out.println("pList size: "+ pList.size());
+		String conceptName = getAllPropertiesValues(uris.get(posUri),pList);
+		//String conceptName = getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
 		
 		System.out.println(" \nPROPERTIES! WITH VALUES");
+		System.out.println("pList size: "+ pList.size());
+		
+		/*
 		for(int h=0; h< pList.size(); h++){
 			System.out.println(pList.get(h).getUri());		
 			System.out.println(pList.get(h).getName());	
 			System.out.println(pList.get(h).getValue());			
 		}
-		
+		*/
 	    // obtener clase a la que pertenece (?class)			    
 	    // consultar en la BD las propiedades que corresponden a la clase 	    
 	    // PROPIEDADES TIPO 1: navegables	    	    
@@ -241,7 +246,7 @@ public class DbpediaEndpoint {
 	    
 		qexec.close();	
 		Concept c = new Concept();
-		c.setName(conceptName);
+		//c.setName(conceptName);
 		c.setProperties(pList);
 		return c;
 	}
@@ -399,6 +404,200 @@ public class DbpediaEndpoint {
 		System.out.println("***NAME DBPEDIA: " + name);
 		
 		return name;
+	}
+	
+	private static String getAllPropertiesValues(String uri, List<Property> pList){
+		
+		String apQuery = appendPropertiesInQuery(uri,pList,1); // Navegables, 0:no navegables
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+				"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
+		"   SELECT DISTINCT * " +
+		"   WHERE { " +	
+		"		{"+
+		"			OPTIONAL { "+
+		"					<"+uri+">  rdfs:label ?label . " +
+		"					FILTER (langMatches(lang(?label), \"en\"))" +
+		"			}"+
+		"			OPTIONAL { "+
+		"					<"+uri+">  <http://dbpedia.org/ontology/abstract>  ?abstract . " +
+		"					FILTER (langMatches(lang(?abstract), \"en\")) " +
+		"			}"+
+		"		}"+
+		"		UNION"+
+		"		{"+
+		"			<"+uri+"> ?property ?value ."+
+		"   	} "+
+		"	}"+
+		"	LIMIT 100";
+				
+		Query query = QueryFactory.create(sparqlQueryString1);
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://dbpedia.org/sparql/", query);
+
+		
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query); 
+		
+		List<Property> propTotal = new ArrayList<Property>();
+		List<String> urisList= new ArrayList<String>(), valuesList = new ArrayList<String>();
+		String propUri, propValue;
+		int cont=0;
+		String name = null;
+		String abst = null;
+		
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			
+			if(qsol.contains("property") && qsol.contains("value")){	
+				
+				
+				System.out.println("entro ***! ");
+
+				propUri = qsol.get("property").toString();
+				System.out.println("|property: ");
+				System.out.println(propUri);
+							
+				propValue = qsol.get("value").toString();
+				System.out.println("|value: ");			
+				System.out.println(propValue);
+				
+				urisList.add(propUri);
+				valuesList.add(propValue);
+				
+				int pos = findProperty(propUri,pList);
+				
+				if(pos == -1){ // no encontro la porpiedad en la lista de propiedades del concepto
+					//agrega propiedad
+					Property p = new Property();
+					p.setUri(propUri);
+					p.setValue(propValue);
+					p.setName("Agregados");
+					p.setShow_default(0);
+					p.setIs_mapping(0);
+					pList.add(p);		
+					
+					System.out.println("---PROPIEDAD: "+ propUri);
+					System.out.println("---Show Default: "+p.getShow_default());
+				}
+				else { // encontro propiedad -> se actuazlin valores
+					pList.get(pos).setValue(propValue);
+					pList.get(pos).setShow_default(1);
+					
+					if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && 
+							propUri.compareTo("http://dbpedia.org/ontology/abstract") != 0){
+						
+						if(pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()>1){ // mapping a dataset en Bio2rdf
+							String inputUri = null;
+							switch(pList.get(pos).getTarget()){								
+								case 2: inputUri = "http://bio2rdf.org/mesh:" + propValue; // MESH
+										break;
+								case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + propValue;	// PHARMGKB
+										break;
+								case 4: inputUri = "http://bio2rdf.org/goa:" + propValue;	// NCBI
+										break;
+								case 5: inputUri = "http://bio2rdf.org/ncbi:" + propValue;	// NCBI
+										break;
+							}							
+						}							
+					}
+					else if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
+						//System.out.println("name final: " + name);
+						pList.get(pos).setValue(name);
+					}
+					else if(propUri.compareTo("http://dbpedia.org/ontology/abstract") == 0){
+						//System.out.println("abstract final: " + abst);
+						pList.get(pos).setValue(abst);
+					}
+				}
+				
+			}
+			
+			if(qsol.contains("label")){
+				System.out.println("entro label***! ");
+				
+				name = "" + qsol.get("label");
+				System.out.println(name);
+			}
+			if(qsol.contains("abstract")){
+				System.out.println("entro abstract***! ");
+				abst = "" + qsol.get("abstract");
+				System.out.println(abst);
+			}
+			
+			
+			cont++;
+		}
+				
+		//pList esta vacio, se llenara con los valores de uriList y valueList
+		
+			
+//		for(int i=0; i < pList.size(); i++){
+//			for(int j=0; j < propTotal.size(); j++){
+//				
+//				if(pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") != 0){
+//						
+//						
+//						//Configurado para que se muestre por defecto
+//						if(pList.get(i).getUri().compareTo(propTotal.get(j).getUri()) == 0){ 
+//							propTotal.get(j).setShow_default(1);
+//							propTotal.get(j).setDescription(pList.get(i).getDescription());
+//							propTotal.get(j).setName(pList.get(i).getName());
+//							propTotal.get(j).setIs_mapping(is_mapping);
+//						}
+//						else {
+//							p.setShow_default(0);
+//						}
+//						
+//						/* copiar los valores de las propiedades*/
+//						if(pList.get(i).getIs_mapping() == 1 && pList.get(i).getTarget()>1){ // mapping a dataset en Bio2rdf
+//							String inputUri = null;
+//							switch(pList.get(i).getTarget()){								
+//								case 2: inputUri = "http://bio2rdf.org/mesh:" + valuesList.get(j); // MESH
+//										break;
+//								case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + valuesList.get(j);	// PHARMGKB
+//										break;
+//								case 4: inputUri = "http://bio2rdf.org/goa:" + valuesList.get(j);	// NCBI
+//										break;
+//								case 5: inputUri = "http://bio2rdf.org/ncbi:" + valuesList.get(j);	// NCBI
+//										break;
+//							}
+//							
+//							pList.get(i).setValue(inputUri);
+//						}
+//						else{
+//							//pList.get(i).setValue(valuesList.get(j));
+//						}
+//									
+//				}
+//				else if (pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
+//					System.out.println("name final: " + name);
+//					pList.get(i).setValue(name);
+//				}
+//				else if (pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") == 0){
+//					System.out.println("abstract final: " + abst);
+//					pList.get(i).setValue(abst);
+//				}
+//			}			
+//		}
+		
+		System.out.println("cant: " + cont);
+		
+		System.out.println("***NAME DBPEDIA: " + name);
+		
+		return name;
+	}
+	
+	private static int findProperty(String puri, List<Property>pList){
+		
+		for(int i=0; i<pList.size(); i++){
+			if(pList.get(i).getUri().compareTo(puri) == 0 && pList.get(i).getName().compareTo("Agregados")!=0) 
+				return i;
+		}
+		
+		return -1;
 	}
 	
 	
