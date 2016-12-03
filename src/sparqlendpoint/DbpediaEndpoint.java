@@ -594,6 +594,7 @@ public class DbpediaEndpoint {
 		
 		for(int i=0; i<pList.size(); i++){
 			if(pList.get(i).getUri().compareTo(puri) == 0 && pList.get(i).getName().compareTo("Agregados")!=0) 
+				System.out.println("i: "+i);
 				return i;
 		}
 		

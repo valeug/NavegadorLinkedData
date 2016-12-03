@@ -35,12 +35,11 @@
 	          <h4 class="modal-title">Seleccionar fuentes de los datos</h4>
 	        </div>
 	        <div class="modal-body">
-	          	<div id="ontologydiv" >
-					<table class="table" cellspacing="0" id="ontologytable">
+	          	<div id="propertydiv" >
+					<table class="table" cellspacing="0" id="propertytable">
 						<tr>
-							<th scope="col">Name</th>
-							<th scope="col">Description</th>
-							<th scope="col">Select</th>
+							<th scope="col">URI</th>
+							<th scope="col">Seleccionar</th>
 						</tr>
 					</table>	    
 			   	</div>	
@@ -100,25 +99,48 @@
 		<div class = "row"> 
 			<div class="col-md-12 desc-info-row" >
 				Descriptivas<br>
-				<ul class="list-group">
+				<ul id="prop-list" class="list-group">
 					<c:forEach items="${term.properties}" var="i">
 						<!-- 
 						<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
 						 -->
 						<c:if test="${i.value != null}">
 							<c:if test="${i.show_default==1}">
-								<li class="list-group-item">						
-									uri:<c:out value="${i.uri}" /><br>
-									nombre:<c:out value="${i.name}" /><br>
+								<li class="list-group-item">
+									uri:
+									<p><c:out value="${i.uri}" /></p>
+									nombre:		
+									<p><c:out value="${i.name}" /></p>
+									<p style="display: none;"><c:out value="${i.show_default}" /></p>
 									<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
 										<img src="${i.value}}" alt="Smiley face" >
 									</c:if>
 									<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
 										<c:if test="${i.is_mapping == 1}">
-											<a href="#" onclick=""><c:out value="${i.value}" /></a>
+											<p><a href="#" onclick=""><c:out value="${i.value}" /></a></p>
 										</c:if>
 										<c:if test="${i.is_mapping != 1}">
-											<c:out value="${i.value}" />
+											<p><c:out value="${i.value}" /></p>
+										</c:if>									
+									</c:if>		
+								</li>
+							</c:if>
+							<c:if test="${i.show_default==0}">
+								<li class="list-group-item" style="display: none;">						
+									uri:
+									<p><c:out value="${i.uri}" /></p>
+									nombre:
+									<p><c:out value="${i.name}" /></p>
+									<p style="display: none;"><c:out value="${i.show_default}" /></p>
+									<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+										<img src="${i.value}}" alt="Smiley face" >
+									</c:if>
+									<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+										<c:if test="${i.is_mapping == 1}">
+											<p><a href="#" onclick=""><c:out value="${i.value}" /></a></p>
+										</c:if>
+										<c:if test="${i.is_mapping != 1}">
+											<p><c:out value="${i.value}" /></p>
 										</c:if>									
 									</c:if>		
 								</li>
@@ -175,5 +197,74 @@
 			</div>
 		</div>
 	</div>
+	
+	<script type="text/javascript">
+	
+	// Get the modal
+	var modal = document.getElementById('confModal');
+	
+	// Get the button that opens the modal
+	var btn = document.getElementById("confBtn");
+	
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+	
+	// Get the button that opens the modal
+	var btn = document.getElementById("confBtn");
+	
+	btn.onclick = function() {
+	    modal.style.display = "block";
+	    //
+	    //alert('x1');
+	    $("#propertydiv").hide();
+	    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
+	    //$.get('RetrieveOntologies',function(responseJson){
+	    	//alert('x2');
+			//if(responseJson!=null){					
+				$("#propertytable").find("tr:gt(0)").remove();
+				var table = $("#propertytable");
+				//alert('no entro');
+				//alert("gg");
+				var list = document.getElementById('prop-list');
+				console.log(list);
+				var elements = list.children;
+				console.log(elements);
+				var cont = 1;
+				$.each(elements, function(key, value){
+					/*
+					var rowNew = $("<tr><td></td><td></td></tr>");
+					alert(value['name']);
+					rowNew.children().eq(0).text(value['name']);
+					rowNew.children().eq(1).text(value['description']);
+					rowNew.appendTo(table);
+					*/
+					//alert('entro each');
+					//alert(value['name']);
+					var row = $("<tr />");
+					console.log(value);
+					console.log('p');
+					console.log(value.children[0].innerHTML);
+                    $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
+                    //$("<td />").text(value.children[3]}).appendTo(row); //FALTARIA INDICAR EL NOMBRE DEL DATASET   
+                    var show_default = value.children[2].innerHTML;
+                    if(show_default == 1){
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="checkboxList"/ checked="checked">'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                    else {
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="checkboxList"/>'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                    
+                    row.appendTo(table);
+                    cont = cont + 1;
+				});					
+
+			//}			
+		//});
+		$("#propertydiv").show();
+		
+	}
+	</script>
 </body>
 </html>
