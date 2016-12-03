@@ -62,5 +62,30 @@ $(document).ready(function() {
 	    });
 	});
 	
+	
+	//save selected ontologies
+	$("#updatePropBtn").click(function(){
+		var arr = [];
+		$("input:checkbox[name=new_checkboxList]:checked").each(function(){
+			var element = $(this);	
+			var itemList = element.closest('tr');
+			var uriProp = ""+itemList.children('td')[0].innerHTML;
+			var list = document.getElementById('prop-list');
+			
+			var elements = list.children;
+			//console.log(elements);
+			$.each(elements, function(key, value){
+				var uriPshow = ""+value.children[0].innerHTML; //uri de propiedad en la descripcion
+				//console.log(uriPshow);
+				if(uriProp == uriPshow){
+					//console.log('lo agrego');
+					value.classList.remove("not-show-default");
+					value.classList.add("show-default");
+					value.style.display = "block";
+				}
+			});
+		});
+	});
+	
 			
 });

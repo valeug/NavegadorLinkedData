@@ -45,7 +45,7 @@
 			   	</div>	
 	        </div>
 	        <div class="modal-footer">
-	          	<button type="submit" class="btn btn-default" id="saveOntoBtn">Aceptar</button>
+	          	<button type="submit" class="btn btn-default" id="updatePropBtn">Aceptar</button>
 	          	<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 	        </div>
 	      </div>
@@ -106,7 +106,7 @@
 						 -->
 						<c:if test="${i.value != null}">
 							<c:if test="${i.show_default==1}">
-								<li class="list-group-item">
+								<li class="list-group-item show-default">
 									uri:
 									<p><c:out value="${i.uri}" /></p>
 									nombre:		
@@ -126,7 +126,7 @@
 								</li>
 							</c:if>
 							<c:if test="${i.show_default==0}">
-								<li class="list-group-item" style="display: none;">						
+								<li class="list-group-item not-show-default" style="display: none;">						
 									uri:
 									<p><c:out value="${i.uri}" /></p>
 									nombre:
@@ -226,9 +226,9 @@
 				//alert('no entro');
 				//alert("gg");
 				var list = document.getElementById('prop-list');
-				console.log(list);
+				//console.log(list);
 				var elements = list.children;
-				console.log(elements);
+				//console.log(elements);
 				var cont = 1;
 				$.each(elements, function(key, value){
 					/*
@@ -241,18 +241,18 @@
 					//alert('entro each');
 					//alert(value['name']);
 					var row = $("<tr />");
-					console.log(value);
-					console.log('p');
-					console.log(value.children[0].innerHTML);
+					//console.log(value);
+					//console.log('p');
+					//console.log(value.children[0].innerHTML);
                     $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
                     //$("<td />").text(value.children[3]}).appendTo(row); //FALTARIA INDICAR EL NOMBRE DEL DATASET   
                     var show_default = value.children[2].innerHTML;
                     if(show_default == 1){
-                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="checkboxList"/ checked="checked">'; 
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList"/ checked="checked">'; 
                     	$("<td />").html(inpStr).appendTo(row);
                     }
                     else {
-                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="checkboxList"/>'; 
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
                     	$("<td />").html(inpStr).appendTo(row);
                     }
                     
