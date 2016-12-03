@@ -57,6 +57,16 @@
 	<!-- CONTENT -->
 	<div class ="center-vertical">
 		<div class="container">
+			<form action="Configuration" method="get">
+				<div class = "row">	
+					<div class="col-md-8 home-page-modal">		
+						<!--  
+						<button  type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">Configuracion avanzada</button>
+						-->
+						<input id="advanced-confBtn" type="submit" value="Configuracion avanzada"/>
+					</div>
+				</div>
+			</form>
 			<form action="AppServlet" method="get">
 				<div class = "row">			
 					<div class="col-md-8 home-page-type">	
