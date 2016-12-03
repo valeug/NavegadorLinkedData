@@ -439,7 +439,15 @@ public class DbpediaEndpoint {
 		ResultSet results = qexec.execSelect();
 		//ResultSetFormatter.out(System.out, results, query); 
 		
-		List<Property> propTotal = new ArrayList<Property>();
+		
+		/* indicar que las propiedades de la BD no ha sido recien agregadas en la sesion (se obtiene de la BD)*/
+		for(int k=0; k<pList.size();k++){
+			pList.get(k).setAdd(0);
+			pList.get(k).setShow_default(1);
+		}
+			
+		
+		
 		List<String> urisList= new ArrayList<String>(), valuesList = new ArrayList<String>();
 		String propUri, propValue;
 		int cont=0;
@@ -467,8 +475,9 @@ public class DbpediaEndpoint {
 				urisList.add(propUri);
 				valuesList.add(propValue);
 				
-				int pos = findProperty(propUri,pList);
 				
+				int pos = findProperty(propUri,pList);
+				System.out.println("pos: "+pos);
 				if(pos == -1){ // no encontro la porpiedad en la lista de propiedades del concepto
 					//agrega propiedad
 					Property p = new Property();
@@ -477,6 +486,8 @@ public class DbpediaEndpoint {
 					p.setName("Agregados");
 					p.setShow_default(0);
 					p.setIs_mapping(0);
+					p.setAdd(0);
+					p.setNewProperty(1);
 					pList.add(p);		
 					
 					System.out.println("---PROPIEDAD: "+ propUri);
@@ -484,7 +495,9 @@ public class DbpediaEndpoint {
 				}
 				else { // encontro propiedad -> se actuazlin valores
 					pList.get(pos).setValue(propValue);
-					pList.get(pos).setShow_default(1);
+					//if(pList.get(pos).getNewProperty() == )
+					//pList.get(pos).setShow_default(1);
+					//pList.get(pos).setAdd(0);
 					
 					if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && 
 							propUri.compareTo("http://dbpedia.org/ontology/abstract") != 0){
@@ -530,61 +543,8 @@ public class DbpediaEndpoint {
 			
 			cont++;
 		}
-				
-		//pList esta vacio, se llenara con los valores de uriList y valueList
-		
-			
-//		for(int i=0; i < pList.size(); i++){
-//			for(int j=0; j < propTotal.size(); j++){
-//				
-//				if(pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") != 0){
-//						
-//						
-//						//Configurado para que se muestre por defecto
-//						if(pList.get(i).getUri().compareTo(propTotal.get(j).getUri()) == 0){ 
-//							propTotal.get(j).setShow_default(1);
-//							propTotal.get(j).setDescription(pList.get(i).getDescription());
-//							propTotal.get(j).setName(pList.get(i).getName());
-//							propTotal.get(j).setIs_mapping(is_mapping);
-//						}
-//						else {
-//							p.setShow_default(0);
-//						}
-//						
-//						/* copiar los valores de las propiedades*/
-//						if(pList.get(i).getIs_mapping() == 1 && pList.get(i).getTarget()>1){ // mapping a dataset en Bio2rdf
-//							String inputUri = null;
-//							switch(pList.get(i).getTarget()){								
-//								case 2: inputUri = "http://bio2rdf.org/mesh:" + valuesList.get(j); // MESH
-//										break;
-//								case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + valuesList.get(j);	// PHARMGKB
-//										break;
-//								case 4: inputUri = "http://bio2rdf.org/goa:" + valuesList.get(j);	// NCBI
-//										break;
-//								case 5: inputUri = "http://bio2rdf.org/ncbi:" + valuesList.get(j);	// NCBI
-//										break;
-//							}
-//							
-//							pList.get(i).setValue(inputUri);
-//						}
-//						else{
-//							//pList.get(i).setValue(valuesList.get(j));
-//						}
-//									
-//				}
-//				else if (pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
-//					System.out.println("name final: " + name);
-//					pList.get(i).setValue(name);
-//				}
-//				else if (pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") == 0){
-//					System.out.println("abstract final: " + abst);
-//					pList.get(i).setValue(abst);
-//				}
-//			}			
-//		}
-		
-		System.out.println("cant: " + cont);
-		
+						
+		System.out.println("cant: " + cont);		
 		System.out.println("***NAME DBPEDIA: " + name);
 		
 		return name;
@@ -593,8 +553,9 @@ public class DbpediaEndpoint {
 	private static int findProperty(String puri, List<Property>pList){
 		
 		for(int i=0; i<pList.size(); i++){
-			if(pList.get(i).getUri().compareTo(puri) == 0 && pList.get(i).getName().compareTo("Agregados")!=0) 
-				System.out.println("i: "+i);
+			//if(pList.get(i).getUri().compareTo(puri) == 0 && pList.get(i).getName().compareTo("Agregados")!=0) 
+			Property p = pList.get(i);
+			if(p.getUri().compareTo(puri) == 0 && p.getAdd()==0) //propiedades que no han sido recientemente agregadas
 				return i;
 		}
 		

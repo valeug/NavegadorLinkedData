@@ -10,8 +10,21 @@ public class Property {
 	int is_mapping;
 	int target;
 	int show_default; //configuration
+	int add; // propiedad agregar en la sesion actual
+	int newProperty;
 	
-	
+	public int getNewProperty() {
+		return newProperty;
+	}
+	public void setNewProperty(int newProperty) {
+		this.newProperty = newProperty;
+	}
+	public int getAdd() {
+		return add;
+	}
+	public void setAdd(int add) {
+		this.add = add;
+	}
 	public int getShow_default() {
 		return show_default;
 	}
