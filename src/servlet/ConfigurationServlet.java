@@ -65,9 +65,17 @@ public class ConfigurationServlet extends HttpServlet {
 		PropertyDAO dao = new PropertyDAO();
 		dao.storeProperty(p);
 		
-		RequestDispatcher dispatcher = request.getRequestDispatcher("");
+		
+		/*
+		RequestDispatcher dispatcher;
 		//dispatcher = request.getRequestDispatcher("jsp/"+"home.jsp");
+		
+		response.sendRedirect("http://localhost:8080/HelloWorld/test");
+		dispatcher = request.getRequestDispatcher("jsp/"+view);
 	    dispatcher.forward( request, response);  
+	    */
+		response.sendRedirect("/NavegadorLinkedData/");
+		//doGet(request, response);
 		
 	}
 
