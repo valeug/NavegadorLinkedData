@@ -27,8 +27,22 @@ public class ConfigurationServlet extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+
+		RequestDispatcher dispatcher;
+		
+		System.out.println( "para 1: "+ request.getParameter("dataset"));
+		System.out.println( "para 2: "+ request.getParameter("class"));
+		System.out.println( "para 3: "+ request.getParameter("uriInputProperty"));
+		System.out.println( "para 4: "+ request.getParameter("nameInputProperty"));
+		System.out.println( "para 5: "+ request.getParameter("descriptionInputProperty"));
+		System.out.println( "para 6: "+ request.getParameter("checkbox-mapping")); // verificar que es null para mapeo o no
+		System.out.println( "para 7: "+ request.getParameter("datasetMapping"));
+		System.out.println( "para 8: "+ request.getParameter("mappingInputProperty"));
+		
+		
+		dispatcher = request.getRequestDispatcher("jsp/"+"home.jsp");
+	    dispatcher.forward( request, response);  
+		
 	}
 
 }

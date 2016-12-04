@@ -25,35 +25,47 @@
 <body>
 	holi ;)
 	
-	<form action="ConfigurationServlet" method="post">
+	<form action="Configuration" method="post">
 		<div class="container">
 			
 			<div class="form-group">
 				<label for="dataset-sel">Seleccionar dataset</label>
-				<select name="resultado" id="dataset" class="form-control">
+				<select name="dataset" id="dataset" class="form-control">
 				</select>
 			</div>
 			<div class="form-group">
 				<label for="class-sel">Seleccionar clase</label>
-				<select name="class" id="class" class="form-control">
+				<select name=class id="class" class="form-control">
 				</select>
 			</div>	
 			<div class="form-group">
 			    <label for="uri-prop">Ingresar URI de la propiedad:</label>
-			    <input type="text" class="form-control" id="uriInputProperty" placeholder="URI">		
+			    <input type="text" class="form-control" id="uriInputProperty" name="uriInputProperty" placeholder="URI">		
 			</div>
 			<div class="form-group">
 			    <label for="name-prop">Ingresar nombre de la propiedad:</label>
-			    <input type="text" class="form-control" id="nameInputProperty" placeholder="Nombre">		
+			    <input type="text" class="form-control" id="nameInputProperty" name="nameInputProperty" placeholder="Nombre">		
 			</div>
 			<div class="form-group">
 			    <label for="desc-prop">Ingresar descripción de la propiedad:</label>
-			    <input type="text" class="form-control" id="descriptionInputProperty" placeholder="Descripcion">		
+			    <input type="text" class="form-control" id="descriptionInputProperty" name="descriptionInputProperty" placeholder="Descripcion">		
+			</div>
+			<div class="form-check">
+    			<label class="form-check-label">
+      			<input id = "checkbox-mapping" name="checkbox-mapping" class="form-check-input" type="checkbox"> Mapeo
+			</div>
+			<div class="form-group">
+				<label for="dataset-sel">Seleccionar dataset</label>
+				<select name="datasetMapping" id="datasetMapping" class="form-control">
+				</select>
+			</div>
+			<div class="form-group">
+			    <label for="desc-prop">Ingresar mapeo a otro dataset</label>
+			    <input type="text" class="form-control" id="mappingInputProperty" name="mappingInputProperty" placeholder="URI o código">		
 			</div>
 			
 			<button type="submit" class="btn btn-primary">Aceptar</button>
-			<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>
-			
+			<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>		
 	</form>
 
 	<script type="text/javascript">
@@ -66,12 +78,15 @@
                     $('#dataset').append('<option value="">--Seleccione--</option>');
                     console.log(responseJson);
 					$.each(responseJson, function(key, value){
-						//console.log(value);
+						//console.log(value);						
                         $('#dataset').append("<option value='"  +  value['id'] + "'>" +  value['name'] + "</option>");
+						$('#datasetMapping').append("<option value='"  +  value['id'] + "'>" +  value['name'] + "</option>");
 					});					
 				}			
 			});
 			
+			$( "#datasetMapping" ).prop( "disabled", true );
+			$( "#mappingInputProperty" ).prop( "disabled", true );
 			
 			$('#dataset').change(function(){
                 var idDat = $('#dataset').val();
@@ -93,7 +108,9 @@
                             $('#class').append('<option value="">--Seleccione--</option>');
                             
 							$.each(responseJson, function(key, value){
-                                $('#class').append("<option value='"  +  value['id_class'] + "'>" +  value['name'] + "</option>");
+								console.log('class:');
+								console.log(value);
+                                $('#class').append("<option value='"  +  value['idClass'] + "'>" +  value['name'] + "</option>");
 
         					});					
         				}                       
@@ -105,6 +122,21 @@
 
                 });
             });
+			
+			$('#checkbox-mapping').change(function() {
+		        if($(this).is(":checked")) {
+					//enable select combobox
+					//console.log('enable');
+					$( "#datasetMapping" ).prop( "disabled", false );
+					$( "#mappingInputProperty" ).prop( "disabled", false );
+		        }
+		        else{
+		        	//disable select combobox
+		        	//console.log('disable');
+		        	$( "#datasetMapping" ).prop( "disabled", true );
+		        	$( "#mappingInputProperty" ).prop( "disabled", true );
+		        }    
+		    })
 			
 		});
 	</script>
