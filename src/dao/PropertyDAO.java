@@ -102,4 +102,68 @@ public class PropertyDAO {
     	
     	return pList;		
 	}
+    
+    public static void storeProperty(Property p){
+		//SELECT MAX(id) FROM tablename;
+    	String query = "SELECT id_property "+
+					"FROM property " + 
+					"ORDER BY id_property DESC LIMIT 1";
+    		
+    	int idMax=-1;
+		try {    		
+			myConnec = getConnection();
+			myStat = myConnec.createStatement();
+			ResultSet myres = myStat.executeQuery(query);
+			
+			//System.out.println("myres: " +myres);
+			while(myres.next()){
+
+				idMax = myres.getInt("id_property");
+				System.out.println("MAX property ID: " + idMax);
+				break;
+			}
+			myres.close();			
+			myConnec.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+    	
+    	try {    		
+    		myConnec = getConnection();
+    		myStat = myConnec.createStatement();			
+    		
+    		if(idMax==-1) idMax = 500;
+    		else idMax += 1; //el id es 1 mas que el mayor id en la BD
+    		
+    		p.setId(idMax);
+			
+    		//build query
+    		String sql = "";
+    		if(p.getIs_mapping()!=-1){
+    			sql = "INSERT INTO property " + 
+						" (id_property, name, description, uri, is_mapping, target) " +
+						" values ('" + p.getId() +"', '" + p.getName() +"', '" + p.getDescription() +"', '" + p.getUri() +"', '" + p.getIs_mapping() +"', '" + p.getTarget() +"') ";
+    		}
+    		else {
+    			sql = "INSERT INTO property " + 
+						" (id_property, name, description, uri) " +
+						" values ('" + p.getId() +"', '" + p.getName() +"', '" + p.getDescription() +"', '" + p.getUri() +"') ";
+			
+    		}			
+			System.out.println("query:\n"+sql);
+			
+			//Execute SQL query   
+			myStat.executeUpdate(sql);
+			System.out.println("Insert complete.");
+
+			myConnec.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    			
+	}
 }
