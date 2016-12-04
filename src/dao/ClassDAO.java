@@ -9,6 +9,7 @@ import java.util.List;
 
 import db.JDBCMySQLConnection;
 import model.Class;
+import model.Property;
 
 public class ClassDAO {
 	
@@ -113,4 +114,54 @@ public class ClassDAO {
     	return uris;		
 	}
 	
+	public static void storeClassxProperty(int idClass, int idProperty){
+		
+    	String query = " SELECT id_class_x_property "+
+					" FROM class_x_property " + 
+					" ORDER BY id_class_x_property DESC LIMIT 1 ";
+    		
+    	int idMax=-1;
+		try {    		
+			myConnec = getConnection();
+			myStat = myConnec.createStatement();
+			ResultSet myres = myStat.executeQuery(query);
+
+			while(myres.next()){
+				idMax = myres.getInt("id_class_x_property");
+				System.out.println("MAX class_x_property ID: " + idMax);
+				break;
+			}
+			myres.close();			
+			myConnec.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+    	
+    	try {    		
+    		myConnec = getConnection();
+    		myStat = myConnec.createStatement();			
+    		
+    		if(idMax==-1) idMax = 500;
+    		else idMax += 1; //el id es 1 mas que el mayor id en la BD
+		
+    		//build query
+    		String sql = "";
+
+			sql = "INSERT INTO class_x_property " + 
+					" (id_class_x_property, id_class, id_property) " +
+					" values ('" + idMax +"', '" + idClass +"', '" + idProperty +"') ";
+	
+			System.out.println("query:\n"+sql);
+			
+			//Execute SQL query   
+			myStat.executeUpdate(sql);
+			System.out.println("Insert complete.");
+			myConnec.close();			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

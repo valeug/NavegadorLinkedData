@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import dao.ClassDAO;
 import dao.PropertyDAO;
 import model.Property;
 
@@ -42,6 +43,7 @@ public class ConfigurationServlet extends HttpServlet {
 		Property p = new Property();
 		p.setUri(request.getParameter("uriInputProperty"));
 		p.setName(request.getParameter("nameInputProperty"));
+		// FALTA insertar la clase x property
 		p.setDescription(request.getParameter("descriptionInputProperty"));
 		
 		if(request.getParameter("checkbox-mapping")!=null && request.getParameter("checkbox-mapping").compareTo("on")==0){ //se selecciono mapeo
@@ -63,8 +65,11 @@ public class ConfigurationServlet extends HttpServlet {
 		*/
 		
 		PropertyDAO dao = new PropertyDAO();
-		dao.storeProperty(p);
+		int idProperty = dao.storeProperty(p);
 		
+		ClassDAO daoC = new ClassDAO();
+		int idClass = request.getParameter("class").charAt(0)-0;
+		daoC.storeClassxProperty(idClass, idProperty);
 		
 		/*
 		RequestDispatcher dispatcher;

@@ -103,11 +103,11 @@ public class PropertyDAO {
     	return pList;		
 	}
     
-    public static void storeProperty(Property p){
+    public static int storeProperty(Property p){
 		//SELECT MAX(id) FROM tablename;
     	String query = "SELECT id_property "+
-					"FROM property " + 
-					"ORDER BY id_property DESC LIMIT 1";
+					" FROM property " + 
+					" ORDER BY id_property DESC LIMIT 1";
     		
     	int idMax=-1;
 		try {    		
@@ -160,10 +160,13 @@ public class PropertyDAO {
 
 			myConnec.close();
 			
+			return idMax;
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    			
+    	
+    	return -1;
 	}
 }
