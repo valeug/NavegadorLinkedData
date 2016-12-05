@@ -9,9 +9,17 @@ public class Concept {
 	private String definition;
 	private String classType;
 	private List<Property> properties; //podria incluir "name", "definition" (aunque son propiedades importantes)
+	private List<PropertyGroup> propertyGroups; // list of list of properties	
 	private List<Concept> linkedTerms;
 	private List<Concept> similarTerms;
 	
+	
+	public List<PropertyGroup> getPropertyGroups() {
+		return propertyGroups;
+	}
+	public void setPropertyGroups(List<PropertyGroup> propertyGroups) {
+		this.propertyGroups = propertyGroups;
+	}
 	public String getUri() {
 		return uri;
 	}

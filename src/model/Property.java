@@ -9,6 +9,7 @@ public class Property {
 	String value;
 	int is_mapping;
 	int target;
+	/* session */
 	int show_default; //configuration
 	int add; // propiedad agregar en la sesion actual
 	int newProperty;

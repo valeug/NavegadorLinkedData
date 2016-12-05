@@ -550,6 +550,18 @@ public class SearchController {
 		}
 		else System.out.println("Propiedades null :/");
 		
+		if(c.getPropertyGroups() != null){
+			System.out.println("PROPERTY GROUP: ");
+			System.out.println("pg size: " + c.getPropertyGroups().size());
+			for(int i=0; i<c.getPropertyGroups().size(); i++){
+				System.out.println(i+") Group uri: " + c.getPropertyGroups().get(i).getUri());
+				for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
+					System.out.println(k+". Property: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());
+				}
+			}
+		}
+		else System.out.println("Propiedades GROUP null :/");
+		
 		if(c.getSimilarTerms() != null){
 			System.out.println("Similar terms: ");
 			for(int i=0; i<c.getSimilarTerms().size(); i++){

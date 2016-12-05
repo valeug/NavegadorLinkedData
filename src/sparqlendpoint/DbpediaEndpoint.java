@@ -16,6 +16,7 @@ import dao.ClassDAO;
 import dao.PropertyDAO;
 import model.Concept;
 import model.Property;
+import model.PropertyGroup;
 import model.Class;
 
 public class DbpediaEndpoint {
@@ -225,8 +226,13 @@ public class DbpediaEndpoint {
 		
 		System.out.println(" \nMY PROPERTIES! ");
 		System.out.println("pList size: "+ pList.size());
-		String conceptName = getAllPropertiesValues(uris.get(posUri),pList);
+		List<PropertyGroup> pgList = new ArrayList<>();
+		
+		String conceptName = getAllPropertiesValues(uris.get(posUri),pList, pgList);
 		//String conceptName = getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+		
+		//if(pgList.size()==0) pgList = null;
+		
 		
 		System.out.println(" \nPROPERTIES! WITH VALUES");
 		System.out.println("pList size: "+ pList.size());
@@ -248,6 +254,8 @@ public class DbpediaEndpoint {
 		Concept c = new Concept();
 		//c.setName(conceptName);
 		c.setProperties(pList);
+		c.setPropertyGroups(pgList);
+		
 		return c;
 	}
 	
@@ -406,7 +414,7 @@ public class DbpediaEndpoint {
 		return name;
 	}
 	
-	private static String getAllPropertiesValues(String uri, List<Property> pList){
+	private static String getAllPropertiesValues(String uri, List<Property> pList, List<PropertyGroup> pgList){
 		
 		String apQuery = appendPropertiesInQuery(uri,pList,1); // Navegables, 0:no navegables
 		
@@ -476,10 +484,26 @@ public class DbpediaEndpoint {
 				valuesList.add(propValue);
 				
 				
-				int pos = findProperty(propUri,pList);
+				int [] res = findProperty(propUri, propValue,pList,pgList);
+								
+				int pos = -1;
+				int posPG = -1;
+				int posP = -1;
+				
+				if(res[0] == 1) pos = res[1];
+				if(res[0] == 2) {
+					posPG = res[1];
+					posP = res[2];
+				}
+				
 				System.out.println("pos: "+pos);
-				if(pos == -1){ // no encontro la porpiedad en la lista de propiedades del concepto
-					//agrega propiedad
+				System.out.println("res 0: "+res[0]);
+				System.out.println("res 1: "+res[1]);
+				System.out.println("res 2: "+res[2]);
+				
+								
+				if(res[0] == -1){ // no encontro la porpiedad en la lista de propiedades del concepto
+					//agrega propiedad  (PROPIEDADES QUE EL USUARIO AGREGARA SI DESEA)
 					Property p = new Property();
 					p.setUri(propUri);
 					p.setValue(propValue);
@@ -494,7 +518,7 @@ public class DbpediaEndpoint {
 					System.out.println("---Show Default: "+p.getShow_default());
 				}
 				else { // encontro propiedad -> se actuazlin valores
-					pList.get(pos).setValue(propValue);
+					//pList.get(pos).setValue(propValue);
 					//if(pList.get(pos).getNewProperty() == )
 					//pList.get(pos).setShow_default(1);
 					//pList.get(pos).setAdd(0);
@@ -502,6 +526,7 @@ public class DbpediaEndpoint {
 					if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && 
 							propUri.compareTo("http://dbpedia.org/ontology/abstract") != 0){
 						
+						/*
 						if(pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()>1){ // mapping a dataset en Bio2rdf
 							String inputUri = null;
 							switch(pList.get(pos).getTarget()){								
@@ -513,9 +538,98 @@ public class DbpediaEndpoint {
 										break;
 								case 5: inputUri = "http://bio2rdf.org/ncbi:" + propValue;	// NCBI
 										break;
-							}							
-						}							
+							}	
+							pList.get(pos).setValue(inputUri);
+						}
+						*/	
+						
+						if(pos!= -1){ 
+							if(pList.get(pos).getIs_mapping() == 0 || (pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()==1)){ // DBPEDIA (ej: subject)
+
+								System.out.println("ENTRA A PROPIEDADES MAPPING - GROUP PROPERTY");
+								// se crea gouplist, para tener las propiedades que tienen el mismo uri agrupadas
+								if(res[0] == 1 && res[1] != -1){
+									
+									String aux = pList.get(pos).getName();
+									if (pgList == null) pgList = new ArrayList<PropertyGroup>();
+									else {
+											//buscar la propiedad en los grupos
+											Property pOrig = pList.get(res[1]);
+											
+											Property p = new Property();
+											
+											aux = pOrig.getUri();
+											p.setUri(aux);
+											aux = pOrig.getName();
+											p.setName(aux);
+											aux = pOrig.getDescription();
+											p.setDescription(aux);
+											int n = pOrig.getId();
+											p.setId(n);
+											n = pOrig.getIs_mapping();
+											p.setIs_mapping(n);
+											n = pOrig.getTarget();
+											p.setTarget(n);	
+											getMappingUri(p,propValue);
+											//p.setValue(propValue);
+											p.setAdd(0);
+											
+											// si no esta inicializado, inicializar lista de grupos
+											if(pgList == null) pgList = new ArrayList<PropertyGroup>();
+											
+											// crear grupo
+											PropertyGroup pg = new PropertyGroup();
+											pg.setUri(p.getUri());
+											pg.setName(p.getName());
+											List<Property> props = new ArrayList<Property>();
+											pg.setPropertyList(props);
+											
+											// agregar a la lista de grupos
+											pg.getPropertyList().add(p);										
+											pgList.add(pg);
+											System.out.println("CREO GROUP PROPERTY ;)");
+									}
+								}
+							}
+							
+							if(res[0] == 2 && posPG != -1){ // encontro group
+								
+								if(posP != -1){ /* encontro propiedad identica, incluso mismo valor -> no deberia agregar */
+									System.out.println("*****PROPIEDAD IDENTICA! ");
+								}
+								else { /* NO ENCONTRO PROPIEDAD EN EL GROUP -> crearla y agregarla */
+									
+										Property p = new Property();
+										
+										String aux = pList.get(pos).getUri();
+										p.setUri(aux);
+										aux = pList.get(pos).getName();
+										p.setName(aux);
+										aux = pList.get(pos).getDescription();
+										p.setDescription(aux);
+										int n = pList.get(pos).getId();
+										p.setId(n);
+										n = pList.get(pos).getIs_mapping();
+										p.setIs_mapping(n);
+										n = pList.get(pos).getTarget();
+										p.setTarget(n);
+										p.setValue(propValue);
+										p.setAdd(0);
+										
+										pgList.get(posPG).getPropertyList().add(p);
+
+								}
+								
+							}
+							/*							
+							else { //no encontro group -> crear group, propiedad y agregarla (NOTA: si no encontro group, deberia estar en la lista simple)
+								
+							}
+							*/
+						}
+					
 					}
+					/*
 					else if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
 						//System.out.println("name final: " + name);
 						pList.get(pos).setValue(name);
@@ -524,6 +638,7 @@ public class DbpediaEndpoint {
 						//System.out.println("abstract final: " + abst);
 						pList.get(pos).setValue(abst);
 					}
+					*/
 				}
 				
 			}
@@ -543,23 +658,102 @@ public class DbpediaEndpoint {
 			
 			cont++;
 		}
+		
+		for(int j=0; j<pList.size(); j++){
+			if(pList.get(j).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
+				//System.out.println("name final: " + name);
+				pList.get(j).setValue(name);
+			}
+			if(pList.get(j).getUri().compareTo("http://dbpedia.org/ontology/abstract") == 0){
+				//System.out.println("abstract final: " + abst);
+				pList.get(j).setValue(abst);
+			}
+		}
 						
 		System.out.println("cant: " + cont);		
 		System.out.println("***NAME DBPEDIA: " + name);
 		
+		System.out.println("pgList GROUP size: " + pgList.size());
+		
 		return name;
 	}
 	
-	private static int findProperty(String puri, List<Property>pList){
+	private static void getMappingUri(Property p, String propValue){
 		
-		for(int i=0; i<pList.size(); i++){
-			//if(pList.get(i).getUri().compareTo(puri) == 0 && pList.get(i).getName().compareTo("Agregados")!=0) 
-			Property p = pList.get(i);
-			if(p.getUri().compareTo(puri) == 0 && p.getAdd()==0) //propiedades que no han sido recientemente agregadas
-				return i;
+		if(p.getIs_mapping() == 1 && p.getTarget()>1){ // mapping a dataset en Bio2rdf
+			String inputUri = null;
+			switch(p.getTarget()){								
+				case 2: inputUri = "http://bio2rdf.org/mesh:" + propValue; // MESH
+						break;
+				case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + propValue;	// PHARMGKB
+						break;
+				case 4: inputUri = "http://bio2rdf.org/goa:" + propValue;	// NCBI
+						break;
+				case 5: inputUri = "http://bio2rdf.org/ncbi:" + propValue;	// NCBI
+						break;
+			}	
+			p.setValue(inputUri);
+			return ;
+		}
+		p.setValue(propValue);
+	}
+	
+	private static int [] findProperty(String puri, String propvalue, List<Property>pList, List<PropertyGroup> pgList){
+		int [] res = new int [3];
+		
+		if(pList!=null)
+			System.out.println("entro a lista simple");
+			for(int i=0; i<pList.size(); i++){
+				//if(pList.get(i).getUri().compareTo(puri) == 0 && pList.get(i).getName().compareTo("Agregados")!=0) 
+				Property p = pList.get(i);
+				/*
+				if(p.getUri().compareTo(puri) == 0 && p.getAdd()==0){ //propiedades que no han sido recientemente agregadas
+					res[0] = 1; //  lo encontro en la lista simple de propieades 
+					res[1] = i; 
+					return res;
+				}
+				*/				
+				if(p.getUri().compareTo(puri) == 0 && p.getValue()==null){ //propiedades que no han sido recientemente agregadas
+					res[0] = 1; //  lo encontro en la lista simple de propieades 
+					res[1] = -1; 
+					res[2] = -1;
+					getMappingUri(p, propvalue);					
+					p.setAdd(0);
+					return res;
+				}
+				if(p.getUri().compareTo(puri) == 0 && p.getAdd()==0 && 
+					p.getValue()!= null && p.getValue().compareTo(propvalue)!=0){ //propiedades que no han sido recientemente agregadas
+					res[0] = 1; //  lo encontro en la lista simple de propieades 
+					res[1] = i; 
+					res[2] = -1;
+					return res;
+				}
+			}
+		
+		res[0] = -1;
+		res[1] = -1;
+		res[2] = -1;
+		
+		if(pgList != null){
+			System.out.println("entro a lista group");
+			for(int i=0; i<pgList.size(); i++){				
+				if(pgList.get(i).getUri().compareTo(puri) == 0){ //propiedades que no han sido recientemente agregadas
+					res[0] = 2; /* existe la lista group para esa propiedad*/
+					res[1] = i; /* posicion del grupo en la lista*/ 
+					
+					List<Property> propgList = pgList.get(i).getPropertyList();
+					for(int x=0; x < propgList.size(); x++){
+						if(propgList.get(x).getValue().compareTo(propvalue)==0){
+							res[2] = x; /* encontro propiedad en el grupo*/
+							return res;
+						}
+					}
+					res[2] = -1;
+				}
+			}
 		}
 		
-		return -1;
+		return res;
 	}
 	
 	
