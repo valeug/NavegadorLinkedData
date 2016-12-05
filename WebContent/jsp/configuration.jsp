@@ -23,50 +23,85 @@
 	
 </head>
 <body>
-	holi ;)
+	<div class="tabbable"> <!-- Only required for left/right tabs -->
+		<ul class="nav nav-tabs">
+	    	<li class="active"><a href="#tab1" data-toggle="tab">Crear clase</a></li>
+	    	<li><a href="#tab2" data-toggle="tab">Crear propiedad</a></li>
+	  	</ul>
+	  	<div class="tab-content">
+	    	<div class="tab-pane active" id="tab1">	    	
+	      		<form action="Configuration" method="post">
+					<div class="container">	
+						<div class="form-group">
+						    <label for="uri-prop">Ingresar URI de la clase:</label>
+						    <input type="text" class="form-control" id="uriInputProperty" name="uriInputProperty" placeholder="URI">		
+						</div>
+						<div class="form-group">
+						    <label for="name-prop">Ingresar nombre de la clase:</label>
+						    <input type="text" class="form-control" id="nameInputProperty" name="nameInputProperty" placeholder="Nombre">		
+						</div>
+						<div class="form-group">
+							<label for="dataset-sel">Seleccionar dataset</label>
+							<select name="dataset" id="dataset" class="form-control">
+							</select>
+						</div>
+			
+						<button type="submit" class="btn btn-primary">Aceptar</button>
+						<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>
+					</div>		
+				</form>
+	    	</div>
+	    	<div class="tab-pane" id="tab2">
+	      		<form action="Configuration" method="post">
+					<div class="container">
+						
+						<div class="form-group">
+							<label for="dataset-sel">Seleccionar dataset</label>
+							<select name="dataset" id="dataset" class="form-control">
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="class-sel">Seleccionar clase</label>
+							<select name=class id="class" class="form-control">
+							</select>
+						</div>	
+						<div class="form-group">
+						    <label for="uri-prop">Ingresar URI de la propiedad:</label>
+						    <input type="text" class="form-control" id="uriInputProperty" name="uriInputProperty" placeholder="URI">		
+						</div>
+						<div class="form-group">
+						    <label for="name-prop">Ingresar nombre de la propiedad:</label>
+						    <input type="text" class="form-control" id="nameInputProperty" name="nameInputProperty" placeholder="Nombre">		
+						</div>
+						<div class="form-group">
+						    <label for="desc-prop">Ingresar descripción de la propiedad:</label>
+						    <input type="text" class="form-control" id="descriptionInputProperty" name="descriptionInputProperty" placeholder="Descripcion">		
+						</div>
+						<div class="form-check">
+			    			<label class="form-check-label">
+			      			<input id = "checkbox-mapping" name="checkbox-mapping" class="form-check-input" type="checkbox"> Mapeo
+						</div>
+						<div class="form-group">
+							<label for="dataset-sel">Seleccionar dataset objetivo</label>
+							<select name="datasetMapping" id="datasetMapping" class="form-control">
+							</select>
+						</div>
+						<!--
+						<div class="form-group">
+						    <label for="desc-prop">Ingresar valor a otro dataset</label>
+						    <input type="text" class="form-control" id="mappingInputProperty" name="mappingInputProperty" placeholder="URI o código">		
+						</div>
+						-->
+						<button type="submit" class="btn btn-primary">Aceptar</button>
+						<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>	
+					</div>	
+				</form>
+	    	</div>
+	  	</div>
+	</div>
 	
-	<form action="Configuration" method="post">
-		<div class="container">
-			
-			<div class="form-group">
-				<label for="dataset-sel">Seleccionar dataset</label>
-				<select name="dataset" id="dataset" class="form-control">
-				</select>
-			</div>
-			<div class="form-group">
-				<label for="class-sel">Seleccionar clase</label>
-				<select name=class id="class" class="form-control">
-				</select>
-			</div>	
-			<div class="form-group">
-			    <label for="uri-prop">Ingresar URI de la propiedad:</label>
-			    <input type="text" class="form-control" id="uriInputProperty" name="uriInputProperty" placeholder="URI">		
-			</div>
-			<div class="form-group">
-			    <label for="name-prop">Ingresar nombre de la propiedad:</label>
-			    <input type="text" class="form-control" id="nameInputProperty" name="nameInputProperty" placeholder="Nombre">		
-			</div>
-			<div class="form-group">
-			    <label for="desc-prop">Ingresar descripción de la propiedad:</label>
-			    <input type="text" class="form-control" id="descriptionInputProperty" name="descriptionInputProperty" placeholder="Descripcion">		
-			</div>
-			<div class="form-check">
-    			<label class="form-check-label">
-      			<input id = "checkbox-mapping" name="checkbox-mapping" class="form-check-input" type="checkbox"> Mapeo
-			</div>
-			<div class="form-group">
-				<label for="dataset-sel">Seleccionar dataset</label>
-				<select name="datasetMapping" id="datasetMapping" class="form-control">
-				</select>
-			</div>
-			<div class="form-group">
-			    <label for="desc-prop">Ingresar mapeo a otro dataset</label>
-			    <input type="text" class="form-control" id="mappingInputProperty" name="mappingInputProperty" placeholder="URI o código">		
-			</div>
-			
-			<button type="submit" class="btn btn-primary">Aceptar</button>
-			<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>		
-	</form>
+	
+	
 
 	<script type="text/javascript">
 		

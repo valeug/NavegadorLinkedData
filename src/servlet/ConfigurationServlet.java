@@ -48,7 +48,7 @@ public class ConfigurationServlet extends HttpServlet {
 		
 		if(request.getParameter("checkbox-mapping")!=null && request.getParameter("checkbox-mapping").compareTo("on")==0){ //se selecciono mapeo
 			int idDatasetMapping = request.getParameter("datasetMapping").charAt(0)-'0';
-			String code = request.getParameter("mappingInputProperty");
+			//String code = request.getParameter("mappingInputProperty");
 			
 			p.setIs_mapping(1);
 			p.setTarget(idDatasetMapping);			

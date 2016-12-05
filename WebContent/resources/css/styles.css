@@ -110,4 +110,13 @@ body {
 	background-color: #B3E8FF;
 }
 
+#conf-link {
+	top: 45px;
+    right: 100px;
+    position: absolute;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
 

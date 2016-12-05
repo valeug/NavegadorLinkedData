@@ -54,23 +54,26 @@
 	    </div>
 	  </div>
 		
+	<a id="conf-link" href="/NavegadorLinkedData/Configuration">Configuracion avanzada</a>
 	<!-- CONTENT -->
 	<div class ="center-vertical">
+		
 		<div class="container">
+		
+			<!-- 
 			<form action="Configuration" method="get">
 				<div class = "row">	
 					<div class="col-md-8 home-page-modal">		
-						<!--  
-						<button  type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">Configuracion avanzada</button>
-						-->
-						<input id="advanced-confBtn" type="submit" value="Configuracion avanzada"/>
+						
+						<input id="advanced-confBtn" type="submit" value="Configuracion avanzada"/>						
 					</div>
 				</div>
 			</form>
+			 -->
 			<form action="AppServlet" method="get">
 				<div class = "row">			
 					<div class="col-md-8 home-page-type">	
-						<p>	Tipo de busqueda</p>				
+						<p style="font-size: 15px; font-weight: bold;">	Tipo de busqueda</p>				
 						<label class="radio-inline"><input type="radio" name="optradio" value="1" checked="checked">Nombre exacto</label>
 						<label class="radio-inline"><input type="radio" name="optradio" value="2">Coincidencia en nombre</label>
 						<label class="radio-inline"><input type="radio" name="optradio" value="3">Coincidencia en propiedades</label>
