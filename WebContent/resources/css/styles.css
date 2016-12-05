@@ -107,7 +107,7 @@ body {
 
 .sim-info-row{
 	border-radius: 10px;
-	background-color: #B3E8FF;
+	background-color: #C6ACC7;
 }
 
 #conf-link {
@@ -132,3 +132,11 @@ body {
 	color: #337ab7 !important;
 	background-color: #ffffff !important;
 }
+
+.subtitle {
+	font-size: 22px;
+	text-align: center;
+	font-weight: bold;
+	color: white;
+}
+

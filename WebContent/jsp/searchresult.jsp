@@ -32,7 +32,7 @@
 	      <div class="modal-content">
 	        <div class="modal-header">
 	          <button type="button" class="close" data-dismiss="modal">&times;</button>
-	          <h4 class="modal-title">Seleccionar fuentes de los datos</h4>
+	          <h4 class="modal-title">Ver propiedades</h4>
 	        </div>
 	        <div class="modal-body">
 	          	<div id="propertydiv" >
@@ -62,18 +62,22 @@
 			                <div class="input-group-btn">	                    
 		                        <button id="search-button-results" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 		                    </div>
-			                </div>
+			                
 			            </div>
-			          </div>
+			          
 			        </div>			
 				</div>
 			</form>
+			<button style="font-size: 14px; font-weight:bold;" id="confBtn" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#confModal">Agregar propiedades</button>
 		</div>
+		<!--  
 		<div class = "row">	
 			<div class="col-md-8 home-page-modal">		
 				<button id="confBtn" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#confModal">Agregar propiedades</button>
 			</div>
 		</div>
+		-->
+		<%-- 
 		<div class = "row"> 
 			<div class="col-md-12 term-info-row" >
 				Term: ${term.name}<br>
@@ -88,7 +92,9 @@
 				<br>
 				<br>
 			</div>
-		</div>
+		</div> 
+		--%>
+		
 		<!--  
 		<div class = "row"> 
 			<div class="col-md-12 property-info-row" >
@@ -97,8 +103,8 @@
 		</div>
 		-->
 		<div class = "row"> 
-			<div class="col-md-12 desc-info-row" >
-				Descriptivas<br>
+			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >
+				<p class="subtitle">Propiedades</p>
 				<ul id="prop-list" class="list-group">
 					<c:forEach items="${term.properties}" var="i">
 						<!-- 
@@ -107,10 +113,10 @@
 						<c:if test="${i.value != null}">
 							<c:if test="${i.show_default==1}">
 								<li class="list-group-item show-default">
-									uri:
-									<p><c:out value="${i.uri}" /></p>
-									nombre:		
-									<p><c:out value="${i.name}" /></p>
+									
+									<p style = "display: none;"><c:out value="${i.uri}" /></p>
+											
+									<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
 									<p style="display: none;"><c:out value="${i.show_default}" /></p>
 									<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
 										<img src="${i.value}}" alt="Smiley face" >
@@ -127,9 +133,9 @@
 							</c:if>
 							<c:if test="${i.show_default==0}">
 								<li class="list-group-item not-show-default" style="display: none;">						
-									uri:
-									<p><c:out value="${i.uri}" /></p>
-									nombre:
+									
+									<p style = "display: none;"><c:out value="${i.uri}" /></p>
+									
 									<p><c:out value="${i.name}" /></p>
 									<p style="display: none;"><c:out value="${i.show_default}" /></p>
 									<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
@@ -150,6 +156,7 @@
 				</ul>
 			</div>
 		</div>
+		<%-- 
 		<div class = "row"> 
 			<div class="col-md-12 ref-info-row" >
 				Referenciables<br>
@@ -182,9 +189,10 @@
 				<br>
 			</div>
 		</div>
+		--%>
 		<div class = "row"> 
-			<div class="col-md-12 sim-info-row" >
-				Terminos similares:<br> 
+			<div style= "padding: 30px;" class="col-md-12 sim-info-row" >
+				<p class="subtitle">Terminos similares:</p> 
 				<ul class="list-group">
 					<c:forEach items="${term.similarTerms}" var="i">
 						<li class="list-group-item">
@@ -226,10 +234,11 @@
 				//alert('no entro');
 				//alert("gg");
 				var list = document.getElementById('prop-list');
-				//console.log(list);
+				console.log(list);
 				var elements = list.children;
 				//console.log(elements);
 				var cont = 1;
+				console.log('for each');
 				$.each(elements, function(key, value){
 					/*
 					var rowNew = $("<tr><td></td><td></td></tr>");
@@ -241,7 +250,7 @@
 					//alert('entro each');
 					//alert(value['name']);
 					var row = $("<tr />");
-					//console.log(value);
+					console.log(value);
 					//console.log('p');
 					//console.log(value.children[0].innerHTML);
                     $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
