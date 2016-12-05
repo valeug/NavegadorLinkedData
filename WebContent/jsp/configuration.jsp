@@ -24,14 +24,14 @@
 </head>
 <body>
 	<div class="tabbable"> <!-- Only required for left/right tabs -->
-		<ul class="nav nav-tabs">
-	    	<li class="active"><a href="#tab1" data-toggle="tab">Crear clase</a></li>
-	    	<li><a href="#tab2" data-toggle="tab">Crear propiedad</a></li>
+		<ul class="nav nav-tabs" style="background-color: white;">
+	    	<li class="active"><a href="#tab1" data-toggle="tab">Nueva clase</a></li>
+	    	<li><a href="#tab2" data-toggle="tab">Nueva propiedad</a></li>
 	  	</ul>
 	  	<div class="tab-content">
 	    	<div class="tab-pane active" id="tab1">	    	
 	      		<form action="Configuration" method="post">
-					<div class="container">	
+					<div class="container" style="margin-top:100px;">	
 						<div class="form-group">
 						    <label for="uri-prop">Ingresar URI de la clase:</label>
 						    <input type="text" class="form-control" id="uriInputProperty" name="uriInputProperty" placeholder="URI">		
@@ -45,15 +45,16 @@
 							<select name="dataset" id="dataset" class="form-control">
 							</select>
 						</div>
-			
-						<button type="submit" class="btn btn-primary">Aceptar</button>
-						<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>
+						<div style="margin-top:50px;">
+							<button style = "margin-right: 20px; " type="submit" class="btn btn-primary">Guardar</button>
+							<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>
+						</div>						
 					</div>		
 				</form>
 	    	</div>
 	    	<div class="tab-pane" id="tab2">
 	      		<form action="Configuration" method="post">
-					<div class="container">
+					<div class="container" style="margin-top:100px;">
 						
 						<div class="form-group">
 							<label for="dataset-sel">Seleccionar dataset</label>
@@ -92,8 +93,11 @@
 						    <input type="text" class="form-control" id="mappingInputProperty" name="mappingInputProperty" placeholder="URI o código">		
 						</div>
 						-->
-						<button type="submit" class="btn btn-primary">Aceptar</button>
-						<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>	
+						<div style="margin-top:50px;">
+							<button style = "margin-right: 20px; " type="submit" class="btn btn-primary">Guardar</button>
+							<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>
+						</div>
+							
 					</div>	
 				</form>
 	    	</div>

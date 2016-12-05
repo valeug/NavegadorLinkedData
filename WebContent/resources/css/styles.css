@@ -119,4 +119,16 @@ body {
     text-decoration: underline;
 }
 
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+	font-size: 16px !important;
+	font-weight: bold !important;
+	color: #ffffff !important ; 
+	background-color: #337ab7 !important ;
+}
 
+.nav-tabs>li>a {
+	font-size: 16px !important;
+	font-weight: bold !important;
+	color: #337ab7 !important;
+	background-color: #ffffff !important;
+}
