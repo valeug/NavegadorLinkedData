@@ -159,6 +159,22 @@
 						Uri:
 						<c:out value="${i.uri}" /><br>
 						<br><br>
+						Propiedades (valores)
+						<c:forEach items="${i.propertyList}" var="i"> 
+							<li class="list-group-item not-show-default">
+								<p style = "display: none;"><c:out value="${i.uri}" /><c:out value="${i.value}" /></p>
+								<p><c:out value="${i.name}" /></p>
+								<p style="display: none;"><c:out value="${i.show_default}" /></p>
+								<c:if test="${i.is_mapping == 1}">
+									<p><a href="#" onclick=""><c:out value="${i.value}" /></a></p>
+								</c:if>
+								<c:if test="${i.is_mapping != 1}">
+									<p><c:out value="${i.value}" /></p>
+								</c:if>
+							</li>
+						</c:forEach>
+						---------------------------						
+						<br><br>
 					</c:forEach>
 				</ul>
 			</div>
