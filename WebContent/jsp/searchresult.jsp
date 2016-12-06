@@ -153,12 +153,14 @@
 							</c:if>
 						</c:if>
 					</c:forEach>
+				</ul>
+				<ul id="prop-group-list" class="list-group prop-group-list">
 					<c:forEach items="${term.propertyGroups}" var="i">
-						Nombre:<br>
-						<c:out value="${i.name}" /><br>
-						Uri:
-						<c:out value="${i.uri}" /><br>
-						<br><br>
+						
+						<p class="prop-group-name"><c:out value="${i.name}" /></p>
+						
+						<p class="prop-group-uri"><c:out value="${i.uri}" /></p>
+ 						
 						Propiedades (valores)
 						<c:forEach items="${i.propertyList}" var="i"> 
 							<li class="list-group-item not-show-default">
@@ -174,7 +176,6 @@
 							</li>
 						</c:forEach>
 						---------------------------						
-						<br><br>
 					</c:forEach>
 				</ul>
 			</div>
@@ -243,14 +244,14 @@
 	// Get the button that opens the modal
 	var btn = document.getElementById("confBtn");
 	
-	btn.onclick = function() {
+	$("#confBtn").on( "click", function() {
 	    modal.style.display = "block";
 	    //
 	    //alert('x1');
 	    $("#propertydiv").hide();
 	    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
 	    //$.get('RetrieveOntologies',function(responseJson){
-	    	//alert('x2');
+	    	alert('x2');
 			//if(responseJson!=null){					
 				$("#propertytable").find("tr:gt(0)").remove();
 				var table = $("#propertytable");
@@ -259,7 +260,7 @@
 				var list = document.getElementById('prop-list');
 				console.log(list);
 				var elements = list.children;
-				//console.log(elements);
+				console.log(elements);
 				var cont = 1;
 				console.log('for each');
 				$.each(elements, function(key, value){
@@ -276,27 +277,69 @@
 					console.log(value);
 					//console.log('p');
 					//console.log(value.children[0].innerHTML);
+					console.log(value.children[0]);
+					//alert(value.children[0].innerHTML)
                     $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
                     //$("<td />").text(value.children[3]}).appendTo(row); //FALTARIA INDICAR EL NOMBRE DEL DATASET   
                     var show_default = value.children[2].innerHTML;
                     if(show_default == 1){
+                    	console.log('muestra');
                     	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList"/ checked="checked">'; 
                     	$("<td />").html(inpStr).appendTo(row);
                     }
                     else {
+                    	console.log('no muestra');
                     	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
                     	$("<td />").html(inpStr).appendTo(row);
                     }
                     
                     row.appendTo(table);
                     cont = cont + 1;
-				});					
+				});		
+				
+				//prop-group-list
+				var list = document.getElementById('prop-group-list');
+				var elementsP = list.getElementsByClassName("prop-group-uri");
+				
+				console.log('lista agrupadaaaaaa');
+				console.log(elementsP);
+				/*
+				//var elementsG = list.getElementsByClassName("list-group-item" );
+				var elementsG = list.getElementsByClassName("list-group-item" );
+				console.log('lista hijooooos');
+				console.log(elementsG);
+				*/
+				$.each(elementsP, function(key, value){
 
+					var row = $("<tr />");
+					console.log(value);
+					
+                    $("<td />").text(value.innerHTML).appendTo(row); // URI
+                    /*
+                    var show_default = value.children[2].innerHTML;
+                    if(show_default == 1){
+                    	console.log('muestra');
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList"/ checked="checked">'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                    else {
+                    	console.log('no muestra');
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                   	*/
+                    //prueba
+                    var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    	
+                    row.appendTo(table);
+                    cont = cont + 1;
+				});
 			//}			
 		//});
 		$("#propertydiv").show();
 		
-	}
+	});
 	</script>
 </body>
 </html>
