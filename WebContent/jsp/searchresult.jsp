@@ -114,7 +114,7 @@
 							<c:if test="${i.show_default==1}">
 								<li class="list-group-item show-default">
 									
-									<p style = "display: none;"><c:out value="${i.uri}" /></p>
+									<p  class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
 											
 									<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
 									<p style="display: none;"><c:out value="${i.show_default}" /></p>
@@ -123,7 +123,7 @@
 									</c:if>
 									<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
 										<c:if test="${i.is_mapping == 1}">
-											<p><a href="#" onclick=""><c:out value="${i.value}" /></a></p>
+											<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
 										</c:if>
 										<c:if test="${i.is_mapping != 1}">
 											<p><c:out value="${i.value}" /></p>
@@ -134,7 +134,7 @@
 							<c:if test="${i.show_default==0}">
 								<li class="list-group-item not-show-default" style="display: none;">						
 									
-									<p style = "display: none;"><c:out value="${i.uri}" /></p>
+									<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
 									
 									<p><c:out value="${i.name}" /></p>
 									<p style="display: none;"><c:out value="${i.show_default}" /></p>
@@ -143,7 +143,7 @@
 									</c:if>
 									<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
 										<c:if test="${i.is_mapping == 1}">
-											<p><a href="#" onclick=""><c:out value="${i.value}" /></a></p>
+											<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
 										</c:if>
 										<c:if test="${i.is_mapping != 1}">
 											<p><c:out value="${i.value}" /></p>
@@ -162,11 +162,11 @@
 						Propiedades (valores)
 						<c:forEach items="${i.propertyList}" var="i"> 
 							<li class="list-group-item not-show-default">
-								<p style = "display: none;"><c:out value="${i.uri}" /><c:out value="${i.value}" /></p>
-								<p><c:out value="${i.name}" /></p>
+								<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+								<!-- <p><c:out value="${i.name}" /></p>  -->
 								<p style="display: none;"><c:out value="${i.show_default}" /></p>
 								<c:if test="${i.is_mapping == 1}">
-									<p><a href="#" onclick=""><c:out value="${i.value}" /></a></p>
+									<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
 								</c:if>
 								<c:if test="${i.is_mapping != 1}">
 									<p><c:out value="${i.value}" /></p>

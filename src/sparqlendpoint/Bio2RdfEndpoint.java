@@ -304,7 +304,7 @@ public class Bio2RdfEndpoint {
 				System.out.println("|value: ");			
 				System.out.println(aux);
 				p.setValue(aux);
-				
+				p.setShow_default(1);
 				//p.setName("gg "+i);
 				pList.add(p);		    		    	
 			}

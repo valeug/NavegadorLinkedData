@@ -34,11 +34,21 @@ $(document).ready(function() {
 		alert(parent.text());
 		var sib = parent.find( ".linked-t-uris" );
 	    $("#searchbox").val(sib.text());
-	    $("#searchbox").click();
+	    $("#search-button-results").click();
 	});
 	
 	
-	
+	$(".ref-value").click(function(){
+	    alert("The term was clicked.");
+		var parent = $(this).parent();
+		//console.log(parent);
+		//alert(parent.text());
+		var sib = parent.find( ".ref-value" );
+		console.log(sib);
+		console.log(sib.text());
+	    $("#searchbox").val(sib.text());
+	    $("#search-button-results").click();
+	});
 	
 	//save selected ontologies
 	$("#saveOntoBtn").click(function(){
