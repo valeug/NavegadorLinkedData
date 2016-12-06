@@ -552,9 +552,10 @@ public class SearchController {
 		
 		if(c.getPropertyGroups() != null){
 			System.out.println("PROPERTY GROUP: ");
-			System.out.println("pg size: " + c.getPropertyGroups().size());
+			System.out.println("list pg size: " + c.getPropertyGroups().size());
 			for(int i=0; i<c.getPropertyGroups().size(); i++){
 				System.out.println(i+") Group uri: " + c.getPropertyGroups().get(i).getUri());
+				System.out.println("pg size: " + c.getPropertyGroups().get(i).getPropertyList().size());
 				for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
 					System.out.println(k+". Property: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());
 				}

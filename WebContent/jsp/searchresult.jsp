@@ -153,6 +153,13 @@
 							</c:if>
 						</c:if>
 					</c:forEach>
+					<c:forEach items="${term.propertyGroups}" var="i">
+						Nombre:<br>
+						<c:out value="${i.name}" /><br>
+						Uri:
+						<c:out value="${i.uri}" /><br>
+						<br><br>
+					</c:forEach>
 				</ul>
 			</div>
 		</div>

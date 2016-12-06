@@ -486,17 +486,17 @@ public class DbpediaEndpoint {
 				
 				int [] res = findProperty(propUri, propValue,pList,pgList);
 								
-				int pos = -1;
+				//int pos = -1;
 				int posPG = -1;
 				int posP = -1;
-				
+				/*
 				if(res[0] == 1) pos = res[1];
 				if(res[0] == 2) {
 					posPG = res[1];
 					posP = res[2];
 				}
-				
-				System.out.println("pos: "+pos);
+				*/
+				//System.out.println("pos: "+pos);
 				System.out.println("res 0: "+res[0]);
 				System.out.println("res 1: "+res[1]);
 				System.out.println("res 2: "+res[2]);
@@ -543,19 +543,18 @@ public class DbpediaEndpoint {
 						}
 						*/	
 						
-						if(pos!= -1){ 
-							if(pList.get(pos).getIs_mapping() == 0 || (pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()==1)){ // DBPEDIA (ej: subject)
+						//if(pos!= -1){ 
+							//if(pList.get(pos).getIs_mapping() == 0 || (pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()==1)){ // DBPEDIA (ej: subject)
 
 								System.out.println("ENTRA A PROPIEDADES MAPPING - GROUP PROPERTY");
 								// se crea gouplist, para tener las propiedades que tienen el mismo uri agrupadas
-								if(res[0] == 1 && res[1] != -1){
-									
-									String aux = pList.get(pos).getName();
+								//if(res[0] == 1 && res[1] == -1){ //NO ENCONTRO GROUP
+								if(res[0] == 1 && res[1] != -1){	
+									String aux = pList.get(res[1]).getName();
 									if (pgList == null) pgList = new ArrayList<PropertyGroup>();
 									else {
 											//buscar la propiedad en los grupos
-											Property pOrig = pList.get(res[1]);
-											
+											Property pOrig = pList.get(res[1]);											
 											Property p = new Property();
 											
 											aux = pOrig.getUri();
@@ -585,48 +584,70 @@ public class DbpediaEndpoint {
 											pg.setPropertyList(props);
 											
 											// agregar a la lista de grupos
-											pg.getPropertyList().add(p);										
+											pg.getPropertyList().add(p);	
+											
+											Property copy = new Property();
+											copy.setId(pOrig.getId());
+											copy.setUri(pOrig.getUri());
+											copy.setName(pOrig.getName());
+											copy.setDescription(pOrig.getDescription());
+											copy.setIs_mapping(pOrig.getIs_mapping());
+											copy.setAdd(pOrig.getAdd());
+											copy.setNewProperty(pOrig.getNewProperty());
+											copy.setShow_default(pOrig.getShow_default());
+											copy.setTarget(pOrig.getTarget());
+											copy.setValue(pOrig.getValue());
+											
+											pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
+											// REMOVER pOrig de la lissta inicial
+											System.out.println("//////pList size ANTES: "+pList.size());
+											Property removed = pList.remove(res[1]);
+											
+											System.out.println("//////pList size DESPUES: "+pList.size());
 											pgList.add(pg);
 											System.out.println("CREO GROUP PROPERTY ;)");
 									}
 								}
-							}
+							//}
 							
-							if(res[0] == 2 && posPG != -1){ // encontro group
-								
+							//if(res[0] == 2 && posPG != -1){ // encontro group
+							if(res[0] == 2){
 								if(posP != -1){ /* encontro propiedad identica, incluso mismo valor -> no deberia agregar */
 									System.out.println("*****PROPIEDAD IDENTICA! ");
 								}
-								else { /* NO ENCONTRO PROPIEDAD EN EL GROUP -> crearla y agregarla */
-									
-										Property p = new Property();
-										
-										String aux = pList.get(pos).getUri();
-										p.setUri(aux);
-										aux = pList.get(pos).getName();
-										p.setName(aux);
-										aux = pList.get(pos).getDescription();
-										p.setDescription(aux);
-										int n = pList.get(pos).getId();
-										p.setId(n);
-										n = pList.get(pos).getIs_mapping();
-										p.setIs_mapping(n);
-										n = pList.get(pos).getTarget();
-										p.setTarget(n);
-										p.setValue(propValue);
-										p.setAdd(0);
-										
-										pgList.get(posPG).getPropertyList().add(p);
-
-								}
+							}
+							if(res[0] == 3) { /* NO ENCONTRO PROPIEDAD EN EL GROUP -> crearla y agregarla */
+								// en  res[2] esta la posicion de la propiedad en la lista simple
+								Property p = new Property();
+								Property oldy = pgList.get(res[1]).getPropertyList().get(0); // busco el 1ere elemento del grupo para copiar algo de info
 								
+								String aux = oldy.getUri();
+								p.setUri(aux);
+								aux = oldy.getName();
+								p.setName(aux);
+								aux = oldy.getDescription();
+								p.setDescription(aux);
+								int n = oldy.getId();
+								p.setId(n);
+								n = oldy.getIs_mapping();
+								p.setIs_mapping(n);
+								n = oldy.getTarget();								
+								p.setTarget(n);
+								p.setValue(propValue);
+								p.setAdd(0);
+								p.setNewProperty(oldy.getNewProperty());
+								p.setShow_default(oldy.getShow_default());
+								
+								pgList.get(res[1]).getPropertyList().add(p);
+								
+								System.out.println("ENCONTRO GROUP, CREAR PROPERTY ;)");
 							}
 							/*							
 							else { //no encontro group -> crear group, propiedad y agregarla (NOTA: si no encontro group, deberia estar en la lista simple)
 								
 							}
 							*/
-						}
+						//}
 					
 					}
 					/*
@@ -698,10 +719,18 @@ public class DbpediaEndpoint {
 		p.setValue(propValue);
 	}
 	
+	/*
+	 * res:
+	 * -1 -> no exite la propiedad en la lista simple (son las que son opcionales para el usuario, no esta la relacion en la BD)
+	 * 0 -> encontro la propiedad vacia, la llena (es la primera coincidencia)
+	 * 1 -> encontro la propiedad con un valor, se debe crear un grupo y pasar ambas props a ese grupo
+	 * 2 -> encontro grupo y propiedad exactamente igual (con mismo valor) en el grupo
+	 * 3 -> encontro grupo, pero no propiedad
+	 * */
 	private static int [] findProperty(String puri, String propvalue, List<Property>pList, List<PropertyGroup> pgList){
 		int [] res = new int [3];
 		
-		if(pList!=null)
+		if(pList!=null){
 			System.out.println("entro a lista simple");
 			for(int i=0; i<pList.size(); i++){
 				//if(pList.get(i).getUri().compareTo(puri) == 0 && pList.get(i).getName().compareTo("Agregados")!=0) 
@@ -714,10 +743,10 @@ public class DbpediaEndpoint {
 				}
 				*/				
 				if(p.getUri().compareTo(puri) == 0 && p.getValue()==null){ //propiedades que no han sido recientemente agregadas
-					res[0] = 1; //  lo encontro en la lista simple de propieades 
+					res[0] = 0; //  lo encontro en la lista simple de propieades 
 					res[1] = -1; 
 					res[2] = -1;
-					getMappingUri(p, propvalue);					
+					getMappingUri(p, propvalue);	//EVALUA SI ES QUE MAPEA O NO				
 					p.setAdd(0);
 					return res;
 				}
@@ -729,21 +758,23 @@ public class DbpediaEndpoint {
 					return res;
 				}
 			}
-		
-		res[0] = -1;
+		}
+		res[0] = 1;
 		res[1] = -1;
 		res[2] = -1;
 		
+		boolean groupFound = false;
 		if(pgList != null){
 			System.out.println("entro a lista group");
 			for(int i=0; i<pgList.size(); i++){				
 				if(pgList.get(i).getUri().compareTo(puri) == 0){ //propiedades que no han sido recientemente agregadas
-					res[0] = 2; /* existe la lista group para esa propiedad*/
+					res[0] = 3; /* existe la lista group para esa propiedad*/
 					res[1] = i; /* posicion del grupo en la lista*/ 
-					
+					groupFound = true;
 					List<Property> propgList = pgList.get(i).getPropertyList();
 					for(int x=0; x < propgList.size(); x++){
 						if(propgList.get(x).getValue().compareTo(propvalue)==0){
+							res[0] = 2; // Existe propiedad en el grupo
 							res[2] = x; /* encontro propiedad en el grupo*/
 							return res;
 						}
@@ -752,7 +783,9 @@ public class DbpediaEndpoint {
 				}
 			}
 		}
+		if(groupFound) return res;
 		
+		res[0] = -1;
 		return res;
 	}
 	
