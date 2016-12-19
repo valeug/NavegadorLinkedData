@@ -483,7 +483,6 @@ public class DbpediaEndpoint {
 				urisList.add(propUri);
 				valuesList.add(propValue);
 				
-				
 				int [] res = findProperty(propUri, propValue,pList,pgList);
 								
 				//int pos = -1;
@@ -504,18 +503,39 @@ public class DbpediaEndpoint {
 								
 				if(res[0] == -1){ // no encontro la porpiedad en la lista de propiedades del concepto
 					//agrega propiedad  (PROPIEDADES QUE EL USUARIO AGREGARA SI DESEA)
-					Property p = new Property();
-					p.setUri(propUri);
-					p.setValue(propValue);
-					p.setName("Agregados");
-					p.setShow_default(0);
-					p.setIs_mapping(0);
-					p.setAdd(0);
-					p.setNewProperty(1);
-					pList.add(p);		
 					
-					System.out.println("---PROPIEDAD: "+ propUri);
-					System.out.println("---Show Default: "+p.getShow_default());
+					if(propUri.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){
+						if((propValue.contains("http://dbpedia.org/ontology/") || propValue.compareTo("http://www.w3.org/2002/07/owl#Thing")==0 )){ //podria sacar las clases de la BD
+							Property p = new Property();
+							p.setUri(propUri);
+							p.setValue(propValue);
+							p.setName("Agregados");
+							p.setShow_default(0);
+							p.setIs_mapping(0);
+							p.setAdd(0);
+							p.setNewProperty(1);
+							pList.add(p);
+							
+							System.out.println("---PROPIEDAD: "+ propUri);
+							System.out.println("---Show Default: "+p.getShow_default());
+						}
+					}
+					else{
+						Property p = new Property();
+						p.setUri(propUri);
+						p.setValue(propValue);
+						p.setName("Agregados");
+						p.setShow_default(0);
+						p.setIs_mapping(0);
+						p.setAdd(0);
+						p.setNewProperty(1);
+						pList.add(p);
+						
+						System.out.println("---PROPIEDAD: "+ propUri);
+						System.out.println("---Show Default: "+p.getShow_default());
+					}							
+					
+					
 				}
 				else { // encontro propiedad -> se actuazlin valores
 					//pList.get(pos).setValue(propValue);
@@ -549,63 +569,126 @@ public class DbpediaEndpoint {
 								System.out.println("ENTRA A PROPIEDADES MAPPING - GROUP PROPERTY");
 								// se crea gouplist, para tener las propiedades que tienen el mismo uri agrupadas
 								//if(res[0] == 1 && res[1] == -1){ //NO ENCONTRO GROUP
-								if(res[0] == 1 && res[1] != -1){	
+								if(res[0] == 1 && res[1] != -1){ 
 									String aux = pList.get(res[1]).getName();
 									if (pgList == null) pgList = new ArrayList<PropertyGroup>();
-									else {
-											//buscar la propiedad en los grupos
-											Property pOrig = pList.get(res[1]);											
-											Property p = new Property();
+									else {	
 											
-											aux = pOrig.getUri();
-											p.setUri(aux);
-											aux = pOrig.getName();
-											p.setName(aux);
-											aux = pOrig.getDescription();
-											p.setDescription(aux);
-											int n = pOrig.getId();
-											p.setId(n);
-											n = pOrig.getIs_mapping();
-											p.setIs_mapping(n);
-											n = pOrig.getTarget();
-											p.setTarget(n);	
-											getMappingUri(p,propValue);
-											//p.setValue(propValue);
-											p.setAdd(0);
+											if(propUri.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){
+												if((propValue.contains("http://dbpedia.org/ontology/") || propValue.compareTo("http://www.w3.org/2002/07/owl#Thing")==0 )){ //podria sacar las clases de la BD
+													//buscar la propiedad en los grupos
+													Property pOrig = pList.get(res[1]);											
+													Property p = new Property();
+													
+													aux = pOrig.getUri();
+													p.setUri(aux);
+													aux = pOrig.getName();
+													p.setName(aux);
+													aux = pOrig.getDescription();
+													p.setDescription(aux);
+													int n = pOrig.getId();
+													p.setId(n);
+													n = pOrig.getIs_mapping();
+													p.setIs_mapping(n);
+													n = pOrig.getTarget();
+													p.setTarget(n);	
+													getMappingUri(p,propValue);
+													//p.setValue(propValue);
+													p.setAdd(0);
+													
+													// si no esta inicializado, inicializar lista de grupos
+													//if(pgList == null) pgList = new ArrayList<PropertyGroup>();
+													
+													// crear grupo
+													PropertyGroup pg = new PropertyGroup();
+													pg.setUri(p.getUri());
+													pg.setName(p.getName());
+													List<Property> props = new ArrayList<Property>();
+													pg.setPropertyList(props);
+													
+													// agregar a la lista de grupos
+													pg.getPropertyList().add(p);	
+													
+													Property copy = new Property();
+													copy.setId(pOrig.getId());
+													copy.setUri(pOrig.getUri());
+													copy.setName(pOrig.getName());
+													copy.setDescription(pOrig.getDescription());
+													copy.setIs_mapping(pOrig.getIs_mapping());
+													copy.setAdd(pOrig.getAdd());
+													copy.setNewProperty(pOrig.getNewProperty());
+													copy.setShow_default(pOrig.getShow_default());
+													copy.setTarget(pOrig.getTarget());
+													copy.setValue(pOrig.getValue());
+													
+													pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
+													// REMOVER pOrig de la lissta inicial
+													System.out.println("//////pList size ANTES: "+pList.size());
+													Property removed = pList.remove(res[1]);
+													
+													System.out.println("//////pList size DESPUES: "+pList.size());
+													pgList.add(pg);
+													System.out.println("CREO GROUP PROPERTY ;)");
+												}
+												
+											}
+											else {
+												//buscar la propiedad en los grupos
+												Property pOrig = pList.get(res[1]);											
+												Property p = new Property();
+												
+												aux = pOrig.getUri();
+												p.setUri(aux);
+												aux = pOrig.getName();
+												p.setName(aux);
+												aux = pOrig.getDescription();
+												p.setDescription(aux);
+												int n = pOrig.getId();
+												p.setId(n);
+												n = pOrig.getIs_mapping();
+												p.setIs_mapping(n);
+												n = pOrig.getTarget();
+												p.setTarget(n);	
+												getMappingUri(p,propValue);
+												//p.setValue(propValue);
+												p.setAdd(0);
+												
+												// si no esta inicializado, inicializar lista de grupos
+												//if(pgList == null) pgList = new ArrayList<PropertyGroup>();
+												
+												// crear grupo
+												PropertyGroup pg = new PropertyGroup();
+												pg.setUri(p.getUri());
+												pg.setName(p.getName());
+												List<Property> props = new ArrayList<Property>();
+												pg.setPropertyList(props);
+												
+												// agregar a la lista de grupos
+												pg.getPropertyList().add(p);	
+												
+												Property copy = new Property();
+												copy.setId(pOrig.getId());
+												copy.setUri(pOrig.getUri());
+												copy.setName(pOrig.getName());
+												copy.setDescription(pOrig.getDescription());
+												copy.setIs_mapping(pOrig.getIs_mapping());
+												copy.setAdd(pOrig.getAdd());
+												copy.setNewProperty(pOrig.getNewProperty());
+												copy.setShow_default(pOrig.getShow_default());
+												copy.setTarget(pOrig.getTarget());
+												copy.setValue(pOrig.getValue());
+												
+												pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
+												// REMOVER pOrig de la lissta inicial
+												System.out.println("//////pList size ANTES: "+pList.size());
+												Property removed = pList.remove(res[1]);
+												
+												System.out.println("//////pList size DESPUES: "+pList.size());
+												pgList.add(pg);
+												System.out.println("CREO GROUP PROPERTY ;)");
+											}
+										
 											
-											// si no esta inicializado, inicializar lista de grupos
-											if(pgList == null) pgList = new ArrayList<PropertyGroup>();
-											
-											// crear grupo
-											PropertyGroup pg = new PropertyGroup();
-											pg.setUri(p.getUri());
-											pg.setName(p.getName());
-											List<Property> props = new ArrayList<Property>();
-											pg.setPropertyList(props);
-											
-											// agregar a la lista de grupos
-											pg.getPropertyList().add(p);	
-											
-											Property copy = new Property();
-											copy.setId(pOrig.getId());
-											copy.setUri(pOrig.getUri());
-											copy.setName(pOrig.getName());
-											copy.setDescription(pOrig.getDescription());
-											copy.setIs_mapping(pOrig.getIs_mapping());
-											copy.setAdd(pOrig.getAdd());
-											copy.setNewProperty(pOrig.getNewProperty());
-											copy.setShow_default(pOrig.getShow_default());
-											copy.setTarget(pOrig.getTarget());
-											copy.setValue(pOrig.getValue());
-											
-											pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
-											// REMOVER pOrig de la lissta inicial
-											System.out.println("//////pList size ANTES: "+pList.size());
-											Property removed = pList.remove(res[1]);
-											
-											System.out.println("//////pList size DESPUES: "+pList.size());
-											pgList.add(pg);
-											System.out.println("CREO GROUP PROPERTY ;)");
 									}
 								}
 							//}
@@ -618,29 +701,62 @@ public class DbpediaEndpoint {
 							}
 							if(res[0] == 3) { /* NO ENCONTRO PROPIEDAD EN EL GROUP -> crearla y agregarla */
 								// en  res[2] esta la posicion de la propiedad en la lista simple
-								Property p = new Property();
-								Property oldy = pgList.get(res[1]).getPropertyList().get(0); // busco el 1ere elemento del grupo para copiar algo de info
 								
-								String aux = oldy.getUri();
-								p.setUri(aux);
-								aux = oldy.getName();
-								p.setName(aux);
-								aux = oldy.getDescription();
-								p.setDescription(aux);
-								int n = oldy.getId();
-								p.setId(n);
-								n = oldy.getIs_mapping();
-								p.setIs_mapping(n);
-								n = oldy.getTarget();								
-								p.setTarget(n);
-								p.setValue(propValue);
-								p.setAdd(0);
-								p.setNewProperty(oldy.getNewProperty());
-								p.setShow_default(oldy.getShow_default());
+								if(propUri.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){
+									if((propValue.contains("http://dbpedia.org/ontology/") || propValue.compareTo("http://www.w3.org/2002/07/owl#Thing")==0 )){ //podria sacar las clases de la BD
+										Property p = new Property();
+										Property oldy = pgList.get(res[1]).getPropertyList().get(0); // busco el 1ere elemento del grupo para copiar algo de info
+										
+										String aux = oldy.getUri();
+										p.setUri(aux);
+										aux = oldy.getName();
+										p.setName(aux);
+										aux = oldy.getDescription();
+										p.setDescription(aux);
+										int n = oldy.getId();
+										p.setId(n);
+										n = oldy.getIs_mapping();
+										p.setIs_mapping(n);
+										n = oldy.getTarget();								
+										p.setTarget(n);
+										//p.setValue(propValue);
+										getMappingUri(p,propValue);
+										p.setAdd(0);
+										p.setNewProperty(oldy.getNewProperty());
+										p.setShow_default(oldy.getShow_default());
+										
+										pgList.get(res[1]).getPropertyList().add(p);
+										
+										System.out.println("ENCONTRO GROUP, CREAR PROPERTY ;)");
+									}
+								}
+								else{
+									Property p = new Property();
+									Property oldy = pgList.get(res[1]).getPropertyList().get(0); // busco el 1ere elemento del grupo para copiar algo de info
+									
+									String aux = oldy.getUri();
+									p.setUri(aux);
+									aux = oldy.getName();
+									p.setName(aux);
+									aux = oldy.getDescription();
+									p.setDescription(aux);
+									int n = oldy.getId();
+									p.setId(n);
+									n = oldy.getIs_mapping();
+									p.setIs_mapping(n);
+									n = oldy.getTarget();								
+									p.setTarget(n);
+									//p.setValue(propValue);
+									getMappingUri(p,propValue);
+									p.setAdd(0);
+									p.setNewProperty(oldy.getNewProperty());
+									p.setShow_default(oldy.getShow_default());
+									
+									pgList.get(res[1]).getPropertyList().add(p);
+									
+									System.out.println("ENCONTRO GROUP, CREAR PROPERTY ;)");
+								}
 								
-								pgList.get(res[1]).getPropertyList().add(p);
-								
-								System.out.println("ENCONTRO GROUP, CREAR PROPERTY ;)");
 							}
 							/*							
 							else { //no encontro group -> crear group, propiedad y agregarla (NOTA: si no encontro group, deberia estar en la lista simple)
@@ -696,11 +812,14 @@ public class DbpediaEndpoint {
 		
 		System.out.println("pgList GROUP size: " + pgList.size());
 		
+		qexec.close();
+		
 		return name;
 	}
 	
 	private static void getMappingUri(Property p, String propValue){
 		
+		// Es propiedad de mapeo
 		if(p.getIs_mapping() == 1 && p.getTarget()>1){ // mapping a dataset en Bio2rdf
 			String inputUri = null;
 			switch(p.getTarget()){								
@@ -716,6 +835,7 @@ public class DbpediaEndpoint {
 			p.setValue(inputUri);
 			return ;
 		}
+		
 		p.setValue(propValue);
 	}
 	
@@ -766,6 +886,7 @@ public class DbpediaEndpoint {
 		boolean groupFound = false;
 		if(pgList != null){
 			System.out.println("entro a lista group");
+			System.out.println("pURI: " + puri);
 			for(int i=0; i<pgList.size(); i++){				
 				if(pgList.get(i).getUri().compareTo(puri) == 0){ //propiedades que no han sido recientemente agregadas
 					res[0] = 3; /* existe la lista group para esa propiedad*/
@@ -773,6 +894,7 @@ public class DbpediaEndpoint {
 					groupFound = true;
 					List<Property> propgList = pgList.get(i).getPropertyList();
 					for(int x=0; x < propgList.size(); x++){
+						System.out.println("propgList value: " + propgList.get(x).getValue());
 						if(propgList.get(x).getValue().compareTo(propvalue)==0){
 							res[0] = 2; // Existe propiedad en el grupo
 							res[2] = x; /* encontro propiedad en el grupo*/
