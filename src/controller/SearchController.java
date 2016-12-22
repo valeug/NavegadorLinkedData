@@ -104,11 +104,16 @@ public class SearchController {
 						System.out.println("ANTES term properties: " + term.getProperties().size());
 						addInfoToTerm(term, termsMappingList, similarTerms);
 					}
-					else {
+					//else {
 						// No se encontro el concepto en DBPediam, se busca en bio2rdf
-						exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match			
-					}
-				
+						System.out.println("\n\n\nENTRO exacTerms\n");
+						exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match		
+						
+						for(int i=0; i < exactTerms.size(); i++){
+							System.out.println("--------/nTERM " + i + "--------");
+							printConcept(exactTerms.get(i));						
+						}
+					//}				
 			}
 		}
 		else {
@@ -531,54 +536,55 @@ public class SearchController {
 		System.out.println("	CONCEPTO FINAL");
 		System.out.println("==============================");
 		
-		if(c.getName() != null)
-			System.out.println("name: " + c.getName());
-		else System.out.println("Nombre null :/");
-		
-		if(c.getUri() != null)
-			System.out.println("uri: " + c.getUri());
-		else System.out.println("Uri null :/");
-		
-		if(c.getProperties() != null){
-			System.out.println("Propiedades: ");
-			System.out.println("Propiedades size: " + c.getProperties().size());
-			for(int i=0; i<c.getProperties().size(); i++){
-				System.out.println(i+") uri: " + c.getProperties().get(i).getUri());
-				System.out.println(i+") value: " + c.getProperties().get(i).getValue());
-				System.out.println(i+") show_default: " + c.getProperties().get(i).getShow_default());
-			}
-		}
-		else System.out.println("Propiedades null :/");
-		
-		if(c.getPropertyGroups() != null){
-			System.out.println("PROPERTY GROUP: ");
-			System.out.println("list pg size: " + c.getPropertyGroups().size());
-			for(int i=0; i<c.getPropertyGroups().size(); i++){
-				System.out.println(i+") Group uri: " + c.getPropertyGroups().get(i).getUri());
-				System.out.println("pg size: " + c.getPropertyGroups().get(i).getPropertyList().size());
-				for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
-					System.out.println(k+". Property: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());
+		if( c != null){
+			if(c.getName() != null)
+				System.out.println("name: " + c.getName());
+			else System.out.println("Nombre null :/");
+			
+			if(c.getUri() != null)
+				System.out.println("uri: " + c.getUri());
+			else System.out.println("Uri null :/");
+			
+			if(c.getProperties() != null){
+				System.out.println("Propiedades: ");
+				System.out.println("Propiedades size: " + c.getProperties().size());
+				for(int i=0; i<c.getProperties().size(); i++){
+					System.out.println(i+") uri: " + c.getProperties().get(i).getUri());
+					System.out.println(i+") value: " + c.getProperties().get(i).getValue());
+					System.out.println(i+") show_default: " + c.getProperties().get(i).getShow_default());
 				}
 			}
-		}
-		else System.out.println("Propiedades GROUP null :/");
-		
-		if(c.getSimilarTerms() != null){
-			System.out.println("Similar terms: ");
-			for(int i=0; i<c.getSimilarTerms().size(); i++){
-				System.out.println(i+") " + c.getSimilarTerms().get(i).getName());
+			else System.out.println("Propiedades null :/");
+			
+			if(c.getPropertyGroups() != null){
+				System.out.println("PROPERTY GROUP: ");
+				System.out.println("list pg size: " + c.getPropertyGroups().size());
+				for(int i=0; i<c.getPropertyGroups().size(); i++){
+					System.out.println(i+") Group uri: " + c.getPropertyGroups().get(i).getUri());
+					System.out.println("pg size: " + c.getPropertyGroups().get(i).getPropertyList().size());
+					for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
+						System.out.println(k+". Property: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());
+					}
+				}
 			}
-		}
-		else System.out.println("Similar terms null :/");
-		
-		if(c.getLinkedTerms() != null){
-			System.out.println("Linked terms: ");
-			for(int i=0; i<c.getLinkedTerms().size(); i++){
-				System.out.println(i+") " + c.getLinkedTerms().get(i).getName());
+			else System.out.println("Propiedades GROUP null :/");
+			
+			if(c.getSimilarTerms() != null){
+				System.out.println("Similar terms: ");
+				for(int i=0; i<c.getSimilarTerms().size(); i++){
+					System.out.println(i+") " + c.getSimilarTerms().get(i).getName());
+				}
 			}
+			else System.out.println("Similar terms null :/");
+			
+			if(c.getLinkedTerms() != null){
+				System.out.println("Linked terms: ");
+				for(int i=0; i<c.getLinkedTerms().size(); i++){
+					System.out.println(i+") " + c.getLinkedTerms().get(i).getName());
+				}
+			}
+			else System.out.println("Linked terms null :/");
 		}
-		else System.out.println("Linked terms null :/");
-		
 	}
 	
 	

@@ -47,31 +47,31 @@ public class Bio2RdfEndpoint {
 	public static Concept searchTermByExactMatch(String cad, Dataset dataset){
 		System.out.println("DATASET : " + dataset.getName());
 		System.out.println("DATASET id: " + dataset.getId());
-		
+		System.out.println("cad: " + cad);
 		String fromQ = "";
 		
 		if(dataset!=null)
-			fromQ = "	FROM <" + dataset.getUri() + "> ";
+			fromQ = " FROM <" + dataset.getUri() + "> ";
 		
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 						" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 						" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
-			"	SELECT DISTINCT * " +
+			" SELECT DISTINCT * " +
 			fromQ +
-			"	WHERE {"+
-			"		?s rdf:type ?type . " +
+			" WHERE { "+
+			" ?s rdf:type ?type . " +
 			//"		?s ?property ?value . " + //obtener propiedades
-			"		?s <http://purl.org/dc/terms/title> ?label . " +
-			"	FILTER (UCASE(str(?label)) = \"" + cad.toUpperCase() +"\")" +
-			"	} "+
-			"	LIMIT 10";
+			" ?s <http://purl.org/dc/terms/title> ?label . " +
+			" FILTER (UCASE(str(?label)) = \"" + cad.toUpperCase() +"\") " +
+			"} "+
+			"LIMIT 10";
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
 	
 		ResultSet results = qexec.execSelect();
-		ResultSet raux = results;
+		
 		//ResultSetFormatter.out(System.out, raux, query);    
 	
 		// Informacion del resultado		
@@ -101,24 +101,32 @@ public class Bio2RdfEndpoint {
 			types.add(aux);
 
 		} 
-	
-		// faltaria obtener la DEFINICION del concepto -> DEPENDE DE CADA DATASET
 		
-		System.out.println("size TYPES: " +types.size());
-		System.out.println("size classesDataset: " +classesDataset.size());
-		// ELEGIR URI
-		int posUri = selectUriMatchClass(types, classesDataset);
+		if(uris.size() > 0){
+			// faltaria obtener la DEFINICION del concepto -> DEPENDE DE CADA DATASET
+			System.out.println("size URIS: " + uris.size());
+			System.out.println("size TYPES: " +types.size());
+			System.out.println("size classesDataset: " +classesDataset.size());
+			// ELEGIR URI
+			int posUri = selectUriMatchClass(types, classesDataset);
+			
+			List<Property> pList = PropertyDAO.getAllPropertiesByClass(classesDataset.get(posUri).getIdClass());
+			
+			System.out.println("uris size: " + uris.size());
+			System.out.println("pList size: " + pList.size());
+			getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+			
+			
+			qexec.close();		
+			Concept c = new Concept();
+			c.setProperties(pList);
+			c.setProperties(pList);
+			return c;
+		}
 		
-		List<Property> pList = PropertyDAO.getAllPropertiesByClass(classesDataset.get(posUri).getIdClass());
-
-		getPropertiesValues(uris.get(posUri),pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+		qexec.close();
 		
-		
-		qexec.close();		
 		Concept c = new Concept();
-		c.setProperties(pList);
-		c.setProperties(pList);
-		
 		return c;
 	}
 
@@ -172,6 +180,7 @@ public class Bio2RdfEndpoint {
 			}			
 		}
 		
+		qexec.close();
 		System.out.println("cant: " + cont);
 	}
 		
@@ -565,6 +574,7 @@ public class Bio2RdfEndpoint {
 			i++;
 		}
 				
+		qexec.close();
 		return concepts;		
 	}
 
@@ -658,7 +668,7 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 			}
 			
 		} 
-		
+		qexec.close();
 		System.out.println("Property match - termList size: " + termsList.size());
 		return termsList;
 	}
