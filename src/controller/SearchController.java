@@ -44,7 +44,10 @@ public class SearchController {
 	
 	/*		FUNCION PRINCIPAL QUE INICIA LA BUSQUEDA	*/
 	
-	public static Concept searchConcept(HttpServletRequest request) {
+	public static  int  searchConcept(HttpServletRequest request, List<Concept> termList  ) {
+		
+		int flagUri;
+		
 		Concept term = null;
 		String input = request.getParameter("concept");
 		
@@ -60,14 +63,16 @@ public class SearchController {
 		int posBio [] = new int [5]; //posiciones de datasets de bio2rdf en la lista de datasets(datasetList)
 		int cant = 0, found = 0, seleccDbpedia=0;
 
-		
-		if(!InputSearchProcessor.isUri(input)){
-			
+		if(!InputSearchProcessor.isUri(input)){ // cadena, 1era busqueda
+			flagUri = 0;
 			for(int i=0; i<datasetList.size(); i++){
 				int idDat = datasetList.get(i).getId();
 				if(idDat == 1){ //DBPedia
 					if(!InputSearchProcessor.isUri(input)){					
 						term = DbpediaEndpoint.searchTermByExactMatch(input); 
+						//termList.add(term);
+						System.out.println("\n---------------------\n---------------------\n IMPRIMELO 1\n---------------------\n---------------------");
+						printConcept(term);
 					}
 					
 					if(term!=null) found = 1;
@@ -90,19 +95,24 @@ public class SearchController {
 					if(found==1){ // Se encontro el termino en DBPedia -> se busca lista de terminos en Bio2rdf
 
 						//printConcept(term);
+						/*
 						System.out.println("term name: " + term.name);
 						System.out.println("term properties: " + term.getProperties().size());
 						System.out.println("dataset LIST: " + datasetList.size());
-						
+						*/
 						termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
+						System.out.println("\n---------------------\n---------------------\n IMPRIMELO 2\n---------------------\n---------------------");
+						printConcept(term);
 						similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
 						
 						
-						if(term==null) System.out.println("term null!");
+						//if(term==null) System.out.println("term null!");
 						
 						//System.out.println("termsMappingList size: " + termsMappingList.size());
 						System.out.println("ANTES term properties: " + term.getProperties().size());
 						addInfoToTerm(term, termsMappingList, similarTerms);
+						System.out.println("\n---------------------\n---------------------\n IMPRIMELO 3\n---------------------\n---------------------");
+						printConcept(term);
 					}
 					//else {
 						// No se encontro el concepto en DBPediam, se busca en bio2rdf
@@ -110,43 +120,23 @@ public class SearchController {
 						exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match		
 						
 						for(int i=0; i < exactTerms.size(); i++){
-							System.out.println("--------/nTERM " + i + "--------");
+							System.out.println("--------/n exact TERM " + i + "--------");
+							termList.add(exactTerms.get(i));
 							printConcept(exactTerms.get(i));						
+						}
+						
+						System.out.println("\n\nmapping size: " + termsMappingList.size());
+						for(int i=0; i < termsMappingList.size(); i++){
+							System.out.println("--------/n mapping TERM " + i + "--------");
+							termList.add(termsMappingList.get(i));
+							printConcept(termsMappingList.get(i));						
 						}
 					//}				
 			}
 		}
 		else {
 			System.out.println("BUSCA URI!");
-			
-			/*
-			System.out.println("input: " + input);
-			int idDatasetMatch = findUriOrigin(input);
-			System.out.println("idDatasetMatch: " + idDatasetMatch);	
-			
-			System.out.println("datasetList.size(): " + datasetList.size());
-			for(int i=0; i<datasetList.size(); i++){
-				int idDat = datasetList.get(i).getId();
-				if(idDat == 1){ //DBPedia					
-					if(input.contains("http://dbpedia.org/")){
-						term = DbpediaEndpoint.searchByUri(input);
-					}
-				}
-				else if(idDat == idDatasetMatch){ //Bio2RDF
-					System.out.println("dataset origin uri: " + idDat);
-					if(input.contains("http://bio2rdf.org/")){
-						System.out.println("entro a uri bio2rdf");
-						term = Bio2RdfEndpoint.searchTermByExactMatchUri(input, datasetList.get(i));
-						
-						if(term == null) System.out.println("null wtf");
-						else System.out.println("NOT null wtf");
-						
-						break;
-					}
-					System.out.println("hallo termino by uri BIO2RDF ;) " + idDat);
-				}
-			}	
-			*/
+			flagUri = 1;			
 			
 			if(input.contains("http://bio2rdf.org/")){
 				int idDatasetMatch = findUriOrigin(input);
@@ -162,7 +152,7 @@ public class SearchController {
 						System.out.println("entro a uri bio2rdf");
 						// si no es goa
 						term = Bio2RdfEndpoint.searchTermByExactMatchUri(input, dat);
-						
+						//termList.add(term);
 						//si es goa 
 						
 						
@@ -176,7 +166,7 @@ public class SearchController {
 			else if(input.contains("http://dbpedia.org/")){
 				//SI ES TERMINO
 				term = DbpediaEndpoint.searchByUri(input);
-				
+				//termList.add(term);
 				//SI ES CLASE
 			}
 			
@@ -187,9 +177,18 @@ public class SearchController {
 		
 		
 		//term.setName("basurita");
-		printConcept(term);
+		//printConcept(term);
 		
-		return term; //DEVUELVE TERMINO SOLO DE DBPEDIA
+		termList.add(term);
+		
+		
+		System.out.println("\n\n\n\n\n\n---------------\n FINAL ---------------\n\n\n\n");
+		for(int i=0; i < termList.size(); i++){
+			System.out.println("--------/n  TERM " + i + "--------");			
+			printConcept(termList.get(i));						
+		}
+		
+		return flagUri;
 	}
 	private static int findUriOrigin(String input){
 		
@@ -544,7 +543,7 @@ public class SearchController {
 			if(c.getUri() != null)
 				System.out.println("uri: " + c.getUri());
 			else System.out.println("Uri null :/");
-			
+						
 			if(c.getProperties() != null){
 				System.out.println("Propiedades: ");
 				System.out.println("Propiedades size: " + c.getProperties().size());
@@ -552,6 +551,7 @@ public class SearchController {
 					System.out.println(i+") uri: " + c.getProperties().get(i).getUri());
 					System.out.println(i+") value: " + c.getProperties().get(i).getValue());
 					System.out.println(i+") show_default: " + c.getProperties().get(i).getShow_default());
+					System.out.println(i+") consolidated: " + c.getProperties().get(i).getConsolidated());
 				}
 			}
 			else System.out.println("Propiedades null :/");
@@ -561,9 +561,11 @@ public class SearchController {
 				System.out.println("list pg size: " + c.getPropertyGroups().size());
 				for(int i=0; i<c.getPropertyGroups().size(); i++){
 					System.out.println(i+") Group uri: " + c.getPropertyGroups().get(i).getUri());
+					System.out.println(i+") Group consolidated: " + c.getPropertyGroups().get(i).getConsolidated());
 					System.out.println("pg size: " + c.getPropertyGroups().get(i).getPropertyList().size());
 					for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
 						System.out.println(k+". Property: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());
+						//System.out.println(k+") consolidated: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getConsolidated());
 					}
 				}
 			}

@@ -102,6 +102,133 @@
 			</div>
 		</div>
 		-->
+		
+		<div class = "row"> 
+			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >			
+				<c:forEach items="${termsConsolidated}" var="i">					
+					<c:if test="${i.propertyGroups != null}">
+						<ul id="prop-group-list" class="list-group prop-group-list">
+							<!--  <p>PROPIEDADES AGRUPADAS</p> -->
+							<c:forEach items="${i.propertyGroups}" var="j">	
+								<%-- --%>
+								<c:if test="${j.consolidated == 1}"> 
+															
+										<p class="prop-group-name"><c:out value="${j.name}" /></p>							
+										<p class="prop-group-uri"><c:out value="${j.uri}" /></p>	 						
+										<c:forEach items="${j.propertyList}" var="k"> 
+											<li class="list-group-item not-show-default">
+												<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>
+												<!-- <p><c:out value="${i.name}" /></p>  -->
+												<p style="display: none;"><c:out value="${k.show_default}" /></p>
+												<c:if test="${k.is_mapping == 1}">
+													<p><a class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
+												</c:if>
+												<c:if test="${k.is_mapping != 1}">
+													<p><c:out value="${k.value}" /></p>
+												</c:if>
+											</li>
+										</c:forEach>		
+								</c:if>						
+							</c:forEach>
+						</ul>
+					</c:if>
+					
+					<c:if test="${i.properties != null}">
+						<p class="subtitle">Propiedades</p>					
+						<ul id="prop-list" class="list-group">
+							<c:forEach items="${i.properties}" var="i">
+								<!-- 
+								<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
+								 -->
+								 
+								<c:if test="${i.value != null}">
+								<%-- --%>
+									<c:if test="${i.consolidated == 1}"> 
+								
+											<c:if test="${i.show_default==1}">
+												<li class="list-group-item show-default">
+													
+													<p  class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+															
+													<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
+													<p style="display: none;"><c:out value="${i.show_default}" /></p>
+													<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+														<img src="${i.value}}" alt="Smiley face" >
+													</c:if>
+													<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+														<c:if test="${i.is_mapping == 1}">
+															<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+														</c:if>
+														<c:if test="${i.is_mapping != 1}">
+															<p><c:out value="${i.value}" /></p>
+														</c:if>									
+													</c:if>		
+												</li>
+											</c:if>
+											<c:if test="${i.show_default==0}">
+												<li class="list-group-item not-show-default" style="display: none;">						
+													
+													<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+													
+													<p><c:out value="${i.name}" /></p>
+													<p style="display: none;"><c:out value="${i.show_default}" /></p>
+													<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+														<img src="${i.value}}" alt="Smiley face" >
+													</c:if>
+													<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+														<c:if test="${i.is_mapping == 1}">
+															<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+														</c:if>
+														<c:if test="${i.is_mapping != 1}">
+															<p><c:out value="${i.value}" /></p>
+														</c:if>									
+													</c:if>		
+												</li>
+											</c:if>
+									</c:if>
+								</c:if>
+							</c:forEach>	
+						</ul>
+					</c:if>
+															
+					<%-- 
+					<!-- PROPIEDADES AGRUPADAS -->
+					<c:if test="${i.propertyGroups==null}">
+						is null kid !!!!!!!!!!!!!!!!!
+					</c:if>
+					<c:if test="${i.propertyGroups!=null}">
+						<c:forEach items="${i.propertyGroups}" var="i">	
+							<!-- 						
+							<p class="prop-group-name"><c:out value="${i.name}" /></p>								
+							<p class="prop-group-uri"><c:out value="${i.uri}" /></p>
+							 -->		 						
+							Propiedades (agrupados)
+							<ul id="prop-list" class="list-group">
+								<c:forEach items="${i.propertyList}" var="i"> 
+									<li class="list-group-item not-show-default">
+										<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+										<!-- <p><c:out value="${i.name}" /></p>  -->
+										<p style="display: none;"><c:out value="${i.show_default}" /></p>
+										<c:if test="${i.is_mapping == 1}">
+											<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+										</c:if>
+										<c:if test="${i.is_mapping != 1}">
+											<p><c:out value="${i.value}" /></p>
+										</c:if>
+										XD
+									</li>
+								</c:forEach>
+							</ul>					
+						</c:forEach>
+					</c:if>
+					--%>
+					
+					
+
+				</c:forEach>				
+			</div>
+		</div>
+		<%--
 		<div class = "row"> 
 			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >
 				<p class="subtitle">Propiedades</p>
@@ -180,6 +307,10 @@
 				</ul>
 			</div>
 		</div>
+		
+		 --%>
+		
+		
 		<%-- 
 		<div class = "row"> 
 			<div class="col-md-12 ref-info-row" >
@@ -214,6 +345,8 @@
 			</div>
 		</div>
 		--%>
+		
+		<%--
 		<div class = "row"> 
 			<div style= "padding: 30px;" class="col-md-12 sim-info-row" >
 				<p class="subtitle">Terminos similares:</p> 
@@ -228,6 +361,7 @@
 				<div id="mydiv"></div>
 			</div>
 		</div>
+		--%>
 	</div>
 	
 	<script type="text/javascript">
@@ -251,90 +385,90 @@
 	    $("#propertydiv").hide();
 	    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
 	    //$.get('RetrieveOntologies',function(responseJson){
-	    alert('x2');
+	    	//alert('x2');
 			//if(responseJson!=null){					
-		$("#propertytable").find("tr:gt(0)").remove();
-		var table = $("#propertytable");
-		//alert('no entro');
-		//alert("gg");
-		var list = document.getElementById('prop-list');
-		console.log(list);
-		var elements = list.children;
-		console.log(elements);
-		var cont = 1;
-		console.log('for each');
-		$.each(elements, function(key, value){
-			/*
-			var rowNew = $("<tr><td></td><td></td></tr>");
-			alert(value['name']);
-			rowNew.children().eq(0).text(value['name']);
-			rowNew.children().eq(1).text(value['description']);
-			rowNew.appendTo(table);
-			*/
-			//alert('entro each');
-			//alert(value['name']);
-			var row = $("<tr />");
-			console.log(value);
-			//console.log('p');
-			//console.log(value.children[0].innerHTML);
-			console.log(value.children[0]);
-			//alert(value.children[0].innerHTML)
-            $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
-            //$("<td />").text(value.children[3]}).appendTo(row); //FALTARIA INDICAR EL NOMBRE DEL DATASET   
-            var show_default = value.children[2].innerHTML;
-            if(show_default == 1){
-            	console.log('muestra');
-            	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList" checked="checked" />'; 
-            	$("<td />").html(inpStr).appendTo(row);
-            }
-            else {
-            	console.log('no muestra');
-            	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
-            	$("<td />").html(inpStr).appendTo(row);
-            }
-            
-            row.appendTo(table);
-            cont = cont + 1;
-		});		
-		
-		//prop-group-list
-		var list = document.getElementById('prop-group-list');
-		var elementsP = list.getElementsByClassName("prop-group-uri");
-		
-		console.log('lista agrupadaaaaaa');
-		console.log(elementsP);
-		/*
-		//var elementsG = list.getElementsByClassName("list-group-item" );
-		var elementsG = list.getElementsByClassName("list-group-item" );
-		console.log('lista hijooooos');
-		console.log(elementsG);
-		*/
-		$.each(elementsP, function(key, value){
+				$("#propertytable").find("tr:gt(0)").remove();
+				var table = $("#propertytable");
+				//alert('no entro');
+				//alert("gg");
+				var list = document.getElementById('prop-list');
+				console.log(list);
+				var elements = list.children;
+				console.log(elements);
+				var cont = 1;
+				console.log('for each');
+				$.each(elements, function(key, value){
+					/*
+					var rowNew = $("<tr><td></td><td></td></tr>");
+					alert(value['name']);
+					rowNew.children().eq(0).text(value['name']);
+					rowNew.children().eq(1).text(value['description']);
+					rowNew.appendTo(table);
+					*/
+					//alert('entro each');
+					//alert(value['name']);
+					var row = $("<tr />");
+					console.log(value);
+					//console.log('p');
+					//console.log(value.children[0].innerHTML);
+					console.log(value.children[0]);
+					//alert(value.children[0].innerHTML)
+                    $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
+                    //$("<td />").text(value.children[3]}).appendTo(row); //FALTARIA INDICAR EL NOMBRE DEL DATASET   
+                    var show_default = value.children[2].innerHTML;
+                    if(show_default == 1){
+                    	console.log('muestra');
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList"/ checked="checked">'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                    else {
+                    	console.log('no muestra');
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                    
+                    row.appendTo(table);
+                    cont = cont + 1;
+				});		
+				
+				//prop-group-list
+				var list = document.getElementById('prop-group-list');
+				var elementsP = list.getElementsByClassName("prop-group-uri");
+				
+				console.log('lista agrupadaaaaaa');
+				console.log(elementsP);
+				/*
+				//var elementsG = list.getElementsByClassName("list-group-item" );
+				var elementsG = list.getElementsByClassName("list-group-item" );
+				console.log('lista hijooooos');
+				console.log(elementsG);
+				*/
+				$.each(elementsP, function(key, value){
 
-			var row = $("<tr />");
-			console.log(value);
-			
-                  $("<td />").text(value.innerHTML).appendTo(row); // URI
-                  /*
-                  var show_default = value.children[2].innerHTML;
-                  if(show_default == 1){
-                  	console.log('muestra');
-                  	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList"/ checked="checked">'; 
-                  	$("<td />").html(inpStr).appendTo(row);
-                  }
-                  else {
-                  	console.log('no muestra');
-                  	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
-                  	$("<td />").html(inpStr).appendTo(row);
-                  }
-                 	*/
-                  //prueba
-                  var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
-                  	$("<td />").html(inpStr).appendTo(row);
-                  	
-                  row.appendTo(table);
-                  cont = cont + 1;
-		});
+					var row = $("<tr />");
+					console.log(value);
+					
+                    $("<td />").text(value.innerHTML).appendTo(row); // URI
+                    /*
+                    var show_default = value.children[2].innerHTML;
+                    if(show_default == 1){
+                    	console.log('muestra');
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList"/ checked="checked">'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                    else {
+                    	console.log('no muestra');
+                    	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    }
+                   	*/
+                    //prueba
+                    var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
+                    	$("<td />").html(inpStr).appendTo(row);
+                    	
+                    row.appendTo(table);
+                    cont = cont + 1;
+				});
 			//}			
 		//});
 		$("#propertydiv").show();

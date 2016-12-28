@@ -119,6 +119,7 @@ public class Bio2RdfEndpoint {
 			
 			qexec.close();		
 			Concept c = new Concept();
+			c.setUri(uris.get(posUri));
 			c.setProperties(pList);
 			c.setProperties(pList);
 			return c;
@@ -266,6 +267,7 @@ public class Bio2RdfEndpoint {
 		List<Property> pList = new ArrayList<Property>();
 		List<String> classTypeList = new ArrayList<String>();
 		Concept c = new Concept();
+		c.setUri(cad);
 		
 		int i=0;
 		String name = null;
@@ -274,7 +276,7 @@ public class Bio2RdfEndpoint {
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
-
+			
 			if(qsol.contains("title")){
 				aux = qsol.get("title").toString();
 				c.setName(aux);
@@ -683,7 +685,7 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 
 		//Buscar si dentro de las propiedades del recurso hay mapping a mesh
 		List<Property> pList = term.getProperties();
-		List<Concept> cList = null;
+		List<Concept> cList = new ArrayList<Concept>();
 		
 		for(int j=0; j < pList.size(); j++){
 			Property p = pList.get(j);
@@ -692,19 +694,6 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 				
 				if(dataset.getId() != 1){ // SOLO MAPPING A DATASETS DE BIO2RDF
 					/*
-					String input = p.getValue();
-					String dataset = null;
-									
-					switch(p.getTarget()){
-						case 2: dataset = "http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3";
-								break;
-						case 3: dataset = "http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3";	
-								break;
-						case 4: dataset = "http://bio2rdf.org/mesh_resource:bio2rdf.dataset.mesh.R3";	
-								break;
-					}
-					*/
-					
 					String inputUri = null;
 					switch(p.getTarget()){
 					
@@ -717,25 +706,34 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 						case 5: inputUri = "http://bio2rdf.org/ncbi:" + p.getValue();	// NCBI
 								break;
 					}
-					
+					*/
 					Concept c = null;
-					
-					if(inputUri != null) 
+					/*
+					if(inputUri != null){
+						System.out.println("ENTRO A inputUri !!");
 						c = searchTermByExactMatchUri(inputUri, dataset);
-					if(c != null) 
-						continue;
+					}
+					*/
+					if(p.getValue() != null){
+						System.out.println("ENTRO A inputUri !!");
+						c = searchTermByExactMatchUri(p.getValue(), dataset);
+					}
+					
+					if(c != null) cList.add(c);
+					else continue;
 					
 					//System.out.println("getMappingPropertiesValues : " +  dataset);
+					/*
 					if(term !=null){
 						c = searchTermByExactMatch(term.name, dataset);
 					}
 					else System.out.println("Termino nulo D:");
-					
+					*/
 					cList.add(c);
 				}
 			}		
 		}
-				
+		System.out.println("cList size: " + cList.size());
 		return cList;
 	}
 	

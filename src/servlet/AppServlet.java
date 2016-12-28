@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -40,16 +41,28 @@ public class AppServlet extends HttpServlet {
 		
 		RequestDispatcher dispatcher;
 		Concept term = null;
-		List<Concept> termList = null; 
+		List<Concept> termList = new ArrayList<Concept>(); 
 		String view ="";
 		
 		System.out.println("Tipo busqueda: " + searchType);
 		if(searchType == 1){
-			term = SearchController.searchConcept(request);	
-			request.setAttribute("term", term);	
-			//request.setAttribute("optradio", "1");
+			int esUri = -1;
+			esUri = SearchController.searchConcept(request, termList);
+			System.out.println("termList: " + termList.size());
+			if(esUri ==-1) System.out.println("tf");
+			if(esUri == 1 ){
+				System.out.println("esURI");
+				/* SI ES URI (o sea, como el uri pertenece a 1 solo recurso) -> MOSTRAR TODA LA INFO DE UN CONCEPTO */
+				request.setAttribute("term", termList.get(0));
+				view = "searchresult.jsp";
+			}
+			else { 
+				System.out.println("NO esURI");
+				// devolver  una lista de conceptos (con las coincidencias en cada dataset)
 			
-			view = "searchresult.jsp";
+				request.setAttribute("termsConsolidated", termList);
+				view = "searchresult-consolidated.jsp";
+			}	
 		}
 		else if (searchType == 2 || searchType == 3) {  // por coincidencia similar en nombre o por coincidencia en propiedades
 			

@@ -13,7 +13,14 @@ public class Property {
 	int show_default; //configuration
 	int add; // propiedad agregar en la sesion actual
 	int newProperty;
+	int consolidated;
 	
+	public int getConsolidated() {
+		return consolidated;
+	}
+	public void setConsolidated(int consolidated) {
+		this.consolidated = consolidated;
+	}
 	public int getNewProperty() {
 		return newProperty;
 	}

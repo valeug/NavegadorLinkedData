@@ -46,6 +46,7 @@ public class PropertyDAO {
 				p.setUri(myres.getString("uri"));
 				p.setIs_mapping(myres.getInt("is_mapping"));	
 				p.setTarget(myres.getInt("target"));
+				p.setConsolidated(myres.getInt("consolidated"));
 				pList.add(p);				
 			}
 			myres.close();
@@ -87,6 +88,7 @@ public class PropertyDAO {
 				p.setUri(myres.getString("uri"));
 				p.setIs_mapping(myres.getInt("is_mapping"));	
 				p.setTarget(myres.getInt("target"));
+				p.setConsolidated(myres.getInt("consolidated"));
 				pList.add(p);
 				System.out.println("DAO - Nombre: " + p.getName());
 				//System.out.println("Nombre: " + myres.getString("name"));

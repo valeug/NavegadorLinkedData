@@ -253,6 +253,7 @@ public class DbpediaEndpoint {
 		qexec.close();	
 		Concept c = new Concept();
 		//c.setName(conceptName);
+		c.setUri(uris.get(posUri));
 		c.setProperties(pList);
 		c.setPropertyGroups(pgList);
 		
@@ -488,13 +489,7 @@ public class DbpediaEndpoint {
 				//int pos = -1;
 				int posPG = -1;
 				int posP = -1;
-				/*
-				if(res[0] == 1) pos = res[1];
-				if(res[0] == 2) {
-					posPG = res[1];
-					posP = res[2];
-				}
-				*/
+
 				//System.out.println("pos: "+pos);
 				System.out.println("res 0: "+res[0]);
 				System.out.println("res 1: "+res[1]);
@@ -546,22 +541,6 @@ public class DbpediaEndpoint {
 					if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && 
 							propUri.compareTo("http://dbpedia.org/ontology/abstract") != 0){
 						
-						/*
-						if(pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()>1){ // mapping a dataset en Bio2rdf
-							String inputUri = null;
-							switch(pList.get(pos).getTarget()){								
-								case 2: inputUri = "http://bio2rdf.org/mesh:" + propValue; // MESH
-										break;
-								case 3: inputUri = "http://bio2rdf.org/pharmgkb:" + propValue;	// PHARMGKB
-										break;
-								case 4: inputUri = "http://bio2rdf.org/goa:" + propValue;	// NCBI
-										break;
-								case 5: inputUri = "http://bio2rdf.org/ncbi:" + propValue;	// NCBI
-										break;
-							}	
-							pList.get(pos).setValue(inputUri);
-						}
-						*/	
 						
 						//if(pos!= -1){ 
 							//if(pList.get(pos).getIs_mapping() == 0 || (pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()==1)){ // DBPEDIA (ej: subject)
@@ -592,6 +571,8 @@ public class DbpediaEndpoint {
 													p.setIs_mapping(n);
 													n = pOrig.getTarget();
 													p.setTarget(n);	
+													n = pOrig.getConsolidated();
+													p.setConsolidated(n);
 													getMappingUri(p,propValue);
 													//p.setValue(propValue);
 													p.setAdd(0);
@@ -603,6 +584,7 @@ public class DbpediaEndpoint {
 													PropertyGroup pg = new PropertyGroup();
 													pg.setUri(p.getUri());
 													pg.setName(p.getName());
+													pg.setConsolidated(p.getConsolidated());
 													List<Property> props = new ArrayList<Property>();
 													pg.setPropertyList(props);
 													
@@ -620,6 +602,7 @@ public class DbpediaEndpoint {
 													copy.setShow_default(pOrig.getShow_default());
 													copy.setTarget(pOrig.getTarget());
 													copy.setValue(pOrig.getValue());
+													copy.setConsolidated(pOrig.getConsolidated());
 													
 													pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
 													// REMOVER pOrig de la lissta inicial
@@ -649,6 +632,9 @@ public class DbpediaEndpoint {
 												p.setIs_mapping(n);
 												n = pOrig.getTarget();
 												p.setTarget(n);	
+												n = pOrig.getConsolidated();
+												p.setConsolidated(n);
+												
 												getMappingUri(p,propValue);
 												//p.setValue(propValue);
 												p.setAdd(0);
@@ -660,6 +646,7 @@ public class DbpediaEndpoint {
 												PropertyGroup pg = new PropertyGroup();
 												pg.setUri(p.getUri());
 												pg.setName(p.getName());
+												pg.setConsolidated(p.getConsolidated());
 												List<Property> props = new ArrayList<Property>();
 												pg.setPropertyList(props);
 												
@@ -677,6 +664,7 @@ public class DbpediaEndpoint {
 												copy.setShow_default(pOrig.getShow_default());
 												copy.setTarget(pOrig.getTarget());
 												copy.setValue(pOrig.getValue());
+												copy.setConsolidated(pOrig.getConsolidated());
 												
 												pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
 												// REMOVER pOrig de la lissta inicial
