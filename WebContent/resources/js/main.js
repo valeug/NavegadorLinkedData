@@ -72,6 +72,32 @@ $(document).ready(function() {
 	    });
 	});
 	
+	// actualizar propiedades
+	$("#savePropBtn").click(function(){
+		var arr = [];
+		//alert('post !!!!')
+		$("input:checkbox[name=checkboxPList]:checked").each(function(){
+			var element = $(this);
+			console.log($(this));
+			arr.push(element.attr('id'));
+			arr.push(element.attr('class'));
+			//alert(element.attr('class'));
+			//alert('asd');
+		});
+		//alert('ontoBtn');
+		console.log("arreglo");
+		console.log(arr);
+		//var arr=[1,2,3,4];
+		$.ajax({
+			url:'UpdateProperty',
+			type:'POST',
+			dataType:'json',
+			data:{arr:arr},
+	        success : function(data){
+	            alert('success post');
+	        }
+	    });
+	});
 	
 	//save selected ontologies
 	$("#updatePropBtn").click(function(){

@@ -23,18 +23,55 @@
 	
 </head>
 <body>
+
+	<!-- Modal -->
+	<div class="modal fade" id="myPropModal" role="dialog">
+	 	<div class="modal-dialog modal-lg">
+	 
+	    	<!-- Modal content-->
+	     	<div class="modal-content">
+	       	<div class="modal-header">
+	         		<button type="button" class="close" data-dismiss="modal">&times;</button>
+	         		<h4 class="modal-title">Seleccionar Propiedades/h4>
+	       	</div>
+	       	
+	       	<div class="modal-body">
+	       		<div class="form-group">
+					<label for="dataset-sel">Seleccionar dataset</label>
+					<select name="dataset" id="dataset-Prop" class="form-control">
+					</select>
+				</div>
+	         	<div id="propertydiv" >
+					<table class="table table-p" cellspacing="0" id="propertytable">
+						<tr class="table-head">
+							<th scope="col">Name</th>
+							<th scope="col">Description</th>
+							<th scope="col">Select</th>
+						</tr>
+					</table>	    
+		   		</div>	
+	       	</div>
+	       	<div class="modal-footer">
+	         		<button type="submit" class="btn btn-default" id="savePropBtn">Aceptar</button>
+	         		<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+	       	</div>
+	     	</div>					      
+	  	</div>
+	</div>
+					 	
 	<div class="tabbable"> <!-- Only required for left/right tabs -->
 		<ul class="nav nav-tabs" style="background-color: white;">
-	    	<li class="active"><a href="#tab1" data-toggle="tab">Nueva clase</a></li>
-	    	<li><a href="#tab2" data-toggle="tab">Nueva propiedad</a></li>
+	    	<%-- <li class="active"><a href="#tab1" data-toggle="tab">Clases</a></li> --%>
+	    	<li><a href="#tab2" data-toggle="tab">Propiedades</a></li>
 	  	</ul>
 	  	<div class="tab-content">
+	  		<%-- 
 	    	<div class="tab-pane active" id="tab1">	    	
 	      		<form action="Configuration" method="post">
 					<div class="container" style="margin-top:100px;">	
 						<div class="form-group">
 						    <label for="uri-prop">Ingresar URI de la clase:</label>
-						    <input type="text" class="form-control" id="uriInputProperty" name="uriInputProperty" placeholder="URI">		
+						    <input type="text" class="form-control" id="uriInputProperty-class" name="uriInputProperty-class" placeholder="URI">		
 						</div>
 						<div class="form-group">
 						    <label for="name-prop">Ingresar nombre de la clase:</label>
@@ -52,9 +89,17 @@
 					</div>		
 				</form>
 	    	</div>
+	    	--%>
 	    	<div class="tab-pane" id="tab2">
 	      		<form action="Configuration" method="post">
 					<div class="container" style="margin-top:100px;">
+						
+						<div class = "row">	
+							<div class="col-md-8 home-page-modal">		
+								<button id="myBtn-prop" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myPropModal">Propiedades a mostrar</button>
+							</div>
+						</div>
+						
 						
 						<div class="form-group">
 							<label for="dataset-sel">Seleccionar dataset</label>
@@ -108,17 +153,18 @@
 	
 
 	<script type="text/javascript">
-		
-		$( document ).ready(function() {
+	$( document ).ready(function() {
 			$.get('RetrieveOntologies',function(responseJson){
 				if(responseJson!=null){		
 					
 					$('#dataset').empty();
-                    $('#dataset').append('<option value="">--Seleccione--</option>');
-                    console.log(responseJson);
+	                $('#dataset').append('<option value="">--Seleccione--</option>');
+	                $('#dataset-Prop').append('<option value="">--Seleccione dataset--</option>');
+	                console.log(responseJson);
 					$.each(responseJson, function(key, value){
 						//console.log(value);						
-                        $('#dataset').append("<option value='"  +  value['id'] + "'>" +  value['name'] + "</option>");
+						$('#dataset-Prop').append("<option value='"  +  value['id'] + "'>" +  value['name'] + "</option>");
+	                    $('#dataset').append("<option value='"  +  value['id'] + "'>" +  value['name'] + "</option>");
 						$('#datasetMapping').append("<option value='"  +  value['id'] + "'>" +  value['name'] + "</option>");
 					});					
 				}			
@@ -128,39 +174,39 @@
 			$( "#mappingInputProperty" ).prop( "disabled", true );
 			
 			$('#dataset').change(function(){
-                var idDat = $('#dataset').val();
-                console.log('idDat: '+idDat);
-                console.log(idDat);
-                
-                $.ajax({        
-                    type: "GET",   
-                    url: 'RetrieveDatasetClasses',
-                    dataType : "JSON",
-                    data: {
-                        idDataset: idDat,
-                    },
-                    success: function(responseJson){
-                    	console.log(responseJson);
-                    	if(responseJson!=null){		
-    			
-        					$('#class').empty();
-                            $('#class').append('<option value="">--Seleccione--</option>');
-                            
+	            var idDat = $('#dataset').val();
+	            console.log('idDat: '+idDat);
+	            console.log(idDat);
+	            
+	            $.ajax({        
+	                type: "GET",   
+	                url: 'RetrieveDatasetClasses',
+	                dataType : "JSON",
+	                data: {
+	                    idDataset: idDat,
+	                },
+	                success: function(responseJson){
+	                	console.log(responseJson);
+	                	if(responseJson!=null){		
+				
+	    					$('#class').empty();
+	                        $('#class').append('<option value="">--Seleccione--</option>');
+	                        
 							$.each(responseJson, function(key, value){
 								console.log('class:');
 								console.log(value);
-                                $('#class').append("<option value='"  +  value['idClass'] + "'>" +  value['name'] + "</option>");
-
-        					});					
-        				}                       
-                    },
-                    error: function (e) {
-                        console.log('Ocurrio un error');
-                     	//console.log(e.responseText);
-                    },
-
-                });
-            });
+	                            $('#class').append("<option value='"  +  value['idClass'] + "'>" +  value['name'] + "</option>");
+	
+	    					});					
+	    				}                       
+	                },
+	                error: function (e) {
+	                    console.log('Ocurrio un error');
+	                 	//console.log(e.responseText);
+	                },
+	
+	            });
+	        });
 			
 			$('#checkbox-mapping').change(function() {
 		        if($(this).is(":checked")) {
@@ -176,8 +222,96 @@
 		        	$( "#mappingInputProperty" ).prop( "disabled", true );
 		        }    
 		    })
+		    
+		
+		/*modal propiedades*/
+				
+		// Get the modal
+		var modal = document.getElementById('myPropModal');
+		
+		// Get the button that opens the modal
+		var btn = document.getElementById("myBtn-prop");
+		
+		// Get the <span> element that closes the modal
+		var span = document.getElementsByClassName("close")[0];
+		
+		// When the user clicks the button, open the modal
+		btn.onclick = function() {
+		    modal.style.display = "block";
+		    
+		    //alert('x1');
+		    $("#propertydiv").hide();
+		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
+		    $.get('UpdateProperty',function(responseJson){
+		    	//alert('x2');
+				if(responseJson!=null){					
+					$("#propertytable").find("tr:gt(0)").remove();
+					var table = $("#propertytable");
+					//alert('no entro');
+					//alert("gg");
+					var cont = 1;
+					$.each(responseJson, function(key, value){
+						/*
+						var rowNew = $("<tr><td></td><td></td></tr>");
+						alert(value['name']);
+						rowNew.children().eq(0).text(value['name']);
+						rowNew.children().eq(1).text(value['description']);
+						rowNew.appendTo(table);
+						*/
+						//alert('entro each');
+						//alert(value['name']);
+						var row = $("<tr class="+ value['dataset']+" />");
+	                    $("<td />").text(value['uri']).appendTo(row);
+	                    $("<td />").text(value['name']).appendTo(row);
+	                    var inpStr = '<input type="checkbox" class="' + value['dataset'] + '" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+	                    if(value['consolidated']==1){
+	                    	var inpStr = '<input type="checkbox" class="' + value['dataset'] + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
+	                    }
+	                    $("<td />").html(inpStr).appendTo(row);
+	                    //alert("prop id: " + value['id']);
+	                    row.appendTo(table);
+	                    cont = cont + 1;
+					});					
+					//alert('wp');
+				}			
+			});
+			$("#propertydiv").show();
 			
+		}
+		
+		// When the user clicks on <span> (x), close the modal
+		span.onclick = function() {
+		    modal.style.display = "none";
+		}
+		
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+		    if (event.target == modal) {
+		        modal.style.display = "none";
+		    }
+		}
+		
+		
+		$("#dataset-Prop").change(function(){
+			
+			var rows = $('table.table-p tr');
+			console.log('TODAS!');
+			console.log(rows);
+			var dataset = $("#dataset-Prop").val();
+			
+			alert("dataset: " + dataset);
+			
+			var selected = rows.filter("."+dataset).show();
+			console.log('SELECCIONADAS!');
+			console.log(selected);
+		    rows.not( selected ).hide();
+		    
+		    $(".table-head").show();
 		});
+		
+	});
+	
+		
 	</script>
 </body>
 </html>

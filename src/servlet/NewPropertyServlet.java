@@ -14,25 +14,35 @@ import dao.PropertyDAO;
 import model.Property;
 
 /**
- * Servlet implementation class ConfigurationServlet
+ * Servlet implementation class NewPropertyServlet
  */
-@WebServlet("/Configuration")
-public class ConfigurationServlet extends HttpServlet {
+@WebServlet({"/NewProperty","/Configuration/Property/New"})
+public class NewPropertyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-	
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public NewPropertyServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 		RequestDispatcher dispatcher;
 		//request.setAttribute("term", term);
-		dispatcher = request.getRequestDispatcher("jsp/"+"configuration.jsp");
-	    dispatcher.forward( request, response);    
+		dispatcher = request.getRequestDispatcher("jsp/"+"configuration_NewProperty.jsp");
+	    dispatcher.forward( request, response);   
 	}
 
-	
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		
+
 		System.out.println( "para 1: "+ request.getParameter("dataset"));
 		System.out.println( "para 2: "+ request.getParameter("class"));
 		System.out.println( "para 3: "+ request.getParameter("uriInputProperty"));

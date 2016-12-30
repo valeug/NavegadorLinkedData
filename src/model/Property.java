@@ -14,7 +14,14 @@ public class Property {
 	int add; // propiedad agregar en la sesion actual
 	int newProperty;
 	int consolidated;
+	int dataset;
 	
+	public int getDataset() {
+		return dataset;
+	}
+	public void setDataset(int dataset) {
+		this.dataset = dataset;
+	}
 	public int getConsolidated() {
 		return consolidated;
 	}
