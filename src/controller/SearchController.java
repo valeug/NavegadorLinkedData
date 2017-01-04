@@ -112,7 +112,7 @@ public class SearchController {
 						System.out.println("ANTES term properties: " + term.getProperties().size());
 						addInfoToTerm(term, termsMappingList, similarTerms);
 						System.out.println("\n---------------------\n---------------------\n IMPRIMELO 3\n---------------------\n---------------------");
-						printConcept(term);
+						//printConcept(term);
 					}
 					//else {
 						// No se encontro el concepto en DBPediam, se busca en bio2rdf
@@ -122,14 +122,14 @@ public class SearchController {
 						for(int i=0; i < exactTerms.size(); i++){
 							System.out.println("--------/n exact TERM " + i + "--------");
 							termList.add(exactTerms.get(i));
-							printConcept(exactTerms.get(i));						
+							//printConcept(exactTerms.get(i));						
 						}
 						
 						System.out.println("\n\nmapping size: " + termsMappingList.size());
 						for(int i=0; i < termsMappingList.size(); i++){
 							System.out.println("--------/n mapping TERM " + i + "--------");
 							termList.add(termsMappingList.get(i));
-							printConcept(termsMappingList.get(i));						
+							//printConcept(termsMappingList.get(i));						
 						}
 					//}				
 			}

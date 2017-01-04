@@ -249,6 +249,8 @@ public class PropertyDAO {
 					p.setUri(myres.getString("uri"));
 					p.setIs_mapping(myres.getInt("is_mapping"));	
 					p.setTarget(myres.getInt("target"));
+					
+					
 					p.setConsolidated(myres.getInt("consolidated"));
 					p.setDataset(datasetList.get(i).charAt(0)-'0');
 					pList.add(p);

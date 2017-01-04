@@ -123,7 +123,7 @@ public class DbpediaEndpoint {
 		List<Class> classesDataset = ClassDAO.getAllClassesByDataset(1);
 		
 		for(int k=0; k<classesDataset.size(); k++){
-			System.out.println("clase " + k + ": " + classesDataset.get(k).getUri());
+			//System.out.println("clase " + k + ": " + classesDataset.get(k).getUri());
 		}
 		
 		List<String> uris = new ArrayList<String>();
@@ -132,7 +132,7 @@ public class DbpediaEndpoint {
 		String pattern1 = "http://dbpedia.org/ontology/"; 
 		String pattern2 = "http://www.w3.org/2002/07/owl#Thing";
 		
-		System.out.println("\nCLASES: \n");
+		//System.out.println("\nCLASES: \n");
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
@@ -147,15 +147,15 @@ public class DbpediaEndpoint {
 			    
 		    }
 		    */
-			System.out.println("entro :)");
+			//System.out.println("entro :)");
 			if(qsol.contains("class") && !qsol.contains("redirected") && !qsol.contains("amb")){	
 				System.out.println("entro 11! ");
 		    	//System.out.println("class type: " + qsol.get("x")); //uri
 		    	//c.setDefinition(""+qsol.get("obodef"));		    	
 		    	aux = qsol.get("class").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia		    	
 		    	if(aux.contains(pattern1) || aux.contains(pattern2)){
-		    		System.out.println("entro 11! ");
-		    		System.out.println("class: " + aux);
+		    		//System.out.println("entro 11! ");
+		    		//System.out.println("class: " + aux);
 		    		types.add(aux);	
 		    		aux = qsol.get("x").toString(); //uri del recurso
 			    	uris.add(aux);
@@ -164,11 +164,11 @@ public class DbpediaEndpoint {
 			}
 			else if(qsol.contains("redirected") && !qsol.contains("amb")){
 				//System.out.println("redirected type: " + qsol.get("redirected")); //uri			
-				System.out.println("entro 21! ");
+				//System.out.println("entro 21! ");
 				aux = qsol.get("class").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia
 		    	if(aux.contains(pattern1) || aux.contains(pattern2)){	
-		    		System.out.println("entro 22! ");
-		    		System.out.println("class: " + aux);
+		    		//System.out.println("entro 22! ");
+		    		//System.out.println("class: " + aux);
 					types.add(aux);
 					aux = qsol.get("redirected").toString(); //uri del recurso
 					uris.add(aux);
@@ -176,14 +176,14 @@ public class DbpediaEndpoint {
 			} 
 			else if(qsol.contains("amb")){
 				//System.out.println("ambiguos type: " + qsol.get("amb")); //uri
-				System.out.println("entro 31! ");
+				//System.out.println("entro 31! ");
 				aux = qsol.get("type").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia				
 				if(aux.contains(pattern1) || aux.contains(pattern2)){	
-					System.out.println("entro 32! ");
-					System.out.println("class: " + aux);
+					//System.out.println("entro 32! ");
+					//System.out.println("class: " + aux);
 					types.add(aux);		
 					aux = qsol.get("amb").toString();
-					System.out.println("uri: " + aux); //uri del recurso
+					//System.out.println("uri: " + aux); //uri del recurso
 			    	uris.add(aux);
 				}
 			}
@@ -192,18 +192,18 @@ public class DbpediaEndpoint {
 		} 
 		
 		//mostrar las clases en type (verificar si se lleno)
-		System.out.println("clases del recurso! ");
+		//System.out.println("clases del recurso! ");
 		for(int w=0; w<types.size(); w++){
 			System.out.println(types.get(w));
 		}
 		
 		int posUri = -1;
 		
-		System.out.println("Types size dbpedia: " + types.size());
+		//System.out.println("Types size dbpedia: " + types.size());
 		if(uris.size()>0 && types.size()>0){
 			posUri = selectUriMatchClass(types,classesDataset); //obtener uri cuya clase este definida en DBPedia (creo que tambien deberia pasarle "label" y verificar que sean iguales)
 		}
-		
+		/*
 		System.out.println("Longitud types list: " + types.size());
 		System.out.println(" URI ENCONTRADO: "+ posUri);
 		System.out.println(" TERMINO BUSQUEDA !");
@@ -212,11 +212,11 @@ public class DbpediaEndpoint {
 		System.out.println("Concept Uri:" + uris.get(posUri));
 		System.out.println("Concept Class:" + types.get(posUri));
 		System.out.println("\n******************************");
-		
+		*/
 		/* AHORA DEVUELVO  propiedades de SOLO UNA CLASE, PODRIA DEVOLVER VARIAS (EJ: BONE Y ANATOMICAL STRUCTURE)*/
 		
 		List<Property> pList = PropertyDAO.getAllPropertiesByClass(classesDataset.get(posUri).getIdClass());
-		
+		/*
 		System.out.println(" \nPROPERTIES! EMPTY ");
 		for(int h=0; h< pList.size(); h++){
 			System.out.println(pList.get(h).getUri());			
@@ -226,6 +226,7 @@ public class DbpediaEndpoint {
 		
 		System.out.println(" \nMY PROPERTIES! ");
 		System.out.println("pList size: "+ pList.size());
+		*/
 		List<PropertyGroup> pgList = new ArrayList<>();
 		
 		String conceptName = getAllPropertiesValues(uris.get(posUri),pList, pgList);
@@ -233,9 +234,10 @@ public class DbpediaEndpoint {
 		
 		//if(pgList.size()==0) pgList = null;
 		
-		
+		/*
 		System.out.println(" \nPROPERTIES! WITH VALUES");
 		System.out.println("pList size: "+ pList.size());
+		*/
 		
 		/*
 		for(int h=0; h< pList.size(); h++){

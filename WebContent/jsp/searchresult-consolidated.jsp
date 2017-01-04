@@ -105,38 +105,20 @@
 		
 		<div class = "row"> 
 			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >			
-				<c:forEach items="${termsConsolidated}" var="i">					
-					<c:if test="${i.propertyGroups != null}">
-						<ul id="prop-group-list" class="list-group prop-group-list">
-							<!--  <p>PROPIEDADES AGRUPADAS</p> -->
-							<c:forEach items="${i.propertyGroups}" var="j">	
-								<%-- --%>
-								<c:if test="${j.consolidated == 1}"> 
-															
-										<p class="prop-group-name"><c:out value="${j.name}" /></p>							
-										<p class="prop-group-uri"><c:out value="${j.uri}" /></p>	 						
-										<c:forEach items="${j.propertyList}" var="k"> 
-											<li class="list-group-item not-show-default">
-												<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>
-												<!-- <p><c:out value="${i.name}" /></p>  -->
-												<p style="display: none;"><c:out value="${k.show_default}" /></p>
-												<c:if test="${k.is_mapping == 1}">
-													<p><a class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
-												</c:if>
-												<c:if test="${k.is_mapping != 1}">
-													<p><c:out value="${k.value}" /></p>
-												</c:if>
-											</li>
-										</c:forEach>		
-								</c:if>						
-							</c:forEach>
-						</ul>
+				<c:forEach items="${termsConsolidated}" var="z">
+					<br> URI <br>
+					<c:out value="${z.uri}" /><br>	
+					<c:out value="${z.properties}" />
+					<%-- 			
+					<c:if test="${z.properties == null}">
+						<br>wtf prop null <br>
 					</c:if>
-					
-					<c:if test="${i.properties != null}">
-						<p class="subtitle">Propiedades</p>					
+					--%>
+					<c:if test="${z.properties != null}">
+						<p class="subtitle">Propiedades</p>		
+						entro<br>			
 						<ul id="prop-list" class="list-group">
-							<c:forEach items="${i.properties}" var="i">
+							<c:forEach items="${z.properties}" var="i">
 								<!-- 
 								<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
 								 -->
@@ -190,7 +172,33 @@
 							</c:forEach>	
 						</ul>
 					</c:if>
+					
+					<c:if test="${z.propertyGroups != null}">
+						<ul id="prop-group-list" class="list-group prop-group-list">
+							<!--  <p>PROPIEDADES AGRUPADAS</p> -->
+							<c:forEach items="${z.propertyGroups}" var="j">	
+								<%-- --%>
+								<c:if test="${j.consolidated == 1}"> 
 															
+										<p class="prop-group-name"><c:out value="${j.name}" /></p>							
+										<p class="prop-group-uri"><c:out value="${j.uri}" /></p>	 						
+										<c:forEach items="${j.propertyList}" var="k"> 
+											<li class="list-group-item not-show-default">
+												<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>
+												<!-- <p><c:out value="${i.name}" /></p>  -->
+												<p style="display: none;"><c:out value="${k.show_default}" /></p>
+												<c:if test="${k.is_mapping == 1}">
+													<p><a class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
+												</c:if>
+												<c:if test="${k.is_mapping != 1}">
+													<p><c:out value="${k.value}" /></p>
+												</c:if>
+											</li>
+										</c:forEach>		
+								</c:if>						
+							</c:forEach>
+						</ul>
+					</c:if>									
 					<%-- 
 					<!-- PROPIEDADES AGRUPADAS -->
 					<c:if test="${i.propertyGroups==null}">
