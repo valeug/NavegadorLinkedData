@@ -108,8 +108,9 @@
 				<c:forEach items="${termsConsolidated}" var="z">
 					<br> URI <br>
 					<c:out value="${z.uri}" /><br>	
+					<%-- 
 					<c:out value="${z.properties}" />
-					<%-- 			
+								
 					<c:if test="${z.properties == null}">
 						<br>wtf prop null <br>
 					</c:if>
@@ -125,9 +126,15 @@
 								 
 								<c:if test="${i.value != null}">
 								<%-- --%>
+									<br>xd<br>
+									
+									<!-- <c:if test="${i.consolidated == 0}"> no es consolidado</c:if> -->
 									<c:if test="${i.consolidated == 1}"> 
-								
+											<br>xd2<br>
+											<!--   BORRAR ESTO PARA MOSTRAR PROPS DE MESH
 											<c:if test="${i.show_default==1}">
+											-->
+												<br>xd2<br>
 												<li class="list-group-item show-default">
 													
 													<p  class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
@@ -146,7 +153,11 @@
 														</c:if>									
 													</c:if>		
 												</li>
+											<!--  
 											</c:if>
+											-->
+											
+											<%--
 											<c:if test="${i.show_default==0}">
 												<li class="list-group-item not-show-default" style="display: none;">						
 													
@@ -167,6 +178,7 @@
 													</c:if>		
 												</li>
 											</c:if>
+											--%>
 									</c:if>
 								</c:if>
 							</c:forEach>	
