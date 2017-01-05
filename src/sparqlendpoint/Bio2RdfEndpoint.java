@@ -655,21 +655,16 @@ public class Bio2RdfEndpoint {
 			else if(qsol.contains("label")){
 					aux = qsol.get("label").toString();
 					c.setName(aux);
-				}				
-			
+				 }			
 			if(qsol.contains("description")){
 				aux = qsol.get("description").toString();
 				c.setDefinition(aux);
 				descr = aux;
 			}
 			
-						
+			
 			if(qsol.contains("property") && qsol.contains("value")){	
-				
-				
-				
-				System.out.println("entro ***! ");
-				
+				System.out.println("entro ***! ");				
 				Property p = new Property();
 				
 				aux = qsol.get("property").toString();
@@ -685,7 +680,7 @@ public class Bio2RdfEndpoint {
 				System.out.println("|value: ");			
 				System.out.println(aux);
 				p.setValue(aux);
-				p.setShow_default(1);
+				p.setShow_default(0);
 				//p.setName("gg "+i);
 				pList.add(p);		    		    	
 			}
@@ -694,6 +689,8 @@ public class Bio2RdfEndpoint {
 		} 
 	
 		System.out.println("classTypeList size: " + classTypeList.size());
+		System.out.println("pList size: " + pList.size());
+		
 		/*
 		for(int t=0; t<classTypeList.size(); t++){
 			System.out.println(t+") " + classTypeList.get(t));
@@ -701,32 +698,34 @@ public class Bio2RdfEndpoint {
 		*/
 		
 		// obtener las propiedades de las clases del recurso
-		List<Property> propsTotal = new ArrayList<Property>();
-		System.out.println("LAS CLASES del recurso: baia baia");
+		List<Property> propsClases = new ArrayList<Property>();
+		System.out.println("\n\nLAS CLASES del recurso: baia baia");
 		for(int w=0; w < classTypeList.size(); w++){
 			System.out.println("clase "+w +": " + classTypeList.get(w));
 			List<Property> props = PropertyDAO.getAllPropertiesByClassUri(classTypeList.get(w));
 			System.out.println("props size : " + props.size());
-			propsTotal.addAll(props);
+			propsClases.addAll(props);
 		}
 		
 		System.out.println("pList size ANTES: " + pList.size());
-		System.out.println("propsTotal size DESPUES: " + propsTotal.size());
+		System.out.println("propsTotal size DESPUES: " + propsClases.size());
 		// asignar aquellas propiedades que hagan match
 		boolean found = false;
 		List<Property> pFinal = new ArrayList<Property>();
 		for(int k=0; k < pList.size(); k++){
 			String pUri = pList.get(k).getUri();
 			//System.out.println("pUri: " + pUri);
-			for(int h=0; h<propsTotal.size(); h++){
+			for(int h=0; h<propsClases.size(); h++){
 				//System.out.println("prop(h): "+propsTotal.get(h).getUri());
-				if(pUri.compareTo(propsTotal.get(h).getUri())==0){
-					System.out.println("/n/n/nprop is mapping: " + propsTotal.get(h).getIs_mapping());
+				if(pUri.compareTo(propsClases.get(h).getUri())==0){
+					System.out.println("/n/n/nprop is mapping: " + propsClases.get(h).getIs_mapping());
 					System.out.println("pUri: " + pUri);
-					System.out.println("prop(h): "+propsTotal.get(h).getUri());					
-					pList.get(k).setIs_mapping(propsTotal.get(h).getIs_mapping()); //mapping
-					pList.get(k).setName(propsTotal.get(h).getName()); //name
-					pFinal.add(pList.get(k));
+					System.out.println("prop(h): "+propsClases.get(h).getUri());					
+					pList.get(k).setIs_mapping(propsClases.get(h).getIs_mapping()); //mapping
+					pList.get(k).setName(propsClases.get(h).getName()); //name
+					//pFinal.add(pList.get(k));
+					pList.get(k).setShow_default(1);
+					
 					//found = true;
 					break;
 				}
@@ -741,10 +740,86 @@ public class Bio2RdfEndpoint {
 		System.out.println("pList size DESPUES: " + pList.size());
 		System.out.println("pFinal size DESPUES: " + pFinal.size());
 		qexec.close();			
-		c.setProperties(pFinal);
+		//c.setProperties(pFinal);
+		List<PropertyGroup> pgList = new ArrayList<PropertyGroup>();
 		
+		regroupPropertyList(pList, pgList);
+		c.setProperties(pList);
+		c.setPropertyGroups(pgList);
 		return c;
 	}
+	
+	
+	private static void regroupPropertyList(List<Property> pList, List<PropertyGroup> pgList){
+
+		List<Property> auxList = new ArrayList<Property>();
+		boolean repite = false;
+		boolean agrupada = false;
+		
+		for(int i=0; i<pList.size(); i++){ //para cada propiedad
+			Property p = pList.get(i);
+			repite = false;
+			int j;
+			//buscar en lista simple
+			for(j=0; j < auxList.size(); j++){ 
+				/*
+				System.out.println("p: " + p);
+				System.out.println("p uri: " + p.getUri());
+				System.out.println("aux: " + auxList.get(j));
+				*/
+				if(p.getUri().compareTo(auxList.get(j).getUri()) ==0 ){
+					repite = true;
+					break;
+				}
+			}
+			
+			if(repite){ //crear nuevo grupo
+				PropertyGroup pg = new PropertyGroup();
+				List<Property> props = new ArrayList<Property>();
+				props.add(p);
+				props.add(auxList.get(j));
+				//property group
+				pg.setUri(p.getUri());
+				pg.setName(p.getName());
+				pg.setPropertyList(props);
+				//agregar a lista final
+				pgList.add(pg);
+				
+				//eliminar de lista simple
+				p = auxList.remove(j);
+			}
+			else {
+				//si no esta en lista simple, buscar en lista de grupos
+				int k;
+				agrupada = false;
+				for(k=0; k < pgList.size(); k++){
+					if(p.getUri().compareTo(pgList.get(k).getUri()) == 0){
+						agrupada = true;
+						break;
+					}
+				}
+				
+				//agregar las que no se repiten a la lista simple
+				if(agrupada){
+					PropertyGroup auxpg = pgList.get(k);
+					auxpg.getPropertyList().add(p);
+				}
+				else {
+					auxList.add(pList.get(i));
+				}
+			}
+		}
+		
+		System.out.println("\nANTES\n");
+		System.out.println("pList size: " + pList.size());
+		System.out.println("auxList size: " + auxList.size());
+		System.out.println("pgList size: " + pgList.size());
+		pList = auxList;		
+		
+		System.out.println("\nDESPUES\n");
+		System.out.println("pList size: " + pList.size());
+	}
+	
 	
 	/****************************************************************
 	 * 		PARA DBPEDIA: LISTA DE TERMINOS POR COINCIDENCIA "EXACTA" O "SIMILAR"

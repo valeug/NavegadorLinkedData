@@ -68,7 +68,6 @@
 			        </div>			
 				</div>
 			</form>
-			<button style="font-size: 14px; font-weight:bold;" id="confBtn" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#confModal">Agregar propiedades</button>
 		</div>
 		<!--  
 		<div class = "row">	
@@ -108,13 +107,7 @@
 				<c:forEach items="${termsConsolidated}" var="z">
 					<br> URI <br>
 					<c:out value="${z.uri}" /><br>	
-					<%-- 
-					<c:out value="${z.properties}" />
-								
-					<c:if test="${z.properties == null}">
-						<br>wtf prop null <br>
-					</c:if>
-					--%>
+					
 					<c:if test="${z.properties != null}">
 						<p class="subtitle">Propiedades</p>		
 						entro<br>			
@@ -126,59 +119,29 @@
 								 
 								<c:if test="${i.value != null}">
 								<%-- --%>
-									<br>xd<br>
 									
 									<!-- <c:if test="${i.consolidated == 0}"> no es consolidado</c:if> -->
 									<c:if test="${i.consolidated == 1}"> 
-											<br>xd2<br>
-											<!--   BORRAR ESTO PARA MOSTRAR PROPS DE MESH
-											<c:if test="${i.show_default==1}">
-											-->
-												<br>xd2<br>
-												<li class="list-group-item show-default">
-													
-													<p  class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
-															
-													<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
-													<p style="display: none;"><c:out value="${i.show_default}" /></p>
-													<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
-														<img src="${i.value}}" alt="Smiley face" >
-													</c:if>
-													<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-														<c:if test="${i.is_mapping == 1}">
-															<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
-														</c:if>
-														<c:if test="${i.is_mapping != 1}">
-															<p><c:out value="${i.value}" /></p>
-														</c:if>									
-													</c:if>		
-												</li>
-											<!--  
-											</c:if>
-											-->
 											
-											<%--
-											<c:if test="${i.show_default==0}">
-												<li class="list-group-item not-show-default" style="display: none;">						
-													
-													<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
-													
-													<p><c:out value="${i.name}" /></p>
-													<p style="display: none;"><c:out value="${i.show_default}" /></p>
-													<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
-														<img src="${i.value}}" alt="Smiley face" >
+											<li class="list-group-item show-default">
+												
+												<p  class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+														
+												<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
+												<p style="display: none;"><c:out value="${i.show_default}" /></p>
+												<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+													<img src="${i.value}}" alt="Smiley face" >
+												</c:if>
+												<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+													<c:if test="${i.is_mapping == 1}">
+														<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
 													</c:if>
-													<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-														<c:if test="${i.is_mapping == 1}">
-															<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
-														</c:if>
-														<c:if test="${i.is_mapping != 1}">
-															<p><c:out value="${i.value}" /></p>
-														</c:if>									
-													</c:if>		
-												</li>
-											</c:if>
-											--%>
+													<c:if test="${i.is_mapping != 1}">
+														<p><c:out value="${i.value}" /></p>
+													</c:if>									
+												</c:if>		
+											</li>
+										
 									</c:if>
 								</c:if>
 							</c:forEach>	
