@@ -257,7 +257,7 @@ public class DbpediaEndpoint {
 	    // PROPIEDADES TIPO 1: navegables	    	    
 	    // PROPIEDADES TIPO 2: info sobre el recurso
 	    
-	    
+	    c.setDataset("DBPedia");
 		qexec.close();
 		/*
 		Concept c = new Concept();
@@ -278,6 +278,7 @@ public class DbpediaEndpoint {
 			System.out.println("value: "+ pList.get(i).getValue());
 			System.out.println("show_default: "+ pList.get(i).getShow_default());
 			System.out.println("consolidated: "+ pList.get(i).getConsolidated());
+			System.out.println("instances: "+ pList.get(i).getInstances());
 		}
 		
 	}
@@ -524,6 +525,7 @@ public class DbpediaEndpoint {
 							//copiar datos de la prop original
 							p.setConsolidated(1);
 							p.setShow_default(1);
+							p.setInstances(1);
 							p.setName("Clase");
 							propList.add(p);						
 						//}
@@ -579,6 +581,7 @@ public class DbpediaEndpoint {
 							p.setShow_default(1);
 							p.setIs_mapping(pList.get(posProperty).getIs_mapping());
 							p.setName(pList.get(posProperty).getName());
+							p.setInstances(pList.get(posProperty).getInstances());
 						}
 						else {
 							p.setConsolidated(0);
@@ -628,6 +631,8 @@ public class DbpediaEndpoint {
 		System.out.println("propList size: " + propList.size());
 		System.out.println("propgroupList size: " + propgroupList.size());		
 		
+		System.out.println("PRINT propList");
+		printProperties(propList);
 		regroupPropertyList(propList, propgroupList);
 		
 		System.out.println("     DESPUES:     ");
@@ -1090,6 +1095,8 @@ public class DbpediaEndpoint {
 				pg.setConsolidated(p.getConsolidated());
 				pg.setShow_default(p.getShow_default());
 				pg.setPropertyList(props);
+				pg.setMapping(p.getIs_mapping());
+				pg.setInstances(p.getInstances());
 				//agregar a lista final
 				pgList.add(pg);
 				

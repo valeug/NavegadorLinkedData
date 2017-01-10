@@ -222,5 +222,41 @@ $(document).ready(function() {
 		});
 	});
 	
-			
+	
+	/* resaltar elemento de una lista */
+	
+	$(".list-group-instances").hover(function(){
+			//IN
+			  $( this ).css("background-color", "#339ccc");
+			  var par = $( this ).find('.prop-label-5');
+			  //prop-label
+			  console.log(par);
+			  par.css("background-color", "#339ccc");
+			  var lab = $( this ).find('.prop-label');
+			  console.log(lab);
+			  lab.css("background-color", "#339ccc");
+			  lab.css("color", "white");
+			  var span = $(this).find(".span-icon");
+			  span.css("color", "white");
+
+        }, function(){
+        	// OUT
+        	  $( this ).css("background-color", "white");
+			  var par = $( this ).find('.prop-label-5');
+			  par.css("background-color", "white");
+			  var lab = $( this ).find('.prop-label');
+			  lab.css("background-color", "white");
+			  lab.css("color", "black");
+			  var span = $(this).find(".span-icon");
+			  span.css("color", "black");
+    });
+	
+	/*
+	$(".list-group-instances").click(function(){
+		var elemclick = $( this ).find('.ref-value');
+		console.log(elemclick);
+		elemclick.click();
+	});
+	*/
+	
 });

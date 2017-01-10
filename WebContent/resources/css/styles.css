@@ -92,12 +92,12 @@ body {
 
 .desc-info-row {
 	border-radius: 10px;
-	background-color: #FFAAA5;
+	/*background-color: #FFAAA5;*/
 }
 
 .ref-info-row {
 	border-radius: 10px;
-	background-color: #FFAAA5;
+	background-color: #4E4E56;
 }
 
 .en-info-row{
@@ -138,5 +138,121 @@ body {
 	text-align: center;
 	font-weight: bold;
 	color: white;
+}
+
+/* TITULOS */
+
+.concept-dataset{
+	font-size: 20px;
+	font-weight: bold;
+	color: #F15F74;
+}
+
+.concept-title {
+	font-size: 22px;
+	text-align: center;
+	font-weight: bold;
+	color: white;
+}
+
+.concept-detail{
+	font-size: 17px;
+	text-align: center;
+	background-color: #FF9248;
+	color: white;
+	width: 155px;
+	margin-left: auto;
+	margin-right: auto;
+	border-radius: 15px;
+}
+
+
+.concept-detail:hover{
+	/*color: #337ab7; !important*/
+	background-color: #FF6700;
+}
+
+.concept-detail a {
+	color: white;
+}
+
+.concept-detail a:hover{
+	color: white;
+}
+
+.property-name{
+	font-size: 20px;
+    font-weight: bold;
+    color: #339ccc;
+}
+
+.see-detail-div {
+	text-align: justify;
+    text-justify: inter-word;
+    margin-bottom: 35px;
+}
+
+.prop-group-elem {
+	margin-bottom: 25px;
+}
+
+.prop-group-name, .property-name{
+	background-color: white;
+	font-size: 20px;
+    font-weight: bold;
+    color: #339ccc;
+    padding: 15px;
+    margin-bottom: 5px;
+    background-color: #4E4E56;
+}
+
+/* elementos lista */
+.prop-label-5 {
+	background-color: white;
+	/*
+	font-size: 17px;
+    font-weight: bold;
+    */
+    color: black;
+}
+/*
+.prop-label-5:hover{
+	background-color: #339ccc;
+}
+*/
+
+.prop-label-5 a{
+	color: black;
+	background-color: white;
+}
+
+/*
+.prop-label-5 a:hover{
+	color: white;
+	background-color: #339ccc;
+}
+*/
+.list-group-instances {
+	background-color: white;
+	cursor: pointer;
+}
+/*
+.list-group-instances:hover {
+	background-color: #339ccc;
+}
+*/
+
+.span-icon {
+	float: right !important ;
+	font-size: 18px;
+}
+
+.flip-instance {
+	width: 90px;
+	float: right;
+}
+
+.list-element-instance {
+	margin-bottom: 10px;
 }
 

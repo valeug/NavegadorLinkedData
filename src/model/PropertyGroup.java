@@ -8,9 +8,23 @@ public class PropertyGroup {
 	String uri;
 	int show_default;	
 	int consolidated;
+	int mapping;
+	int instances;
 	List<Property> propertyList;
 	
-	
+		
+	public int getInstances() {
+		return instances;
+	}
+	public void setInstances(int instances) {
+		this.instances = instances;
+	}
+	public int getMapping() {
+		return mapping;
+	}
+	public void setMapping(int mapping) {
+		this.mapping = mapping;
+	}
 	public int getShow_default() {
 		return show_default;
 	}

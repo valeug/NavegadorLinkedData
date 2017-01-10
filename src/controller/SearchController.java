@@ -21,6 +21,7 @@ import dao.PropertyDAO;
 import model.Concept;
 import model.Dataset;
 import model.Property;
+import model.PropertyGroup;
 import sparqlendpoint.Bio2RdfEndpoint;
 import sparqlendpoint.BioportalEndpoint;
 import sparqlendpoint.DbpediaEndpoint;
@@ -201,8 +202,12 @@ public class SearchController {
 		//term.setName("basurita");
 		//printConcept(term);
 		
-		termList.add(term);
 		
+		//PRUEBA!!!!
+		Concept c = conceptPrueba();
+		
+		termList.add(term);
+		termList.add(c); //SOLO PARA PRUEBA
 		
 		System.out.println("\n\n\n\n\n\n---------------\n FINAL \n---------------\n\n\n\n");
 		System.out.println("termlist size: " + termList.size());
@@ -213,6 +218,178 @@ public class SearchController {
 		
 		return flagUri;
 	}
+	
+	private static Concept conceptPrueba(){
+		Concept c = new Concept();
+		List<PropertyGroup> pgList = new ArrayList<>();
+		List<Property> pList;
+		PropertyGroup pg;
+		
+		List<Property> propertyList = new ArrayList<>();
+		Property p;
+		
+		/*
+		  	3) Group uri: http://www.w3.org/2000/01/rdf-schema#label
+			3) Group consolidated: 0
+			pg size: 3
+			0. Property value: Alzheimer Disease [mesh:D000544]@en
+			0. Property label: null
+			1. Property value: Alzheimer Disease
+			1. Property label: null
+			2. Property value: Alzheimer Disease [mesh:D000544]
+			2. Property label: null
+		 
+		 */
+		
+				
+		
+		/*
+		 *	2) Group uri: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+			2) Group consolidated: 0
+			pg size: 3
+			0. Property value: http://bio2rdf.org/mesh_vocabulary:Descriptor
+			0. Property label: MeSH Descriptor@en
+			1. Property value: http://bio2rdf.org/ctd_vocabulary:Disease
+			1. Property label: CTD Disease@en
+			2. Property value: http://bio2rdf.org/mesh_vocabulary:Resource
+			2. Property label: null
+					 
+		 * */
+		
+		pg = new PropertyGroup();
+		pg.setName("Type");
+		pg.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		pg.setConsolidated(0);
+		pg.setShow_default(1);
+		
+		pList = new ArrayList<>();
+		
+		p = new Property();
+		p.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		p.setValue("http://bio2rdf.org/mesh_vocabulary:Descriptor");
+		p.setValue("MeSH Descriptor@en");
+		pList.add(p);
+		
+		p = new Property();
+		p.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		p.setValue("http://bio2rdf.org/ctd_vocabulary:Disease");
+		p.setValue("CTD Disease@en");
+		pList.add(p);
+		
+		p = new Property();
+		p.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		p.setValue("http://bio2rdf.org/mesh_vocabulary:Resource");
+		p.setValue("mesh resource [mesh_vocabulary:Resource]");
+		pList.add(p);
+		
+		pg.setPropertyList(pList);
+		
+		pgList.add(pg);
+				
+		/*
+		 	1) uri: http://purl.org/dc/terms/title
+			1) value: Alzheimer Disease@en
+			1) label: null
+			1) show_default: 1
+			1) consolidated: 1
+
+		 */
+		
+		p = new Property();
+		p.setName("Title");
+		p.setUri("http://purl.org/dc/terms/title");
+		p.setValue("Alzheimer Disease@en");
+		p.setConsolidated(1);
+		p.setShow_default(1);
+		propertyList.add(p);
+		
+		/*
+		16) uri: http://bio2rdf.org/mesh_vocabulary:mesh-scope-note
+			16) value: A degenerative disease of the BRAIN characterized by the insidious onset of DEMENTIA. Impairment of MEMORY, judgment, attention span, and problem solving skills are followed by severe APRAXIAS and a global loss of cognitive abilities. The condition primarily occurs after age 60, and is marked pathologically by severe cortical atrophy and the triad of SENILE PLAQUES; NEUROFIBRILLARY TANGLES; and NEUROPIL THREADS. (From Adams et al., Principles of Neurology, 6th ed, pp1049-57)
+			16) label: null
+			16) show_default: 1
+			16) consolidated: 0
+		*/
+		
+		p = new Property();
+		p.setName("Scope note");
+		p.setUri("http://bio2rdf.org/mesh_vocabulary:mesh-scope-note");
+		p.setValue("A degenerative disease of the BRAIN characterized by the insidious onset of DEMENTIA. Impairment of MEMORY, judgment, attention span, and problem solving skills are followed by severe APRAXIAS and a global loss of cognitive abilities. The condition primarily occurs after age 60, and is marked pathologically by severe cortical atrophy and the triad of SENILE PLAQUES; NEUROFIBRILLARY TANGLES; and NEUROPIL THREADS. (From Adams et al., Principles of Neurology, 6th ed, pp1049-57)");
+		p.setShow_default(1);
+		p.setConsolidated(1);
+		
+		propertyList.add(p);
+		
+		/*
+		2) uri: http://purl.org/dc/terms/description
+			2) value: A degenerative disease of the BRAIN characterized by the insidious onset of DEMENTIA. Impairment of MEMORY, judgment, attention span, and problem solving skills are followed by severe APRAXIAS and a global loss of cognitive abilities. The condition primarily occurs after age 60, and is marked pathologically by severe cortical atrophy and the triad of SENILE PLAQUES; NEUROFIBRILLARY TANGLES; and NEUROPIL THREADS. (From Adams et al., Principles of Neurology, 6th ed, pp1049-57)@en
+			2) label: null
+			2) show_default: 1
+			2) consolidated: 0
+		*/
+		
+		p = new Property();
+		p.setName("Description");
+		p.setUri("http://purl.org/dc/terms/description");
+		p.setValue("A degenerative disease of the BRAIN characterized by the insidious onset of DEMENTIA. Impairment of MEMORY, judgment, attention span, and problem solving skills are followed by severe APRAXIAS and a global loss of cognitive abilities. The condition primarily occurs after age 60, and is marked pathologically by severe cortical atrophy and the triad of SENILE PLAQUES; NEUROFIBRILLARY TANGLES; and NEUROPIL THREADS. (From Adams et al., Principles of Neurology, 6th ed, pp1049-57)@en");	
+		p.setShow_default(1);
+		p.setConsolidated(0);
+		
+		////////////////TREE ENTRY
+		/*
+			rdfs:subClassOf	
+			Tauopathies [mesh:C10.574.945]
+		*/
+		
+		/*
+		  	rdfs:subClassOf	
+			Dementia [mesh:C10.228.140.380]
+		 */
+		 
+		/*
+		 	Dementia [mesh:F03.087.400]		 	
+		 */
+				
+		pg = new PropertyGroup();
+		pg.setName("Type");
+		pg.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		pg.setConsolidated(0);
+		pg.setShow_default(1);
+		
+		pList = new ArrayList<>();
+		
+		p = new Property();
+		p.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		p.setValue("http://bio2rdf.org/mesh_vocabulary:Descriptor");
+		p.setValue("MeSH Descriptor@en");
+		pList.add(p);
+		
+		p = new Property();
+		p.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		p.setValue("http://bio2rdf.org/ctd_vocabulary:Disease");
+		p.setValue("CTD Disease@en");
+		pList.add(p);
+		
+		p = new Property();
+		p.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+		p.setValue("http://bio2rdf.org/mesh_vocabulary:Resource");
+		p.setValue("mesh resource [mesh_vocabulary:Resource]");
+		pList.add(p);
+		
+		pg.setPropertyList(pList);
+		
+		pgList.add(pg);
+		
+		
+		// final concept
+		c.setName("Alzheimer Disease@en");
+		c.setDataset("MESH");
+		c.setPropertyGroups(pgList);
+		c.setProperties(propertyList);
+		
+		return c;
+	}
+	
 	private static int findUriOrigin(String input){
 		
 		if(input.contains("http://bio2rdf.org/mesh")){			
@@ -580,7 +757,8 @@ public class SearchController {
 					System.out.println(i+") value: " + c.getProperties().get(i).getValue());
 					System.out.println(i+") label: " + c.getProperties().get(i).getLabel());
 					System.out.println(i+") show_default: " + c.getProperties().get(i).getShow_default());
-					System.out.println(i+") consolidated: " + c.getProperties().get(i).getConsolidated());
+					//System.out.println(i+") consolidated: " + c.getProperties().get(i).getConsolidated());
+					//System.out.println(i+") instances: " + c.getProperties().get(i).getInstances());
 				}
 			}
 			else System.out.println("Propiedades null :/");
@@ -592,6 +770,8 @@ public class SearchController {
 					System.out.println(i+") Group uri: " + c.getPropertyGroups().get(i).getUri());
 					System.out.println(i+") Show_default: " + c.getPropertyGroups().get(i).getShow_default());
 					System.out.println(i+") Group consolidated: " + c.getPropertyGroups().get(i).getConsolidated());
+					//System.out.println(i+") Mapping: " + c.getPropertyGroups().get(i).getMapping());
+					System.out.println(i+") Instances: " + c.getPropertyGroups().get(i).getInstances());
 					System.out.println("pg size: " + c.getPropertyGroups().get(i).getPropertyList().size());
 					for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
 						System.out.println(k+". Property value: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());

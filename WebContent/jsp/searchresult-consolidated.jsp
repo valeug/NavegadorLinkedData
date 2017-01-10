@@ -70,194 +70,156 @@
 				</div>
 			</form>
 		</div>
-		<!--  
-		<div class = "row">	
-			<div class="col-md-8 home-page-modal">		
-				<button id="confBtn" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#confModal">Agregar propiedades</button>
-			</div>
-		</div>
-		-->
-		<%-- 
-		<div class = "row"> 
-			<div class="col-md-12 term-info-row" >
-				Term: ${term.name}<br>
-				<!--  
-				Description: ${term.definition}<br>
-				-->
-				<!-- 
-				<c:forEach var="i" begin="1" end="5" step="1">
-					<c:out value="${i}" />
-				</c:forEach>
-				 -->
-				<br>
-				<br>
-			</div>
-		</div> 
-		--%>
-		
-		<!--  
-		<div class = "row"> 
-			<div class="col-md-12 property-info-row" >
-				Propiedades:<br> 
-			</div>
-		</div>
-		-->
-		
+
 		<div class = "row"> 
 			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >			
 				<c:forEach items="${termsConsolidated}" var="z">
-					<br> URI <br>
-					<%-- 
-					<p>
-					<a class="ref-value" href="#" onclick=""><c:out value="${z.uri}" /></a>
-					</p>
-					--%>
-					
-					---------------------
-					<div class="see-detail-div">
-						<p><a class="label-detail  prop-label" href="#" onclick="">Ver a detalle</a></p>
-						<p style="display:none;"><a class="concept-detail-uri" ><c:out value="${z.uri}" /></a></p>
-					</div>
-					---------------------
-					<p>
-					<a class="ref-value" href="#" onclick=""><c:out value="${z.dataset}" /></a>
-					</p>
-					
-					<c:if test="${z.properties != null}">
-						<p class="subtitle">Propiedades</p>		
-						entro<br>			
-						<ul id="prop-list" class="list-group">
-							<c:forEach items="${z.properties}" var="i">
-								<!-- 
-								<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
-								 -->
-								 
-								<c:if test="${i.value != null}">
-								<%-- --%>
-									
-									<!-- <c:if test="${i.consolidated == 0}"> no es consolidado</c:if> -->
-									<c:if test="${i.consolidated == 1}"> 
-										<div class = "prop-group-elem">
-											<li class="list-group-item show-default">
+					<div style="background-color: #4E4E56; padding: 50px; margin-bottom: 100px;">
+						<div class="see-detail-div">
+							<!--  
+							<p class="concept-dataset"><c:out value="${z.dataset}"/></p>
+							-->							
+							<p class="concept-title"><c:out value="${z.name}"/> (<c:out value="${z.dataset}"/>)</p>
+							<p class="concept-detail"><a class="label-detail  prop-label" href="#" onclick="">See all >></a></p>
+							<p style="display:none;"><a class="concept-detail-uri" ><c:out value="${z.uri}" /></a></p>
+						</div>
 												
-												<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${i.uri}" /></p>														
-												<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
-												<p style="display: none;"><c:out value="${i.show_default}" /></p>
-												
-												<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
-													<img src="${i.value}}" alt="Smiley face" >
-												</c:if>
-												<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-													<c:if test="${i.is_mapping == 1}">
-																											
-														<c:if test="${i.label == null}">
-															<div class="prop-label-div">
-																<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
-															</div>
-														</c:if>
-														<c:if test="${i.label != null}">
-															<div class="prop-label-div">
-																<p class="prop-label-2"><a class="ref-value  prop-label" href="#" onclick=""><c:out value="${i.label}" /></a></p>
-																<p style="display:none;"><a class="prop-label-3" ><c:out value="${i.value}" /></a></p>
-															</div>
-														</c:if>
-														
-													</c:if>
-													<c:if test="${i.is_mapping != 1}">
-														<c:if test="${i.label == null}">
-															<p><c:out value="${i.value}" /></p>
-														</c:if>
-														<c:if test="${i.label != null}">
-															<p><c:out value="${i.label}" /></p>
-														</c:if>														
-													</c:if>									
-												</c:if>	
-											</li>
-										</div>	
-									</c:if>
-								</c:if>
-							</c:forEach>	
-						</ul>
-					</c:if>
-					
-					<c:if test="${z.propertyGroups != null}">
-						<ul id="prop-group-list" class="list-group prop-group-list">
-							
-							<!--  <p>PROPIEDADES AGRUPADAS</p> -->
-							<c:forEach items="${z.propertyGroups}" var="j">	
-								<%-- --%>
-								<c:if test="${j.consolidated == 1}"> 
-									<div class = "prop-group-elem">	
-										<br>nombre:<br>					
-										<p class="prop-group-name" style = "font-size: 16px; font-weight: bold;"><c:out value="${j.name}" /></p>						
-										<p class="prop-group-uri" style = "display: none;"><c:out value="${j.uri}" /></p>	 						
-										<c:forEach items="${j.propertyList}" var="k"> 
-											<li class="list-group-item not-show-default">
-												<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>
-												<!-- <p><c:out value="${i.name}" /></p>  -->
-												<p style="display: none;"><c:out value="${k.show_default}" /></p>
-												<c:if test="${k.is_mapping == 1}">													
-													<c:if test="${k.label == null}">
-														<div class="prop-label-div">
-															<p class="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
-														</div>
-													</c:if>
-													<c:if test="${k.label != null}">
-														<div class="prop-label-div">
-															<p class="prop-label-5"><a  class="ref-value prop-label" href="#" onclick=""><c:out value="${k.label}" /></a></p>
-															<p style="display: none;"><a class="prop-label-6"><c:out value="${k.value}" /></a></p>
-														</div>
-													</c:if>
-												</c:if>
-												<c:if test="${k.is_mapping != 1}">													
-													<c:if test="${k.label != null}">
-														<p><c:out value="${k.label}" /></p>
-													</c:if>
-													<c:if test="${k.label == null}">
-														<p><c:out value="${k.value}" /></p>
-													</c:if>
-												</c:if>
-											</li>
-										</c:forEach>
-									</div>		
-								</c:if>						
-							</c:forEach>
-						</ul>
-					</c:if>									
-					<%-- 
-					<!-- PROPIEDADES AGRUPADAS -->
-					<c:if test="${i.propertyGroups==null}">
-						is null kid !!!!!!!!!!!!!!!!!
-					</c:if>
-					<c:if test="${i.propertyGroups!=null}">
-						<c:forEach items="${i.propertyGroups}" var="i">	
-							<!-- 						
-							<p class="prop-group-name"><c:out value="${i.name}" /></p>								
-							<p class="prop-group-uri"><c:out value="${i.uri}" /></p>
-							 -->		 						
-							Propiedades (agrupados)
+						<c:if test="${z.properties != null}">
+							<!-- 
+							<p class="property-title">Propiedades consolidadas</p>					
+							 -->
 							<ul id="prop-list" class="list-group">
-								<c:forEach items="${i.propertyList}" var="i"> 
-									<li class="list-group-item not-show-default">
-										<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
-										<!-- <p><c:out value="${i.name}" /></p>  -->
-										<p style="display: none;"><c:out value="${i.show_default}" /></p>
-										<c:if test="${i.is_mapping == 1}">
-											<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+								<c:forEach items="${z.properties}" var="i">
+									<!-- 
+									<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
+									 -->
+									 
+									<c:if test="${i.value != null}">
+									<%-- --%>
+										
+										<!-- <c:if test="${i.consolidated == 0}"> no es consolidado</c:if> -->
+										<c:if test="${i.consolidated == 1}"> 
+											<div class = "prop-group-elem">
+												<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${i.uri}" /></p>														
+												<p class="property-name"><c:out value="${i.name}" /></p>
+												<p style="display: none;"><c:out value="${i.show_default}" /></p>
+											
+												<li class="list-group-item show-default">													
+													<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+														<img src="${i.value}}" alt="Smiley face" >
+													</c:if>
+													<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+														<c:if test="${i.is_mapping == 1}">
+																												
+															<c:if test="${i.label == null}">
+																<div class="prop-label-div">
+																	<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+																</div>
+															</c:if>
+															<c:if test="${i.label != null}">
+																<div class="prop-label-div">
+																	<p class="prop-label-2"><a class="ref-value  prop-label" href="#" onclick=""><c:out value="${i.label}" /></a></p>
+																	<p style="display:none;"><a class="prop-label-3" ><c:out value="${i.value}" /></a></p>
+																</div>
+															</c:if>
+															
+														</c:if>
+														<c:if test="${i.is_mapping != 1}">
+															<c:if test="${i.label == null}">
+																<p><c:out value="${i.value}" /></p>
+															</c:if>
+															<c:if test="${i.label != null}">
+																<p><c:out value="${i.label}" /></p>
+															</c:if>														
+														</c:if>									
+													</c:if>	
+												</li>
+											</div>	
 										</c:if>
-										<c:if test="${i.is_mapping != 1}">
-											<p><c:out value="${i.value}" /></p>
-										</c:if>
-										XD
-									</li>
+									</c:if>
+								</c:forEach>	
+							</ul>
+						</c:if>
+						
+						<c:if test="${z.propertyGroups != null}">
+							<ul id="prop-group-list" class="list-group prop-group-list">
+								
+								<!--  <p>PROPIEDADES AGRUPADAS</p> -->
+								<c:forEach items="${z.propertyGroups}" var="j">	
+									<%-- --%>
+									<c:if test="${j.consolidated == 1}"> 
+										<div class = "prop-group-elem">				
+											<p class="prop-group-name"><c:out value="${j.name}" /></p>						
+											<p class="prop-group-uri" style = "display: none;"><c:out value="${j.uri}" /></p>	
+											
+											<c:if test="${j.instances == 1}">	
+												 						
+												<c:forEach items="${j.propertyList}" var="k"> 
+													<li class="list-group-item not-show-default list-group-instances">
+														<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>
+														<!-- <p><c:out value="${i.name}" /></p>  -->
+														<p style="display: none;"><c:out value="${k.show_default}" /></p>
+														<c:if test="${k.is_mapping == 1}">													
+															<c:if test="${k.label == null}">
+																<div class="prop-label-div">
+																	<p class="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" />  >> </a></p>
+																</div>
+															</c:if>
+															<c:if test="${k.label != null}">
+																<div class="prop-label-div">
+																	<p class="prop-label-5"><a  class="ref-value prop-label" href="#" onclick=""><c:out value="${k.label}" /></a><span class="glyphicon glyphicon-chevron-right span-icon"></span></p>
+																	<p style="display: none;"><a class="prop-label-6"><c:out value="${k.value}" /></a></p>
+																</div>
+															</c:if>
+														</c:if>
+														<c:if test="${k.is_mapping != 1}">													
+															<c:if test="${k.label != null}">
+																<p><c:out value="${k.label}" /></p>
+															</c:if>
+															<c:if test="${k.label == null}">
+																<p><c:out value="${k.value}" /></p>
+															</c:if>
+														</c:if>
+													</li>
+												</c:forEach>
+											</c:if>
+											
+											<c:if test="${j.instances == 0}">	 						
+												<c:forEach items="${j.propertyList}" var="k"> 
+													<li class="list-group-item not-show-default">
+														<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>
+														<!-- <p><c:out value="${i.name}" /></p>  -->
+														<p style="display: none;"><c:out value="${k.show_default}" /></p>
+														<c:if test="${k.is_mapping == 1}">													
+															<c:if test="${k.label == null}">
+																<div class="prop-label-div">
+																	<p class="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
+																</div>
+															</c:if>
+															<c:if test="${k.label != null}">
+																<div class="prop-label-div">
+																	<p class="prop-label-5"><a  class="ref-value prop-label" href="#" onclick=""><c:out value="${k.label}" /></a></p>
+																	<p style="display: none;"><a class="prop-label-6"><c:out value="${k.value}" /></a></p>
+																</div>
+															</c:if>
+														</c:if>
+														<c:if test="${k.is_mapping != 1}">													
+															<c:if test="${k.label != null}">
+																<p><c:out value="${k.label}" /></p>
+															</c:if>
+															<c:if test="${k.label == null}">
+																<p><c:out value="${k.value}" /></p>
+															</c:if>
+														</c:if>
+													</li>
+												</c:forEach>
+											</c:if>
+										</div>		
+									</c:if>						
 								</c:forEach>
-							</ul>					
-						</c:forEach>
-					</c:if>
-					--%>
-					
-					
-
+							</ul>
+						</c:if>	
+					</div>					
 				</c:forEach>				
 			</div>
 		</div>

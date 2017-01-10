@@ -353,18 +353,23 @@
 		
 		<c:if test="${instances != null}">
 			<div class = "row"> 
-				<div class="col-md-12 ref-info-row" >
-					Instancias de la clase<br>
+				<div class="col-md-12 ref-info-row" style="padding: 50px;">
+					<p class="prop-group-name">Instancias de la clase</p>	
 					<ul class="list-group">
 						<c:forEach items="${instances}" var="i">
-							<li class="list-group-item">
+							<li class="list-group-item list-element-instance">
 								<div class="term-list-item">
 									<p class="term-item-uri" style="display: none;"><a><c:out value="${i.uri}" /></a></p>									 
-									<p class="term-item-name" ><a><c:out value="${i.name}" /></a></p>
+									<p class="term-item-name" style="display: inline-block"><a href="#"><c:out value="${i.name}" /></a></p>
+									<div style="display: inline-block" class="flip-instance">
+										<span class="glyphicon glyphicon-chevron-down span-icon"></span>
+									</div>
 									<!--
 									<p><c:out value="${i.definition}" /></p>
 									-->
-									<div class="flip-instance"><a href="#">VER DEF-></a></div>
+									<!-- 
+									<div class="flip-instance"><a href="#">Definition</a><span class="glyphicon glyphicon-chevron-down span-icon"></span></div>
+									-->
 									<div class="panel-comment"><p><c:out value="${i.definition}" /></p></div>
 								</div>
 							</li>
