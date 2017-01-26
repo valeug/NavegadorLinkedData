@@ -258,11 +258,13 @@
 		//alert('no entro');
 		//alert("gg");
 		var list = document.getElementById('prop-list');
+		console.log("LIST")
 		console.log(list);
+		console.log("FIN LIST")
 		var elements = list.children;
-		console.log(elements);
+		//console.log(elements);
 		var cont = 1;
-		console.log('for each');
+		//console.log('for each');
 		$.each(elements, function(key, value){
 			/*
 			var rowNew = $("<tr><td></td><td></td></tr>");
@@ -274,21 +276,21 @@
 			//alert('entro each');
 			//alert(value['name']);
 			var row = $("<tr />");
-			console.log(value);
+			//console.log(value);
 			//console.log('p');
 			//console.log(value.children[0].innerHTML);
-			console.log(value.children[0]);
+			//console.log(value.children[0]);
 			//alert(value.children[0].innerHTML)
             $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
             //$("<td />").text(value.children[3]}).appendTo(row); //FALTARIA INDICAR EL NOMBRE DEL DATASET   
             var show_default = value.children[2].innerHTML;
             if(show_default == 1){
-            	console.log('muestra');
+            	//console.log('muestra');
             	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList" checked="checked" />'; 
             	$("<td />").html(inpStr).appendTo(row);
             }
             else {
-            	console.log('no muestra');
+            	//console.log('no muestra');
             	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
             	$("<td />").html(inpStr).appendTo(row);
             }
@@ -302,7 +304,13 @@
 		var elementsP = list.getElementsByClassName("prop-group-uri");
 		
 		console.log('lista agrupadaaaaaa');
+		console.log(list);
+		console.log("fin");
+		
+		console.log("elementos");
 		console.log(elementsP);
+		console.log("fin");
+		
 		/*
 		//var elementsG = list.getElementsByClassName("list-group-item" );
 		var elementsG = list.getElementsByClassName("list-group-item" );
@@ -314,26 +322,13 @@
 			var row = $("<tr />");
 			console.log(value);
 			
-                  $("<td />").text(value.innerHTML).appendTo(row); // URI
-                  /*
-                  var show_default = value.children[2].innerHTML;
-                  if(show_default == 1){
-                  	console.log('muestra');
-                  	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList"/ checked="checked">'; 
-                  	$("<td />").html(inpStr).appendTo(row);
-                  }
-                  else {
-                  	console.log('no muestra');
-                  	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
-                  	$("<td />").html(inpStr).appendTo(row);
-                  }
-                 	*/
-                  //prueba
-                  var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
-                  	$("<td />").html(inpStr).appendTo(row);
-                  	
-                  row.appendTo(table);
-                  cont = cont + 1;
+            $("<td />").text(value.innerHTML).appendTo(row); // URI
+            //prueba
+            var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
+            	$("<td />").html(inpStr).appendTo(row);
+            	
+            row.appendTo(table);
+            cont = cont + 1;
 		});
 			//}			
 		//});

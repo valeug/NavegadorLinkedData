@@ -745,6 +745,7 @@ public class Bio2RdfEndpoint {
 		
 		regroupPropertyList(pList, pgList);
 		c.setProperties(pList);
+		System.out.println("** plist size: " + pList.size());
 		c.setPropertyGroups(pgList);
 		return c;
 	}
@@ -752,22 +753,24 @@ public class Bio2RdfEndpoint {
 	
 	private static void regroupPropertyList(List<Property> pList, List<PropertyGroup> pgList){
 
-		List<Property> auxList = new ArrayList<Property>();
+		List<Property> auxList = new ArrayList<Property>(pList);
 		boolean repite = false;
 		boolean agrupada = false;
 		
-		for(int i=0; i<pList.size(); i++){ //para cada propiedad
-			Property p = pList.get(i);
+		//limpiar pList
+		pList.clear();
+		for(int i=0; i<auxList.size(); i++){ //para cada propiedad
+			Property p = auxList.get(i);
 			repite = false;
 			int j;
 			//buscar en lista simple
-			for(j=0; j < auxList.size(); j++){ 
+			for(j=0; j < pList.size(); j++){ 
 				/*
 				System.out.println("p: " + p);
 				System.out.println("p uri: " + p.getUri());
 				System.out.println("aux: " + auxList.get(j));
 				*/
-				if(p.getUri().compareTo(auxList.get(j).getUri()) ==0 ){
+				if(p.getUri().compareTo(pList.get(j).getUri()) ==0 ){
 					repite = true;
 					break;
 				}
@@ -777,7 +780,7 @@ public class Bio2RdfEndpoint {
 				PropertyGroup pg = new PropertyGroup();
 				List<Property> props = new ArrayList<Property>();
 				props.add(p);
-				props.add(auxList.get(j));
+				props.add(pList.get(j));
 				//property group
 				pg.setUri(p.getUri());
 				pg.setName(p.getName());
@@ -786,7 +789,7 @@ public class Bio2RdfEndpoint {
 				pgList.add(pg);
 				
 				//eliminar de lista simple
-				p = auxList.remove(j);
+				p = pList.remove(j);
 			}
 			else {
 				//si no esta en lista simple, buscar en lista de grupos
@@ -805,7 +808,7 @@ public class Bio2RdfEndpoint {
 					auxpg.getPropertyList().add(p);
 				}
 				else {
-					auxList.add(pList.get(i));
+					pList.add(auxList.get(i));
 				}
 			}
 		}
@@ -814,7 +817,7 @@ public class Bio2RdfEndpoint {
 		System.out.println("pList size: " + pList.size());
 		System.out.println("auxList size: " + auxList.size());
 		System.out.println("pgList size: " + pgList.size());
-		pList = auxList;		
+		//pList = auxList;		
 		
 		System.out.println("\nDESPUES\n");
 		System.out.println("pList size: " + pList.size());
