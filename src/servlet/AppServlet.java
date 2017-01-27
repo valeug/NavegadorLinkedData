@@ -52,13 +52,36 @@ public class AppServlet extends HttpServlet {
 			if(esUri ==-1) System.out.println("tf");
 			if(esUri == 1 ){
 				System.out.println("esURI");
-				/* SI ES URI (o sea, como el uri pertenece a 1 solo recurso) -> MOSTRAR TODA LA INFO DE UN CONCEPTO */
-				request.setAttribute("term", termList.get(0));
-				view = "searchresult.jsp";
+				
+				/* VERIFICAR SI ES UNA CLASE DEL DOMINIO (que este en la BD)*/
+				int datasetId;
+				datasetId = SearchController.es_clase_valida(request);
+								
+				if(datasetId != 0){
+					List<Concept> instances = new ArrayList<Concept>();
+					Concept clase = new Concept();
+					
+					instances = SearchController.search_instances(request, datasetId);
+					System.out.println("\n\n\n++++++++++++++++\nINSTANCES\n");
+					System.out.println("size: " + instances.size());
+					
+					//clase.setUri(request.getParameter("concept"));
+					request.setAttribute("term", clase);
+					request.setAttribute("instances", instances);
+					
+					view = "searchresult.jsp";
+				}				
+				else { /* NO ES UNA CLASE */
+					/* SI ES URI (o sea, como el uri pertenece a 1 solo recurso) -> MOSTRAR TODA LA INFO DE UN CONCEPTO */
+					request.setAttribute("term", termList.get(0));
+					view = "searchresult.jsp";
+				}
+				
+				
 			}
 			else { 
 				System.out.println("NO esURI");
-				// devolver  una lista de conceptos (con las coincidencias en cada dataset)
+				// busca por palabra, devolver MEZCLA de varios conceptos. devolver  una lista de conceptos (con las coincidencias en cada dataset)
 			
 				request.setAttribute("termsConsolidated", termList);
 				view = "searchresult-consolidated.jsp";

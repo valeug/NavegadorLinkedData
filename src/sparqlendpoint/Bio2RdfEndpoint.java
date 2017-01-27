@@ -1241,4 +1241,47 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 	}
 	
 	
+	static public List<Concept> getInstances(String classUri){
+		List<Concept> conceptList = new ArrayList<Concept>();
+		
+		//
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+				"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+				"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
+		"   SELECT DISTINCT * " +
+		"   WHERE { " +				
+		"       ?s rdf:type  <" + classUri + "> . " + 
+		" 		?s <http://purl.org/dc/terms/title> ?label . " +
+		"   } "+
+		"	LIMIT 20";
+		
+					
+		
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query);
+					
+		String aux;
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			Concept c = new Concept();
+		    aux = qsol.get("s").toString();		    
+		    c.setUri(aux);
+		    aux = qsol.get("label").toString();
+		    c.setName(aux);
+		    
+		    conceptList.add(c);
+		} 
+		qexec.close();
+
+		//
+		
+		return conceptList;
+	}
+	
 }

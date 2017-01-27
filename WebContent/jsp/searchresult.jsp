@@ -228,6 +228,21 @@
 				<div id="mydiv"></div>
 			</div>
 		</div>
+		
+		<div class = "row"> 
+			<div class="col-md-12 ref-info-row" >
+				Instancias de la clase<br>
+				
+				<c:forEach items="${instances}" var="i">
+					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
+					<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
+				</c:forEach>
+							
+				<br>
+				<br>
+			</div>
+		</div>
+		
 	</div>
 	
 	<script type="text/javascript">

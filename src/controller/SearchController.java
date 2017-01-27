@@ -15,6 +15,7 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 
+import dao.ClassDAO;
 import dao.DatasetDAO;
 import model.Concept;
 import model.Dataset;
@@ -590,4 +591,27 @@ public class SearchController {
 	}
 	
 	
+	public static int es_clase_valida(HttpServletRequest request){
+		
+		String input = request.getParameter("concept");
+		return ClassDAO.searchClass(input);		
+	}
+	
+	public static List<Concept> search_instances(HttpServletRequest request, int datasetId){
+		
+		String classUri = request.getParameter("concept");
+		List<Concept> conceptList = new ArrayList<Concept>();
+		
+		if(datasetId == 1){ // DBPEDIA
+			conceptList = DbpediaEndpoint.getInstances(classUri);
+		}
+		else { // BIO2RDF
+			conceptList = Bio2RdfEndpoint.getInstances(classUri);
+		}
+		
+		return conceptList;
+	}
+	
+
 }
+

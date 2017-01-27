@@ -164,4 +164,39 @@ public class ClassDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	public static int searchClass(String classUri){ //return dataset
+		
+		System.out.println("classUri: " + classUri);
+		
+		String query =  " SELECT id_dataset "+
+					  	" FROM class" +
+					  	" WHERE uri= \"" + classUri +"\""+
+					  	";";
+		
+    	try {
+    		
+    		myConnec = getConnection();
+    		myStat = myConnec.createStatement();
+			ResultSet myres = myStat.executeQuery(query);
+			
+			int dataset = 0;
+			
+			while(myres.next()){
+				dataset = myres.getInt("id_dataset");
+				break;
+			}
+			
+			myres.close();			
+			myConnec.close();
+			
+			return dataset;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	    	
+		return 0;
+	}
 }
