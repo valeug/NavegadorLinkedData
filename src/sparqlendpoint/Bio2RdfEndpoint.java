@@ -743,9 +743,23 @@ public class Bio2RdfEndpoint {
 		//c.setProperties(pFinal);
 		List<PropertyGroup> pgList = new ArrayList<PropertyGroup>();
 		
+		System.out.println("ANTES DEL REGROUP");
+		for(int k=0; k<pList.size(); k++){
+			System.out.println(k+") uri: " + pList.get(k).getUri());
+			System.out.println(k+") show_default: " + pList.get(k).getShow_default());
+		}
+		
 		regroupPropertyList(pList, pgList);
 		c.setProperties(pList);
 		System.out.println("** plist size: " + pList.size());
+		
+
+		System.out.println("DESPUES DEL REGROUP");
+		for(int k=0; k<pList.size(); k++){
+			System.out.println(k+") uri: " + pList.get(k).getUri());
+			System.out.println(k+") show_default: " + pList.get(k).getShow_default());
+		}
+		
 		c.setPropertyGroups(pgList);
 		return c;
 	}

@@ -106,7 +106,9 @@
 			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >			
 				<c:forEach items="${termsConsolidated}" var="z">
 					<br> URI <br>
-					<c:out value="${z.uri}" /><br>	
+					<p>
+					<a class="ref-value" href="#" onclick=""><c:out value="${z.uri}" /></a>
+					</p>
 					
 					<c:if test="${z.properties != null}">
 						<p class="subtitle">Propiedades</p>		

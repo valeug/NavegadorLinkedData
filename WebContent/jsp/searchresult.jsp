@@ -106,47 +106,45 @@
 			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >
 				<p class="subtitle">Propiedades</p>
 				<ul id="prop-list" class="list-group">
-					<c:forEach items="${term.properties}" var="i">
-						<!-- 
-						<a href="#" onclick="myfunction(this);"><c:out value="${i.name}" /></a><br>	
-						 -->
-						<c:if test="${i.value != null}">
-							<c:if test="${i.show_default==1}">
+					<c:forEach items="${term.properties}" var="t">
+						
+						<c:if test="${t.value != null}">							
+							<c:if test="${t.show_default==1}">
 								<li class="list-group-item show-default">
 									
-									<p  class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+									<p  class="ref-uri" style = "display: none;"><c:out value="${t.uri}" /></p>
 											
-									<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
-									<p style="display: none;"><c:out value="${i.show_default}" /></p>
-									<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
-										<img src="${i.value}}" alt="Smiley face" >
+									<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${t.name}" /></p>
+									<p style="display: none;"><c:out value="${t.show_default}" /></p>
+									<c:if test="${t.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+										<img src="${t.value}}" alt="Smiley face" >
 									</c:if>
-									<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-										<c:if test="${i.is_mapping == 1}">
-											<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+									<c:if test="${t.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+										<c:if test="${t.is_mapping == 1}">
+											<p><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
 										</c:if>
-										<c:if test="${i.is_mapping != 1}">
-											<p><c:out value="${i.value}" /></p>
+										<c:if test="${t.is_mapping != 1}">
+											<p><c:out value="${t.value}" /></p>
 										</c:if>									
 									</c:if>		
 								</li>
 							</c:if>
-							<c:if test="${i.show_default==0}">
+							<c:if test="${t.show_default==0}">
 								<li class="list-group-item not-show-default" style="display: none;">						
 									
-									<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+									<p class="ref-uri" style = "display: none;"><c:out value="${t.uri}" /></p>
 									
-									<p><c:out value="${i.name}" /></p>
-									<p style="display: none;"><c:out value="${i.show_default}" /></p>
-									<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
-										<img src="${i.value}}" alt="Smiley face" >
+									<p><c:out value="${t.name}" /></p>
+									<p style="display: none;"><c:out value="${t.show_default}" /></p>
+									<c:if test="${t.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+										<img src="${t.value}}" alt="Smiley face" >
 									</c:if>
-									<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-										<c:if test="${i.is_mapping == 1}">
-											<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+									<c:if test="${t.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+										<c:if test="${t.is_mapping == 1}">
+											<p><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
 										</c:if>
-										<c:if test="${i.is_mapping != 1}">
-											<p><c:out value="${i.value}" /></p>
+										<c:if test="${t.is_mapping != 1}">
+											<p><c:out value="${t.value}" /></p>
 										</c:if>									
 									</c:if>		
 								</li>
@@ -155,23 +153,23 @@
 					</c:forEach>
 				</ul>
 				<ul id="prop-group-list" class="list-group prop-group-list">
-					<c:forEach items="${term.propertyGroups}" var="i">
+					<c:forEach items="${term.propertyGroups}" var="k">
 						
-						<p class="prop-group-name"><c:out value="${i.name}" /></p>
+						<p class="prop-group-name"><c:out value="${k.name}" /></p>
 						
-						<p class="prop-group-uri"><c:out value="${i.uri}" /></p>
+						<p class="prop-group-uri"><c:out value="${k.uri}" /></p>
  						
 						Propiedades (valores)
-						<c:forEach items="${i.propertyList}" var="i"> 
+						<c:forEach items="${k.propertyList}" var="j"> 
 							<li class="list-group-item not-show-default">
-								<p class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+								<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
 								<!-- <p><c:out value="${i.name}" /></p>  -->
-								<p style="display: none;"><c:out value="${i.show_default}" /></p>
-								<c:if test="${i.is_mapping == 1}">
-									<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+								<p style="display: none;"><c:out value="${j.show_default}" /></p>
+								<c:if test="${j.is_mapping == 1}">
+									<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
 								</c:if>
-								<c:if test="${i.is_mapping != 1}">
-									<p><c:out value="${i.value}" /></p>
+								<c:if test="${j.is_mapping != 1}">
+									<p><c:out value="${j.value}" /></p>
 								</c:if>
 							</li>
 						</c:forEach>
