@@ -2,6 +2,7 @@ package sparqlendpoint;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -45,32 +46,86 @@ public class Bio2RdfEndpoint {
 		/*	BUSQUEDA POR COINCIDENCIA EXACTA	*/
 	/*************************************************************************/
 	
-	public static Concept searchTermByExactMatch(String cad, Dataset dataset){
+	public static Concept searchTermByExactMatch(String cad, Dataset dataset, List<Concept> mappingList){
 		System.out.println("DATASET : " + dataset.getName());
 		System.out.println("DATASET id: " + dataset.getId());
 		System.out.println("cad: " + cad);
 		String fromQ = "";
 		
-		if(dataset!=null)
-			fromQ = " FROM <" + dataset.getUri() + "> ";
+		
+		/* 1. dividir cadena en palabras */
+		
+		//String nombre="Angel Franco García";
+		System.out.println("TOKENIZAR: ");
+		StringTokenizer tokens=new StringTokenizer(cad);
+		
+		
+		/* 2. verificar si alguna de las palabras es una clase */
+		
+		List<Class> classesDataset = ClassDAO.getAllClassesByDataset(dataset.getId());
+		String clase = null;
+		while(tokens.hasMoreTokens()){
+			String token = tokens.nextToken();
+            System.out.println(token);
+            
+            for(int t=0; t < classesDataset.size(); t++){
+            	if(classesDataset.get(t).getUri().toUpperCase().contains(token.toUpperCase()) == true){
+            		clase = classesDataset.get(t).getUri();
+            		System.out.println("SI EXISTE LA CLASE!!");
+            		break;
+            	}
+            }
+		}
+		
+		/* 3. generar query */
+		
+		String innerQuery = "";
+		
+		if(clase!=null){
+			innerQuery =  buildInnerQueryByClass(clase, cad.toUpperCase());
+		}
+		else {
+			innerQuery = buildInnerQuery(classesDataset, cad.toUpperCase());
+		}
+		System.out.println("inner:\n" + innerQuery);
+		
+		
+		
+			/*
+			if(dataset!=null)
+				fromQ = " FROM <" + dataset.getUri() + "> ";
+			*/
+			/*
+			 	String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+							" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+							" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+				" SELECT DISTINCT * " +
+				//fromQ +
+				" WHERE { "+
+				" ?s rdf:type ?type . " +
+				//"		?s ?property ?value . " + //obtener propiedades
+				" ?s <http://purl.org/dc/terms/title> ?label . " +
+				" FILTER (UCASE(str(?label)) = \"" + cad.toUpperCase() +"\") " +
+				"} "+
+				"LIMIT 10";
+			*/
 		
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 						" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 						" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
 			" SELECT DISTINCT * " +
-			fromQ +
+			//fromQ +
 			" WHERE { "+
-			" ?s rdf:type ?type . " +
-			//"		?s ?property ?value . " + //obtener propiedades
-			" ?s <http://purl.org/dc/terms/title> ?label . " +
-			" FILTER (UCASE(str(?label)) = \"" + cad.toUpperCase() +"\") " +
-			"} "+
+			innerQuery +
+			" } "+
 			"LIMIT 10";
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
-		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
-	
+		//QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		QueryEngineHTTP qexec = new QueryEngineHTTP(dataset.getSparqlEndpoint(), query);
+		System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+		
 		ResultSet results = qexec.execSelect();
 		
 		//ResultSetFormatter.out(System.out, results, query);    
@@ -82,7 +137,7 @@ public class Bio2RdfEndpoint {
 		String aux = null;	
 
 		
-		List<Class> classesDataset = ClassDAO.getAllClassesByDataset(dataset.getId());
+		//List<Class> classesDataset = ClassDAO.getAllClassesByDataset(dataset.getId());
 		
 		//List<Property> pList = new ArrayList<Property>();
 
@@ -91,16 +146,29 @@ public class Bio2RdfEndpoint {
 		List<String> uris = new ArrayList<String>();
 		List<String> types = new ArrayList<String>(); // clase del recurso
 		
+		boolean repite;
+		
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
 			
 			aux = qsol.get("s").toString();
-			uris.add(aux);
-			aux = qsol.get("type").toString();
-			System.out.println("aux : "+aux);
-			types.add(aux);
-
+			repite = false;
+			
+			for(int p=0; p<mappingList.size(); p++){
+				if(aux.compareTo(mappingList.get(p).getUri())==0){
+					repite = true;
+					break;
+				}
+			}
+			
+			if(repite == false){	
+				System.out.println("exact match: no repite");
+				uris.add(aux);
+				aux = qsol.get("type").toString();
+				System.out.println("aux : "+aux);
+				types.add(aux);
+			}
 		} 
 		
 		if(uris.size() > 0){
@@ -125,20 +193,54 @@ public class Bio2RdfEndpoint {
 			qexec.close();		
 			Concept c = new Concept();
 			c.setUri(uris.get(posUri));
+			c.setDataset(dataset.getSparqlEndpoint());
 			//c.setProperties(pList);
 			c.setProperties(pList);
 			c.setPropertyGroups(pgList);
 			
+			System.out.println("dentro exact");
 			System.out.println("pglist size*: " + pgList.size());
 			return c;
 		}
 		
 		qexec.close();
 		
+		System.out.println("fuera exact");
 		Concept c = new Concept();
 		return c;
 	}
-
+	
+	private static String buildInnerQuery(List<Class> classesDataset, String cad){
+		String query = "";
+		
+		for(int i=0; i < classesDataset.size(); i++){
+			if(i>0){
+				query += " UNION ";				
+			}
+			query += " { ";
+			query += "  ?s rdf:type ?type . ";
+			query += "  ?s rdf:type <" + classesDataset.get(i).getUri() + "> . ";			
+			query += "  ?s <http://purl.org/dc/terms/title> ?label . ";
+			query += "  FILTER (UCASE(str(?label)) = \"" + cad + "\") ";
+			query += " } ";
+		}
+		
+		return query;
+	}
+	
+	private static String buildInnerQueryByClass(String classUri, String cad){
+		String query = "";
+				
+		query += " { ";
+		query += "  ?s rdf:type ?type . ";
+		query += "  ?s rdf:type <" + classUri + "> . ";			
+		query += "  ?s <http://purl.org/dc/terms/title> ?label . ";
+		query += "  FILTER (UCASE(str(?label)) = \"" + cad + "\") ";
+		query += " } ";
+			
+		return query;
+	}
+	
 	private static void imprimirLista(List<Property> pList){
 		
 		System.out.println("*****************");
@@ -598,7 +700,7 @@ public class Bio2RdfEndpoint {
 			"	LIMIT 100";
 			*/
 		
-		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 									" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 									" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
 				"   SELECT DISTINCT * " +
@@ -624,8 +726,12 @@ public class Bio2RdfEndpoint {
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
-		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
-	
+		//QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		QueryEngineHTTP qexec = new QueryEngineHTTP(dataset.getSparqlEndpoint(), query);
+		
+		System.out.println("uri: " + cad);
+		System.out.println("dataset: " + dataset.getSparqlEndpoint());
+		
 		ResultSet results = qexec.execSelect();
 		//ResultSetFormatter.out(System.out, results, query);    
 	
@@ -638,6 +744,7 @@ public class Bio2RdfEndpoint {
 		List<String> classTypeList = new ArrayList<String>();
 		Concept c = new Concept();
 		c.setUri(cad);
+		c.setDataset(dataset.getSparqlEndpoint());
 		
 		int i=0;
 		String name = null;
@@ -664,21 +771,21 @@ public class Bio2RdfEndpoint {
 			
 			
 			if(qsol.contains("property") && qsol.contains("value")){	
-				System.out.println("entro ***! ");				
+				//System.out.println("entro ***! ");				
 				Property p = new Property();
 				
 				aux = qsol.get("property").toString();
 				
-				System.out.println("|property: ");
-				System.out.println(aux);
+				//System.out.println("|property: ");
+				//System.out.println(aux);
 				p.setUri(aux);
 				
 				if(aux.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){					
 					classTypeList.add(qsol.get("value").toString());
 				}
 				aux = qsol.get("value").toString();
-				System.out.println("|value: ");			
-				System.out.println(aux);
+				//System.out.println("|value: ");			
+				//System.out.println(aux);
 				p.setValue(aux);
 				p.setShow_default(0);
 				//p.setName("gg "+i);
@@ -718,13 +825,14 @@ public class Bio2RdfEndpoint {
 			for(int h=0; h<propsClases.size(); h++){
 				//System.out.println("prop(h): "+propsTotal.get(h).getUri());
 				if(pUri.compareTo(propsClases.get(h).getUri())==0){
-					System.out.println("/n/n/nprop is mapping: " + propsClases.get(h).getIs_mapping());
-					System.out.println("pUri: " + pUri);
-					System.out.println("prop(h): "+propsClases.get(h).getUri());					
+					//System.out.println("/n/n/nprop is mapping: " + propsClases.get(h).getIs_mapping());
+					//System.out.println("pUri: " + pUri);
+					//System.out.println("prop(h): "+propsClases.get(h).getUri());					
 					pList.get(k).setIs_mapping(propsClases.get(h).getIs_mapping()); //mapping
 					pList.get(k).setName(propsClases.get(h).getName()); //name
 					//pFinal.add(pList.get(k));
 					pList.get(k).setShow_default(1);
+					pList.get(k).setConsolidated(propsClases.get(h).getConsolidated()) ; //OJOOOOO
 					
 					//found = true;
 					break;
@@ -743,11 +851,14 @@ public class Bio2RdfEndpoint {
 		//c.setProperties(pFinal);
 		List<PropertyGroup> pgList = new ArrayList<PropertyGroup>();
 		
+		
 		System.out.println("ANTES DEL REGROUP");
+		/*
 		for(int k=0; k<pList.size(); k++){
 			System.out.println(k+") uri: " + pList.get(k).getUri());
 			System.out.println(k+") show_default: " + pList.get(k).getShow_default());
 		}
+		*/
 		
 		regroupPropertyList(pList, pgList);
 		c.setProperties(pList);
@@ -755,12 +866,15 @@ public class Bio2RdfEndpoint {
 		
 
 		System.out.println("DESPUES DEL REGROUP");
+		/*
 		for(int k=0; k<pList.size(); k++){
 			System.out.println(k+") uri: " + pList.get(k).getUri());
 			System.out.println(k+") show_default: " + pList.get(k).getShow_default());
 		}
+		*/
 		
 		c.setPropertyGroups(pgList);
+		
 		return c;
 	}
 	
@@ -988,7 +1102,7 @@ public class Bio2RdfEndpoint {
 	/* LISTA DE CONCEPTOS: COINCIDENCIA SIMILAR EN NOMBRE */
 	/*************************************************************************/
 
-	public static List<Concept> searchTermBySimilarName(String input, Dataset dataset){
+	/*public static List<Concept> searchTermBySimilarName(String input, Dataset dataset){
 		
 		System.out.println("DATASET : " + dataset.getName());
 		
@@ -1011,7 +1125,107 @@ public class Bio2RdfEndpoint {
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
-		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		//QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		QueryEngineHTTP qexec = new QueryEngineHTTP(dataset.getSparqlEndpoint(), query);
+		
+		System.out.println("dataset: " + dataset.getSparqlEndpoint());
+		
+		ResultSet results = qexec.execSelect();
+		//ResultSetFormatter.out(System.out, results, query); 
+		
+		List<Concept> concepts = new ArrayList<>();
+		String aux;
+		int i=0;
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			Concept c = new Concept();
+			
+			aux = qsol.get("s").toString();
+			System.out.println("uri: "+aux);
+			c.setUri(aux);
+									
+			aux = qsol.get("label").toString();
+			System.out.println("label: "+aux);
+			c.setName(aux);			
+			
+			concepts.add(c);
+			
+			i++;
+		}
+				
+		qexec.close();
+		return concepts;		
+	}*/
+
+	public static List<Concept> searchTermBySimilarName(String input, Dataset dataset){
+		
+		System.out.println("DATASET : " + dataset.getName());
+		
+//		/* 1) separar la cadena en varias palabras */
+//		
+//		System.out.println("TOKENIZAR: ");
+//		StringTokenizer tokens=new StringTokenizer(input);
+//		
+//		/* 2) agrupar los tokens */  
+//		
+//		List<String> tokenList = new ArrayList<String>();
+//		while(tokens.hasMoreTokens()){
+//			String token = tokens.nextToken();
+//            System.out.println(token);
+//            
+//            tokenList.add(token);
+//		}
+//		
+//		/* 3. generar query */
+//		
+//		String innerQuery = buildInnerQuery_Similar(tokenList);
+		
+		
+		////////////////////////////////////////
+		
+		
+		/* 1. obtener clases del dataset */
+		
+		List<Class> classesDataset = ClassDAO.getAllClassesByDataset(dataset.getId());
+		
+		/* 3. generar query */
+		
+		String innerQuery = "";
+
+		innerQuery = buildInnerQuery_Similar(classesDataset, input);
+
+		
+		System.out.println("inner:\n" + innerQuery);
+		
+		
+		/*
+		String fromQ = "";
+		if(dataset!=null)
+			fromQ = "	FROM <" + dataset.getUri() + "> ";
+		*/
+		
+		System.out.println("TERMINO A BUSCAR: " + input);
+		
+		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
+				"   SELECT DISTINCT ?s ?label  " +
+				//fromQ +
+				"   WHERE { " +				
+				//"       ?s <http://purl.org/dc/terms/title> ?label . " +		
+				//"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
+				innerQuery + 
+				"   } "+
+				"	LIMIT 5";				
+		
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);
+		//QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		QueryEngineHTTP qexec = new QueryEngineHTTP(dataset.getSparqlEndpoint(), query);
+		
+		System.out.println("dataset: " + dataset.getSparqlEndpoint());
 		
 		ResultSet results = qexec.execSelect();
 		//ResultSetFormatter.out(System.out, results, query); 
@@ -1042,13 +1256,40 @@ public class Bio2RdfEndpoint {
 		return concepts;		
 	}
 
+	public static String buildInnerQuery_Similar(List<Class> classList, String input){
 
+		
+		/*
+		 * 
+		 * 				"       ?s <http://purl.org/dc/terms/title> ?label . " +		
+				"	    FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) " +
+		 * 
+		 */
+		
+		String query = "";
+		
+		for(int i=0; i < classList.size(); i++){
+			if(i>0){
+				query += " UNION ";				
+			}
+			query += " { ";
+			query += "  ?s rdf:type ?type . ";
+			query += "  ?s rdf:type <" + classList.get(i).getUri() + "> . ";			
+			query += "  ?s <http://purl.org/dc/terms/title> ?label . ";
+			query += "  FILTER (CONTAINS ( UCASE(str(?label)), \"" + input.toUpperCase() + "\")) ";
+			query += " } ";
+		}
+		
+		return query;
+		
+	}
+	
 	/*************************************************************************/
 	/* BUSQUEDA POR COINCIDENCIA EN PROPIEDAD */
 	/*************************************************************************/
 
 	
-public static List<Concept> searchTermByPropertyMatch(String input, Dataset dataset){
+	public static List<Concept> searchTermByPropertyMatch(String input, Dataset dataset){
 		
 		
 		String fromQ = "";
@@ -1170,15 +1411,26 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 					}
 					*/
 					Concept c = null;
-					/*
-					if(inputUri != null){
-						System.out.println("ENTRO A inputUri !!");
-						c = searchTermByExactMatchUri(inputUri, dataset);
-					}
-					*/
+
 					if(p.getValue() != null){
 						System.out.println("ENTRO A inputUri !!");
-						c = searchTermByExactMatchUri(p.getValue(), dataset);
+						//si no se repite
+						boolean repite = false;
+						
+						for(int k=0; k<cList.size(); k++){
+							System.out.println("p.getvalue: " + p.getValue());
+							System.out.println("clist: " + cList.get(k).getUri());
+							if(p.getValue().compareTo(cList.get(k).getUri()) == 0){
+								repite = true;
+								break;
+							}
+						}
+						
+						if(repite == false){
+							System.out.println(" no repite :/");
+							c = searchTermByExactMatchUri(p.getValue(), dataset);
+						}
+						
 					}
 					
 					if(c != null) cList.add(c);
@@ -1191,9 +1443,11 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 					}
 					else System.out.println("Termino nulo D:");
 					*/
-					cList.add(c);
+					//cList.add(c);
 				}
-			}		
+			}
+			
+			System.out.println( j + ". cList size: " + cList.size());
 		}
 		System.out.println("cList size: " + cList.size());
 		return cList;
@@ -1215,7 +1469,7 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 		return cList;
 	}
 	
-	static public List<Concept> searchTermByExactMatch_Datasets(String input, List<Dataset> datasetList){
+	static public List<Concept> searchTermByExactMatch_Datasets(String input, List<Dataset> datasetList, List<Concept> mappingList){
 		
 		List<Concept> cList = new ArrayList<Concept>();
 		
@@ -1223,7 +1477,7 @@ public static List<Concept> searchTermByPropertyMatch(String input, Dataset data
 			Dataset dat = datasetList.get(i);
 			if(dat.getId() != 1){ // DBPEDIA
 				if(!InputSearchProcessor.isUri(input)){					
-					Concept aux = searchTermByExactMatch(input, dat);
+					Concept aux = searchTermByExactMatch(input, dat, mappingList);
 					cList.add(aux);					
 				}
 				else { //es uri

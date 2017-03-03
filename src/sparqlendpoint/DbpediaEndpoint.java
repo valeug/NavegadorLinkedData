@@ -91,13 +91,12 @@ public class DbpediaEndpoint {
 		"		UNION"+
 		" 		{ "+
 		"			?x <http://dbpedia.org/ontology/wikiPageRedirects> ?redirected . "+
-		//"			OPTIONAL { }"+
 		"			?redirected rdf:type ?class . "+
 		"		} "+
 		"		UNION { "+
 		"			?x <http://dbpedia.org/ontology/wikiPageDisambiguates> ?amb . "+
-		"			?amb rdf:type ?type ."+
-		"		FILTER (CONTAINS(str(?type), \"http://dbpedia.org/ontology/\" ))"+		//http://dbpedia.org/ontology/Disease
+		"			?amb rdf:type ?type . "+
+		"		FILTER (CONTAINS(str(?type), \"http://dbpedia.org/ontology/\" )) "+		//http://dbpedia.org/ontology/Disease
 		"		}"+
 		"		FILTER ( ?label = \""+ cad2 +"\"@en ) " +
 		//"		FILTER regex(str(?x), \"http://dbpedia.org/resource/\" )"+
@@ -444,7 +443,7 @@ public class DbpediaEndpoint {
 		"	LIMIT 100";
 				
 		Query query = QueryFactory.create(sparqlQueryString1);
-		QueryEngineHTTP qexec = new QueryEngineHTTP("http://dbpedia.org/sparql/", query);
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://dbpedia.org/sparql", query);
 
 		
 		ResultSet results = qexec.execSelect();

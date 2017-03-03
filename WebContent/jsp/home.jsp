@@ -127,8 +127,10 @@
 					var table = $("#ontologytable");
 					//alert('no entro');
 					//alert("gg");
-					var cont = 1;
+					//var cont = 1;
+					
 					$.each(responseJson, function(key, value){
+						console.log(value);
 						/*
 						var rowNew = $("<tr><td></td><td></td></tr>");
 						alert(value['name']);
@@ -141,10 +143,12 @@
 						var row = $("<tr />");
                         $("<td />").text(value['name']).appendTo(row);
                         $("<td />").text(value['description']).appendTo(row);
-                        var inpStr = '<input type="checkbox" id="'+ cont +'" name="checkboxList"/>'; 
+                        //var inpStr = '<input type="checkbox" id="'+ cont +'" name="checkboxList"/>'; 
+                        console.log("id: " + value['id']);
+                        var inpStr = '<input type="checkbox" id="'+ value['id'] +'" name="checkboxList"/>'; 
                         $("<td />").html(inpStr).appendTo(row);
                         row.appendTo(table);
-                        cont = cont + 1;
+                        //cont = cont + 1;
 					});					
 					//alert('wp');
 				}			

@@ -7,6 +7,7 @@ public class Concept {
 	public String uri;
 	public String name;
 	private String definition;
+	private String dataset;	
 	private String classType;
 	private List<Property> properties; //podria incluir "name", "definition" (aunque son propiedades importantes)
 	private List<PropertyGroup> propertyGroups; // list of list of properties	
@@ -14,6 +15,12 @@ public class Concept {
 	private List<Concept> similarTerms;
 	
 	
+	public String getDataset() {
+		return dataset;
+	}
+	public void setDataset(String dataset) {
+		this.dataset = dataset;
+	}
 	public List<PropertyGroup> getPropertyGroups() {
 		return propertyGroups;
 	}

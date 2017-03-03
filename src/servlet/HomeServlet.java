@@ -23,7 +23,7 @@ public class HomeServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
 		/* SETEAR TODOS LOS DATASETS A ELEGIDOS*/		
-		int ids [] = {1,2,3,4,5};
+		int ids [] = {1,2,4,5,6,7,8};
 		DatasetDAO.updateStatusById(ids, 1);
 		
 		System.out.println("inicializo datasets");

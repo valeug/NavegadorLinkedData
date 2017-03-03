@@ -60,8 +60,13 @@ public class SearchController {
 		List<Concept> tList = null;
 		
 		
+		System.out.println("DATASETLIST size: " + datasetList.size());
+		for(int p =0; p<datasetList.size(); p++){
+			System.out.println("id: "+datasetList.get(p).getId()+"  -  nom:"+datasetList.get(p).getName());
+		}
+		
 		/**/
-		int posBio [] = new int [5]; //posiciones de datasets de bio2rdf en la lista de datasets(datasetList)
+		int posBio [] = new int [7]; //posiciones de datasets de bio2rdf en la lista de datasets(datasetList)
 		int cant = 0, found = 0, seleccDbpedia=0;
 
 		if(!InputSearchProcessor.isUri(input)){ // cadena, 1era busqueda
@@ -111,17 +116,22 @@ public class SearchController {
 						
 						//System.out.println("termsMappingList size: " + termsMappingList.size());
 						System.out.println("ANTES term properties: " + term.getProperties().size());
+						
+						/* CREO QUE HAY QUE BORRAR ESTOOOOOOOOOOO!!!!!!!!!!!!!!!!!!!!1*/
 						addInfoToTerm(term, termsMappingList, similarTerms);
+						
 						System.out.println("\n---------------------\n---------------------\n IMPRIMELO 3\n---------------------\n---------------------");
 						//printConcept(term);
 					}
 					//else {
 						// No se encontro el concepto en DBPediam, se busca en bio2rdf
 						System.out.println("\n\n\nENTRO exacTerms\n");
-						exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList); //exact match		
+						
+						exactTerms = Bio2RdfEndpoint.searchTermByExactMatch_Datasets(input, datasetList, termsMappingList); //exact match		
 						
 						for(int i=0; i < exactTerms.size(); i++){
 							System.out.println("--------/n exact TERM " + i + "--------");
+							System.out.println("uri: " +exactTerms.get(i).getUri() );
 							termList.add(exactTerms.get(i));
 							//printConcept(exactTerms.get(i));						
 						}
@@ -129,6 +139,7 @@ public class SearchController {
 						System.out.println("\n\nmapping size: " + termsMappingList.size());
 						for(int i=0; i < termsMappingList.size(); i++){
 							System.out.println("--------/n mapping TERM " + i + "--------");
+							System.out.println("uri: " +termsMappingList.get(i).getUri() );
 							termList.add(termsMappingList.get(i));
 							//printConcept(termsMappingList.get(i));						
 						}
@@ -183,7 +194,8 @@ public class SearchController {
 		termList.add(term);
 		
 		
-		System.out.println("\n\n\n\n\n\n---------------\n FINAL ---------------\n\n\n\n");
+		System.out.println("\n\n\n\n\n\n---------------\n FINAL \n---------------\n\n\n\n");
+		System.out.println("termlist size: " + termList.size());
 		for(int i=0; i < termList.size(); i++){
 			System.out.println("--------/n  TERM " + i + "--------");			
 			printConcept(termList.get(i));						
@@ -260,6 +272,7 @@ public class SearchController {
 		if(searchType==2){
 			//tlist = DbpediaEndpoint.searchTermBySimilarName(input);
 			//tlist = Bio2RdfEndpoint.searchTermBySimilarName(input, null);
+			
 			tlist = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input,datasetList);
 		}
 		else if(searchType == 3){
@@ -545,6 +558,10 @@ public class SearchController {
 				System.out.println("uri: " + c.getUri());
 			else System.out.println("Uri null :/");
 						
+			if(c.getDataset() != null)
+				System.out.println("dataset: " + c.getDataset());
+			else System.out.println("Dataset null :/");
+			
 			if(c.getProperties() != null){
 				System.out.println("Propiedades: ");
 				System.out.println("Propiedades size: " + c.getProperties().size());

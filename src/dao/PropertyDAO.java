@@ -86,7 +86,7 @@ public class PropertyDAO {
     	return pList;		
 	}
     
-    public static List<Property> getAllPropertiesByClassUri(String uri){
+    /*public static List<Property> getAllPropertiesByClassUri(String uri){
 		
 		String query = "SELECT * "+
 						"FROM property "+ 
@@ -96,7 +96,7 @@ public class PropertyDAO {
 																	"  FROM class" + 
 																	"  WHERE uri = \"" + uri + "\" ))";
 		
-		System.out.println("QUERY DAO: " + query);
+		//System.out.println("QUERY DAO: " + query);
     	List<Property> pList = new ArrayList<Property>();
     	Property p = null;
 
@@ -128,7 +128,42 @@ public class PropertyDAO {
 		}
     	
     	return pList;		
+	}*/
+    
+    public static List<Property> getAllPropertiesByClassUri(String uri){
+		
+		String query =  "  SELECT id_class "+
+						"  FROM class" + 
+						"  WHERE uri = \"" + uri + "\" ";
+		
+		
+		
+    	List<Property> pList = new ArrayList<Property>();
+    	int id_class = 0;
+    	
+    	try {    		
+    		myConnec = getConnection();
+    		myStat = myConnec.createStatement();
+			ResultSet myres = myStat.executeQuery(query);
+
+			while(myres.next()){
+				id_class = myres.getInt("id_class");
+				break;
+			}
+			
+			myres.close();			
+			myConnec.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+    	pList = getAllPropertiesByClass(id_class);
+    	
+    	    	
+    	return pList;		
 	}
+    
     
     public static int storeProperty(Property p){
 		//SELECT MAX(id) FROM tablename;

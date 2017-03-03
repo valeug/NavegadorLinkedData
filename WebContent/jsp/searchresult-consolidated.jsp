@@ -110,6 +110,10 @@
 					<a class="ref-value" href="#" onclick=""><c:out value="${z.uri}" /></a>
 					</p>
 					
+					<p>
+					<a class="ref-value" href="#" onclick=""><c:out value="${z.dataset}" /></a>
+					</p>
+					
 					<c:if test="${z.properties != null}">
 						<p class="subtitle">Propiedades</p>		
 						entro<br>			
