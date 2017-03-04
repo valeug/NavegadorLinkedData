@@ -151,7 +151,8 @@ public class SearchController {
 			flagUri = 1;			
 			
 			if(input.contains("http://bio2rdf.org/")){
-				int idDatasetMatch = findUriOrigin(input);
+				
+				int idDatasetMatch = findUriOrigin(input); /* ADAPTAR A NUEVOS DATASETS */
 				
 				System.out.println("idDatasetMatch: " + idDatasetMatch);				
 				System.out.println("datasetList.size(): " + datasetList.size());
@@ -164,8 +165,8 @@ public class SearchController {
 						System.out.println("entro a uri bio2rdf");
 						// si no es goa
 						term = Bio2RdfEndpoint.searchTermByExactMatchUri(input, dat);
-						//termList.add(term);
-						//si es goa 
+						// termList.add(term);
+						// si es goa 
 						
 						
 						if(term == null) System.out.println("null wtf");

@@ -722,7 +722,7 @@ public class Bio2RdfEndpoint {
 				"			<"+cad+"> ?property ?value ."+
 				"   	} "+
 				"	}"+
-				"	LIMIT 100";
+				"	LIMIT 300";
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
