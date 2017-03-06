@@ -140,12 +140,25 @@
 												</c:if>
 												<c:if test="${i.uri != 'http://dbpedia.org/ontology/thumbnail'}">
 													<c:if test="${i.is_mapping == 1}">
-														<p><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+																											
+														<c:if test="${i.label == null}">
+															<p id="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+														</c:if>
+														<c:if test="${i.label != null}">
+															<p id="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${i.label}" /></a></p>
+															<p style="display:none;"><a id="prop-label-3" ><c:out value="${i.value}" /></a></p>
+														</c:if>
+														
 													</c:if>
 													<c:if test="${i.is_mapping != 1}">
-														<p><c:out value="${i.value}" /></p>
+														<c:if test="${i.label == null}">
+															<p><c:out value="${i.value}" /></p>
+														</c:if>
+														<c:if test="${i.label != null}">
+															<p><c:out value="${i.label}" /></p>
+														</c:if>														
 													</c:if>									
-												</c:if>		
+												</c:if>	
 											</li>
 										
 									</c:if>
@@ -168,11 +181,22 @@
 												<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>
 												<!-- <p><c:out value="${i.name}" /></p>  -->
 												<p style="display: none;"><c:out value="${k.show_default}" /></p>
-												<c:if test="${k.is_mapping == 1}">
-													<p><a class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
+												<c:if test="${k.is_mapping == 1}">													
+													<c:if test="${k.label == null}">
+														<p id="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
+													</c:if>
+													<c:if test="${k.label != null}">
+														<p id="prop-label-5"><a  class="ref-value prop-label" href="#" onclick=""><c:out value="${k.label}" /></a></p>
+														<p style="display: none;"><a id="prop-label-6"><c:out value="${k.value}" /></a></p>
+													</c:if>
 												</c:if>
-												<c:if test="${k.is_mapping != 1}">
-													<p><c:out value="${k.value}" /></p>
+												<c:if test="${k.is_mapping != 1}">													
+													<c:if test="${k.label != null}">
+														<p><c:out value="${k.label}" /></p>
+													</c:if>
+													<c:if test="${k.label == null}">
+														<p><c:out value="${k.value}" /></p>
+													</c:if>
 												</c:if>
 											</li>
 										</c:forEach>		

@@ -569,6 +569,7 @@ public class SearchController {
 				for(int i=0; i<c.getProperties().size(); i++){
 					System.out.println(i+") uri: " + c.getProperties().get(i).getUri());
 					System.out.println(i+") value: " + c.getProperties().get(i).getValue());
+					System.out.println(i+") label: " + c.getProperties().get(i).getLabel());
 					System.out.println(i+") show_default: " + c.getProperties().get(i).getShow_default());
 					System.out.println(i+") consolidated: " + c.getProperties().get(i).getConsolidated());
 				}
@@ -583,7 +584,8 @@ public class SearchController {
 					System.out.println(i+") Group consolidated: " + c.getPropertyGroups().get(i).getConsolidated());
 					System.out.println("pg size: " + c.getPropertyGroups().get(i).getPropertyList().size());
 					for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
-						System.out.println(k+". Property: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());
+						System.out.println(k+". Property value: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getValue());
+						System.out.println(k+". Property label: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getLabel());
 						//System.out.println(k+") consolidated: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getConsolidated());
 					}
 				}

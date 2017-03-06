@@ -41,12 +41,42 @@ $(document).ready(function() {
 	$(".ref-value").click(function(){
 	    alert("The term was clicked.");
 		var parent = $(this).parent();
-		//console.log(parent);
+		console.log("parent");
+		console.log(parent);
+		//alert(parent);
 		//alert(parent.text());
+		/*
 		var sib = parent.find( ".ref-value" );
+		console.log("parent: ");
+		console.log(parent);
+		console.log("sib: ");
 		console.log(sib);
-		console.log(sib.text());
-	    $("#searchbox").val(sib.text());
+		console.log("sib id: "); 
+		console.log(sib.getAttribute("id"));
+		*/
+		var parentId = parent.attr("id");;
+		console.log(parentId);
+		var input = "";
+		if(parentId == "prop-label-1" || parentId == "prop-label-4"){
+			var sib = parent.find( ".ref-value" );
+			input = sib.text();
+		}
+		if(parentId == "prop-label-2"){
+			//console.log("pl3");
+			//console.log(document.getElementById('prop-label-3'));
+			input = document.getElementById('prop-label-3').innerHTML; 
+		}
+		if(parentId == "prop-label-5"){
+			//console.log("pl6");
+			//console.log(document.getElementById('prop-label-6'));
+			input = document.getElementById('prop-label-6').innerHTML;
+		}
+		//alert(sib);
+		//console.log("sib");
+		//console.log(sib);
+		//console.log(sib.text());
+		console.log("input: " + input);
+	    $("#searchbox").val(input);
 	    $("#search-button-results").click();
 	});
 	

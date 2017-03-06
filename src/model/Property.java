@@ -6,7 +6,8 @@ public class Property {
 	String uri;
 	String name;
 	String description;
-	String value;
+	String value; // valor es uri
+	String label; // valor es label
 	int is_mapping;
 	int target;
 	/* session */
@@ -16,6 +17,13 @@ public class Property {
 	int consolidated;
 	int dataset;
 	
+	
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
 	public int getDataset() {
 		return dataset;
 	}

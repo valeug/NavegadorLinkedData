@@ -396,15 +396,18 @@ public class DbpediaEndpoint {
 								pList.get(i).setValue(inputUri);
 							}
 							else pList.get(i).setValue(valuesList.get(j));
-						}					
+						}		
+						pList.get(i).setShow_default(1); /* busqueda por uri*/
 				}
 				else if (pList.get(i).getUri().compareTo("http://www.w3.org/2000/01/rdf-schema#label") == 0){
 					System.out.println("name final: " + name);
 					pList.get(i).setValue(name);
+					pList.get(i).setShow_default(1); /* busqueda por uri*/
 				}
 				else if (pList.get(i).getUri().compareTo("http://dbpedia.org/ontology/abstract") == 0){
 					System.out.println("abstract final: " + abst);
 					pList.get(i).setValue(abst);
+					pList.get(i).setShow_default(1); /* busqueda por uri*/
 				}
 			}			
 		}
@@ -438,6 +441,7 @@ public class DbpediaEndpoint {
 		"		UNION"+
 		"		{"+
 		"			<"+uri+"> ?property ?value ."+
+		"			OPTIONAL { ?value <http://www.w3.org/2000/01/rdf-schema#label> ?proplabel . } " +
 		"   	} "+
 		"	}"+
 		"	LIMIT 100";
@@ -459,19 +463,16 @@ public class DbpediaEndpoint {
 		
 		
 		List<String> urisList= new ArrayList<String>(), valuesList = new ArrayList<String>();
-		String propUri, propValue;
+		List<String> propLabelList = new ArrayList<String>();
+		String propUri, propValue, propLabel = null;
 		int cont=0;
 		String name = null;
 		String abst = null;
 		
 		while (results.hasNext())
 		{
-			QuerySolution qsol = results.nextSolution();	
-			
-			
+			QuerySolution qsol = results.nextSolution();		
 			if(qsol.contains("property") && qsol.contains("value")){	
-				
-				
 				System.out.println("entro ***! ");
 
 				propUri = qsol.get("property").toString();
@@ -485,7 +486,13 @@ public class DbpediaEndpoint {
 				urisList.add(propUri);
 				valuesList.add(propValue);
 				
-				int [] res = findProperty(propUri, propValue,pList,pgList);
+				if(qsol.contains("proplabel")){ // Si la propiedad tiene como valor un URI -> busca su "label"
+					propLabel = qsol.get("proplabel").toString();
+					System.out.println("\ntiene label!!! \n"+ propLabel +"\n\n");
+					//propLabelList.add(propLabel);
+				}
+				
+				int [] res = findProperty(propUri, propValue, propLabel,pList,pgList);
 								
 				//int pos = -1;
 				int posPG = -1;
@@ -505,6 +512,9 @@ public class DbpediaEndpoint {
 							Property p = new Property();
 							p.setUri(propUri);
 							p.setValue(propValue);
+							/////................
+							System.out.println("aux label 1: " + propLabel);
+							p.setLabel(propLabel);
 							p.setName("Agregados");
 							p.setShow_default(0);
 							p.setIs_mapping(0);
@@ -520,6 +530,9 @@ public class DbpediaEndpoint {
 						Property p = new Property();
 						p.setUri(propUri);
 						p.setValue(propValue);
+						/////................
+						System.out.println("aux label 2: " + propLabel);
+						p.setLabel(propLabel);
 						p.setName("Agregados");
 						p.setShow_default(0);
 						p.setIs_mapping(0);
@@ -564,6 +577,9 @@ public class DbpediaEndpoint {
 													p.setUri(aux);
 													aux = pOrig.getName();
 													p.setName(aux);
+													aux = pOrig.getLabel();
+													System.out.println("aux label 3: " + aux);
+													p.setLabel(aux);
 													aux = pOrig.getDescription();
 													p.setDescription(aux);
 													int n = pOrig.getId();
@@ -574,7 +590,7 @@ public class DbpediaEndpoint {
 													p.setTarget(n);	
 													n = pOrig.getConsolidated();
 													p.setConsolidated(n);
-													getMappingUri(p,propValue);
+													getMappingUri(p,propValue,propValue);
 													//p.setValue(propValue);
 													p.setAdd(0);
 													
@@ -596,6 +612,8 @@ public class DbpediaEndpoint {
 													copy.setId(pOrig.getId());
 													copy.setUri(pOrig.getUri());
 													copy.setName(pOrig.getName());
+													System.out.println("aux label 4: " + pOrig.getLabel());
+													copy.setLabel(pOrig.getLabel());
 													copy.setDescription(pOrig.getDescription());
 													copy.setIs_mapping(pOrig.getIs_mapping());
 													copy.setAdd(pOrig.getAdd());
@@ -625,6 +643,9 @@ public class DbpediaEndpoint {
 												p.setUri(aux);
 												aux = pOrig.getName();
 												p.setName(aux);
+												aux = pOrig.getLabel();
+												System.out.println("aux label 5: " + aux);
+												p.setLabel(aux);
 												aux = pOrig.getDescription();
 												p.setDescription(aux);
 												int n = pOrig.getId();
@@ -636,7 +657,7 @@ public class DbpediaEndpoint {
 												n = pOrig.getConsolidated();
 												p.setConsolidated(n);
 												
-												getMappingUri(p,propValue);
+												getMappingUri(p,propValue,propValue);
 												//p.setValue(propValue);
 												p.setAdd(0);
 												
@@ -658,6 +679,8 @@ public class DbpediaEndpoint {
 												copy.setId(pOrig.getId());
 												copy.setUri(pOrig.getUri());
 												copy.setName(pOrig.getName());
+												System.out.println("aux label 6: " + pOrig.getLabel());
+												copy.setLabel(pOrig.getLabel());
 												copy.setDescription(pOrig.getDescription());
 												copy.setIs_mapping(pOrig.getIs_mapping());
 												copy.setAdd(pOrig.getAdd());
@@ -700,6 +723,9 @@ public class DbpediaEndpoint {
 										p.setUri(aux);
 										aux = oldy.getName();
 										p.setName(aux);
+										aux = oldy.getLabel();
+										System.out.println("aux label 7: " + aux);
+										p.setLabel(aux);
 										aux = oldy.getDescription();
 										p.setDescription(aux);
 										int n = oldy.getId();
@@ -709,7 +735,7 @@ public class DbpediaEndpoint {
 										n = oldy.getTarget();								
 										p.setTarget(n);
 										//p.setValue(propValue);
-										getMappingUri(p,propValue);
+										getMappingUri(p,propValue,propValue);
 										p.setAdd(0);
 										p.setNewProperty(oldy.getNewProperty());
 										p.setShow_default(oldy.getShow_default());
@@ -727,6 +753,9 @@ public class DbpediaEndpoint {
 									p.setUri(aux);
 									aux = oldy.getName();
 									p.setName(aux);
+									aux = oldy.getLabel();
+									System.out.println("aux label 8: " + aux);
+									p.setLabel(aux);
 									aux = oldy.getDescription();
 									p.setDescription(aux);
 									int n = oldy.getId();
@@ -736,7 +765,7 @@ public class DbpediaEndpoint {
 									n = oldy.getTarget();								
 									p.setTarget(n);
 									//p.setValue(propValue);
-									getMappingUri(p,propValue);
+									getMappingUri(p,propValue, propLabel);
 									p.setAdd(0);
 									p.setNewProperty(oldy.getNewProperty());
 									p.setShow_default(oldy.getShow_default());
@@ -801,12 +830,26 @@ public class DbpediaEndpoint {
 		
 		System.out.println("pgList GROUP size: " + pgList.size());
 		
+		System.out.println("++++++++++++++++++++++++++++++++++");
+		System.out.println("		PG LABEL");
+		System.out.println("++++++++++++++++++++++++++++++++++");
+		for(int i=0; i<pgList.size(); i++){
+			System.out.println(i+") Group uri: " + pgList.get(i).getUri());
+			System.out.println(i+") Group consolidated: " + pgList.get(i).getConsolidated());
+			System.out.println("pg size: " + pgList.get(i).getPropertyList().size());
+			for(int k=0; k < pgList.get(i).getPropertyList().size() ; k++){
+				System.out.println(k+". Property value: " + pgList.get(i).getPropertyList().get(k).getValue());
+				System.out.println(k+". Property label: " + pgList.get(i).getPropertyList().get(k).getLabel());
+				//System.out.println(k+") consolidated: " + c.getPropertyGroups().get(i).getPropertyList().get(k).getConsolidated());
+			}
+		}
+		
 		qexec.close();
 		
 		return name;
 	}
 	
-	private static void getMappingUri(Property p, String propValue){
+	private static void getMappingUri(Property p, String propValue, String propLabel){
 		
 		// Es propiedad de mapeo
 		if(p.getIs_mapping() == 1 && p.getTarget()>1){ // mapping a dataset en Bio2rdf
@@ -826,6 +869,7 @@ public class DbpediaEndpoint {
 		}
 		
 		p.setValue(propValue);
+		p.setLabel(propLabel);
 	}
 	
 	/*
@@ -836,7 +880,7 @@ public class DbpediaEndpoint {
 	 * 2 -> encontro grupo y propiedad exactamente igual (con mismo valor) en el grupo
 	 * 3 -> encontro grupo, pero no propiedad
 	 * */
-	private static int [] findProperty(String puri, String propvalue, List<Property>pList, List<PropertyGroup> pgList){
+	private static int [] findProperty(String puri, String propvalue, String propLabel, List<Property>pList, List<PropertyGroup> pgList){
 		int [] res = new int [3];
 		
 		if(pList!=null){
@@ -855,7 +899,7 @@ public class DbpediaEndpoint {
 					res[0] = 0; //  lo encontro en la lista simple de propieades 
 					res[1] = -1; 
 					res[2] = -1;
-					getMappingUri(p, propvalue);	//EVALUA SI ES QUE MAPEA O NO				
+					getMappingUri(p, propvalue, propLabel);	//EVALUA SI ES QUE MAPEA O NO				
 					p.setAdd(0);
 					return res;
 				}
@@ -1076,10 +1120,11 @@ public class DbpediaEndpoint {
 			if(qsol.contains("class") && !qsol.contains("redirected") && !qsol.contains("amb")){				
 		    	//System.out.println("class type: " + qsol.get("x")); //uri
 		    	//c.setDefinition(""+qsol.get("obodef"));		    	
-		    	aux = qsol.get("class").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia		    	
-		    	if(aux.contains(pattern)){
-		    		System.out.println("class: " + aux);
-		    		types.add(aux);	
+		    	aux = qsol.get("class").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia		
+		    	System.out.println("class antes 1: " + aux);
+		    	if(aux.contains(pattern) || aux.contains("www.w3.org/2002/07/owl#Thing")){
+		    		System.out.println("class despues 1: " + aux);
+		    		types.add(aux);
 		    		/*
 		    		aux = qsol.get("x").toString(); //uri del recurso
 			    	uris.add(aux);
@@ -1091,8 +1136,9 @@ public class DbpediaEndpoint {
 				//System.out.println("redirected type: " + qsol.get("redirected")); //uri			
 		    	
 				aux = qsol.get("class").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia
-		    	if(aux.contains(pattern)){	
-		    		System.out.println("class: " + aux);
+				System.out.println("class antes 2: " + aux);
+		    	if(aux.contains(pattern) || aux.contains("www.w3.org/2002/07/owl#Thing")){	
+		    		System.out.println("class despues 2: " + aux);
 					types.add(aux);
 					/*
 					aux = qsol.get("redirected").toString(); //uri del recurso
@@ -1103,9 +1149,10 @@ public class DbpediaEndpoint {
 			else if(qsol.contains("amb")){
 				//System.out.println("ambiguos type: " + qsol.get("amb")); //uri
 				
-				aux = qsol.get("type").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia				
-				if(aux.contains(pattern)){	
-					System.out.println("class: " + aux);
+				aux = qsol.get("type").toString(); //verificar si esta clase pertenece a las definidas en la BD para DBpedia
+				System.out.println("class despues 3: " + aux);
+				if(aux.contains(pattern) || aux.contains("www.w3.org/2002/07/owl#Thing")){	
+					System.out.println("class despues 3: " + aux);
 					types.add(aux);		
 					/*
 					aux = qsol.get("amb").toString();
@@ -1144,6 +1191,7 @@ public class DbpediaEndpoint {
 		
 		
 		// PROPIEDADES DE LA CLASE A LA QUE PERTENECE EL RECURSO (URI)
+		System.out.println("se cae - posUri: " + posUri);
 		List<Property> pList = PropertyDAO.getAllPropertiesByClass(classesDataset.get(posUri).getIdClass());
 		
 		System.out.println(" \nPROPERTIES! EMPTY ");
