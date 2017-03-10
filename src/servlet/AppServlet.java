@@ -31,6 +31,8 @@ public class AppServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		int searchType=-1;
 		
+		
+				
 		if(request.getParameter("optradio")!=null){
 			searchType = request.getParameter("optradio").charAt(0)-'0';
 			session.setAttribute("optradio", "" + searchType);
@@ -47,21 +49,44 @@ public class AppServlet extends HttpServlet {
 		System.out.println("Tipo busqueda: " + searchType);
 		if(searchType == 1){
 			int esUri = -1;
+			
+			int id_dataset = 0;
+			if(request.getParameter("property-uri")!=null){
+				String aux = request.getParameter("property-uri");
+				System.out.println("property-uri: " + aux);
+				
+				System.out.println("concept: " + request.getParameter("concept"));
+				
+				id_dataset = SearchController.is_class(request);
+			}
+			
 			esUri = SearchController.searchConcept(request, termList);
 			System.out.println("termList: " + termList.size());
+			
+			System.out.println("es URI value: " + esUri);
 			if(esUri ==-1) System.out.println("tf");
-			if(esUri == 1 ){
+			if(esUri == 1 || esUri ==2){
 				System.out.println("esURI");
 				
+				/*
+				int id_dataset = 0;
+				if(request.getParameter("property-uri-input")!=null){
+					String aux = request.getParameter("property-uri-input");
+					System.out.println("property-uri-input: " + aux);
+					
+					id_dataset = SearchController.is_class(request);
+				}
+				*/
 				/* VERIFICAR SI ES UNA CLASE DEL DOMINIO (que este en la BD)*/
-				int datasetId;
-				datasetId = SearchController.es_clase_valida(request);
+				/* EN EL CASO DE DBPDIA, al darle click a "CATEGORY" tambien devuelve sus instancias*/
+				//int datasetId = 1;
+				//datasetId = SearchController.es_clase_valida(request);
 								
-				if(datasetId != 0){
+				if(id_dataset > 0){
 					List<Concept> instances = new ArrayList<Concept>();
 					Concept clase = new Concept();
 					
-					instances = SearchController.search_instances(request, datasetId);
+					instances = SearchController.search_instances(request, id_dataset);
 					System.out.println("\n\n\n++++++++++++++++\nINSTANCES\n");
 					System.out.println("size: " + instances.size());
 					
@@ -105,6 +130,7 @@ public class AppServlet extends HttpServlet {
 			view = "termslistresult.jsp";
 		}
 		
+		System.out.println("view: " + view);
 		dispatcher = request.getRequestDispatcher("jsp/"+view);
 	    dispatcher.forward( request, response);
 	}

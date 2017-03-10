@@ -59,6 +59,7 @@
 					<div class="result-col">
 			            <div class="input-group" id="adv-search">
 			                <input id="searchbox" name="concept" type="text" class="form-control" placeholder="Search" />
+			                <input id="property-uri-input" name="property-uri" value = "yolo" type="hidden" />
 			                <div class="input-group-btn">	                    
 		                        <button id="search-button-results" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 		                    </div>
@@ -128,10 +129,10 @@
 									
 									<!-- <c:if test="${i.consolidated == 0}"> no es consolidado</c:if> -->
 									<c:if test="${i.consolidated == 1}"> 
-											
+										<div class = "prop-group-elem">
 											<li class="list-group-item show-default">
 												
-												<p  class="ref-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
+												<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
 														
 												<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
 												<p style="display: none;"><c:out value="${i.show_default}" /></p>
@@ -142,11 +143,15 @@
 													<c:if test="${i.is_mapping == 1}">
 																											
 														<c:if test="${i.label == null}">
-															<p id="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+															<div class="prop-label-div">
+																<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${i.value}" /></a></p>
+															</div>
 														</c:if>
 														<c:if test="${i.label != null}">
-															<p id="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${i.label}" /></a></p>
-															<p style="display:none;"><a id="prop-label-3" ><c:out value="${i.value}" /></a></p>
+															<div class="prop-label-div">
+																<p class="prop-label-2"><a class="ref-value  prop-label" href="#" onclick=""><c:out value="${i.label}" /></a></p>
+																<p style="display:none;"><a class="prop-label-3" ><c:out value="${i.value}" /></a></p>
+															</div>
 														</c:if>
 														
 													</c:if>
@@ -160,7 +165,7 @@
 													</c:if>									
 												</c:if>	
 											</li>
-										
+										</div>	
 									</c:if>
 								</c:if>
 							</c:forEach>	
@@ -173,7 +178,7 @@
 							<c:forEach items="${z.propertyGroups}" var="j">	
 								<%-- --%>
 								<c:if test="${j.consolidated == 1}"> 
-															
+									<div class = "prop-group-elem">						
 										<p class="prop-group-name"><c:out value="${j.name}" /></p>							
 										<p class="prop-group-uri"><c:out value="${j.uri}" /></p>	 						
 										<c:forEach items="${j.propertyList}" var="k"> 
@@ -183,11 +188,15 @@
 												<p style="display: none;"><c:out value="${k.show_default}" /></p>
 												<c:if test="${k.is_mapping == 1}">													
 													<c:if test="${k.label == null}">
-														<p id="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
+														<div class="prop-label-div">
+															<p class="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a></p>
+														</div>
 													</c:if>
 													<c:if test="${k.label != null}">
-														<p id="prop-label-5"><a  class="ref-value prop-label" href="#" onclick=""><c:out value="${k.label}" /></a></p>
-														<p style="display: none;"><a id="prop-label-6"><c:out value="${k.value}" /></a></p>
+														<div class="prop-label-div">
+															<p class="prop-label-5"><a  class="ref-value prop-label" href="#" onclick=""><c:out value="${k.label}" /></a></p>
+															<p style="display: none;"><a class="prop-label-6"><c:out value="${k.value}" /></a></p>
+														</div>
 													</c:if>
 												</c:if>
 												<c:if test="${k.is_mapping != 1}">													
@@ -199,7 +208,8 @@
 													</c:if>
 												</c:if>
 											</li>
-										</c:forEach>		
+										</c:forEach>
+									</div>		
 								</c:if>						
 							</c:forEach>
 						</ul>

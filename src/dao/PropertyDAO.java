@@ -324,4 +324,39 @@ public class PropertyDAO {
 			e.printStackTrace();
 		}
 	}
+    
+    public static Property getPropertyByUri (String uri){
+    	String query = "SELECT * "+
+				"FROM property "+ 
+				"WHERE uri = \""+uri+"\" ; ";
+
+		Property p = new Property();		    	
+		try {
+			
+			myConnec = getConnection();
+			myStat = myConnec.createStatement();
+			ResultSet myres = myStat.executeQuery(query);
+		
+			while(myres.next()){
+				p.setId(myres.getInt("id_property"));
+				p.setName(myres.getString("name"));
+				p.setUri(myres.getString("uri"));
+				p.setIs_mapping(myres.getInt("is_mapping"));	
+				p.setTarget(myres.getInt("target"));
+				//p.setConsolidated(myres.getInt("consolidated"));
+				System.out.println("inst: " + myres.getInt("instances"));
+				p.setInstances(myres.getInt("instances"));
+				break;
+			}
+			
+			myres.close();			
+			myConnec.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return p;	    	
+    }
 }

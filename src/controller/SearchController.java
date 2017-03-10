@@ -17,6 +17,7 @@ import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 
 import dao.ClassDAO;
 import dao.DatasetDAO;
+import dao.PropertyDAO;
 import model.Concept;
 import model.Dataset;
 import model.Property;
@@ -150,7 +151,12 @@ public class SearchController {
 			System.out.println("BUSCA URI!");
 			flagUri = 1;			
 			
-			if(input.contains("http://bio2rdf.org/")){
+			
+			if(input.contains("purl.org/dc/terms/subject") || input.contains("www.w3.org/1999/02/22-rdf-syntax-ns#type")){  /* el URI es rdf:type y subject */
+				return 2;
+			}
+			
+			if(input.contains("bio2rdf.org/")){
 				
 				int idDatasetMatch = findUriOrigin(input); /* ADAPTAR A NUEVOS DATASETS */
 				
@@ -176,8 +182,9 @@ public class SearchController {
 					}
 				}
 			}
-			else if(input.contains("http://dbpedia.org/")){
+			else if(input.contains("dbpedia.org/")){
 				//SI ES TERMINO
+				if(request.getParameter("property-uri")!=null) return 1;
 				term = DbpediaEndpoint.searchByUri(input);
 				//termList.add(term);
 				//SI ES CLASE
@@ -632,6 +639,25 @@ public class SearchController {
 		return conceptList;
 	}
 	
+	
+	public static int is_class(HttpServletRequest request){
+		
+		String propUri = request.getParameter("property-uri");
+		String classUri = request.getParameter("concept");
+		int id_dataset = 0;
+		
 
+		Property p = PropertyDAO.getPropertyByUri(propUri);
+		
+		if(p.getInstances() == 1){
+			
+			if(classUri.contains("dbpedia")) return 1;
+			//if(classUri.contains("dbpedia")) return 1;
+		}
+		
+		
+		return id_dataset;
+	}
 }
+
 

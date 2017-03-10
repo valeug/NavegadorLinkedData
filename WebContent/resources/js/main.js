@@ -40,43 +40,41 @@ $(document).ready(function() {
 	
 	$(".ref-value").click(function(){
 	    alert("The term was clicked.");
-		var parent = $(this).parent();
-		console.log("parent");
+		var parent = $(this).parent();		
+		//var parentId = parent.attr("id");
+		console.log("parent!!")
 		console.log(parent);
-		//alert(parent);
-		//alert(parent.text());
-		/*
-		var sib = parent.find( ".ref-value" );
-		console.log("parent: ");
-		console.log(parent);
-		console.log("sib: ");
-		console.log(sib);
-		console.log("sib id: "); 
-		console.log(sib.getAttribute("id"));
-		*/
-		var parentId = parent.attr("id");;
-		console.log(parentId);
 		var input = "";
-		if(parentId == "prop-label-1" || parentId == "prop-label-4"){
+		if(parent.hasClass("prop-label-1") || parent.hasClass( "prop-label-4")){
 			var sib = parent.find( ".ref-value" );
 			input = sib.text();
 		}
-		if(parentId == "prop-label-2"){
-			//console.log("pl3");
-			//console.log(document.getElementById('prop-label-3'));
-			input = document.getElementById('prop-label-3').innerHTML; 
+		if(parent.hasClass("prop-label-2")){
+			var label_parent = $(this).parents("div .prop-label-div");
+			console.log("label parent");
+			console.log(label_parent);
+			console.log("prop label 3");
+			console.log(label_parent.find('.prop-label-3'));
+			input = label_parent.find('.prop-label-3').text();
+			console.log("input");
+			console.log(input);
 		}
-		if(parentId == "prop-label-5"){
-			//console.log("pl6");
-			//console.log(document.getElementById('prop-label-6'));
-			input = document.getElementById('prop-label-6').innerHTML;
+		if(parent.hasClass("prop-label-5")){
+			var label_parent = $(this).parents("div .prop-label-div");
+			input = label_parent.find('.prop-label-6').text();
 		}
-		//alert(sib);
-		//console.log("sib");
-		//console.log(sib);
-		//console.log(sib.text());
 		console.log("input: " + input);
 	    $("#searchbox").val(input);
+	    
+	    //property uri (hidden input)
+	    var div_parent = $(this).parents("div .prop-group-elem");
+	    console.log("div_parent");
+		console.log(div_parent);
+		var prop_uri = div_parent.find('.prop-group-uri');
+		console.log("prop_uri");
+		console.log(prop_uri);
+		$("#property-uri-input").val(prop_uri.text());		
+		console.log(prop_uri.text());
 	    $("#search-button-results").click();
 	});
 	

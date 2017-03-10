@@ -17,7 +17,15 @@ public class Property {
 	int consolidated;
 	int dataset;
 	
+	int instances;
 	
+	
+	public int getInstances() {
+		return instances;
+	}
+	public void setInstances(int instances) {
+		this.instances = instances;
+	}
 	public String getLabel() {
 		return label;
 	}

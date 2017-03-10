@@ -11,6 +11,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
+import org.apache.jena.sparql.function.library.execTime;
 
 import dao.ClassDAO;
 import dao.PropertyDAO;
@@ -299,6 +300,8 @@ public class DbpediaEndpoint {
 		"	LIMIT 100";
 		
 		
+		System.out.println("query-Dbpedia, byUri: ");
+		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
 		QueryEngineHTTP qexec = new QueryEngineHTTP("http://dbpedia.org/sparql/", query);
 
@@ -372,7 +375,9 @@ public class DbpediaEndpoint {
 			
 			cont++;
 		}
-				
+			
+		
+		System.out.println("====================================================");
 		//pList esta vacio, se llenara con los valores de uriList y valueList
 		for(int i=0; i < pList.size(); i++){
 			
@@ -415,6 +420,8 @@ public class DbpediaEndpoint {
 		System.out.println("cant: " + cont);
 		
 		System.out.println("***NAME DBPEDIA: " + name);
+		
+		qexec.close();
 		
 		return name;
 	}
@@ -1200,10 +1207,11 @@ public class DbpediaEndpoint {
 		}
 				
 		// 
-		
+		List<PropertyGroup> pgList = new ArrayList<>();
 		if(posUri != -1){
 			System.out.println(" \nMY PROPERTIES! ");
-			getPropertiesValues(uriInput,pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+			//getPropertiesValues(uriInput,pList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+			getAllPropertiesValues(uriInput, pList, pgList);
 		}
 		System.out.println(" \nPROPERTIES! WITH VALUES");
 		for(int h=0; h< pList.size(); h++){
@@ -1220,11 +1228,87 @@ public class DbpediaEndpoint {
 	    
 		qexec.close();	
 		
+		/* REAGRUPAR EN PREPERTY GROUPS*/
+		
+		/*
+		System.out.println("antes de regroup--");
+		regroupPropertyList(pList, pgList);
+		System.out.println("despues de regroup--");
+		*/
 		
 		Concept c = new Concept();
 		c.setProperties(pList);
+		c.setPropertyGroups(pgList);
 		
 		return c;
+	}
+	
+	
+	private static void regroupPropertyList(List<Property> pList, List<PropertyGroup> pgList){
+
+		List<Property> auxList = new ArrayList<Property>(pList);
+		boolean repite = false;
+		boolean agrupada = false;
+		
+		//limpiar pList
+		pList.clear();
+		for(int i=0; i<auxList.size(); i++){ //para cada propiedad
+			Property p = auxList.get(i);
+			repite = false;
+			int j;
+			//buscar en lista simple
+			for(j=0; j < pList.size(); j++){ 
+				if(p.getUri().compareTo(pList.get(j).getUri()) ==0 ){
+					repite = true;
+					break;
+				}
+			}
+			
+			if(repite){ //crear nuevo grupo
+				PropertyGroup pg = new PropertyGroup();
+				List<Property> props = new ArrayList<Property>();
+				props.add(p);
+				props.add(pList.get(j));
+				//property group
+				pg.setUri(p.getUri());
+				pg.setName(p.getName());
+				pg.setPropertyList(props);
+				//agregar a lista final
+				pgList.add(pg);
+				
+				//eliminar de lista simple
+				p = pList.remove(j);
+			}
+			else {
+				//si no esta en lista simple, buscar en lista de grupos
+				int k;
+				agrupada = false;
+				for(k=0; k < pgList.size(); k++){
+					if(p.getUri().compareTo(pgList.get(k).getUri()) == 0){
+						agrupada = true;
+						break;
+					}
+				}
+				
+				//agregar las que no se repiten a la lista simple
+				if(agrupada){
+					PropertyGroup auxpg = pgList.get(k);
+					auxpg.getPropertyList().add(p);
+				}
+				else {
+					pList.add(auxList.get(i));
+				}
+			}
+		}
+		
+		System.out.println("\nANTES\n");
+		System.out.println("pList size: " + pList.size());
+		System.out.println("auxList size: " + auxList.size());
+		System.out.println("pgList size: " + pgList.size());
+		//pList = auxList;		
+		
+		System.out.println("\nDESPUES\n");
+		System.out.println("pList size: " + pList.size());
 	}
 	
 	

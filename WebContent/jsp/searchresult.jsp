@@ -59,6 +59,7 @@
 					<div class="result-col">
 			            <div class="input-group" id="adv-search">
 			                <input id="searchbox" name="concept" type="text" class="form-control" placeholder="Search" />
+			                <input id="property-uri-input" name="property-uri" value = "yolo" type="hidden" />
 			                <div class="input-group-btn">	                    
 		                        <button id="search-button-results" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 		                    </div>
@@ -111,42 +112,86 @@
 						<c:if test="${t.value != null}">							
 							<c:if test="${t.show_default==1}">
 								<li class="list-group-item show-default">
-									
-									<p  class="ref-uri" style = "display: none;"><c:out value="${t.uri}" /></p>
-											
-									<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${t.name}" /></p>
-									<p style="display: none;"><c:out value="${t.show_default}" /></p>
-									<c:if test="${t.uri == 'http://dbpedia.org/ontology/thumbnail'}">
-										<img src="${t.value}}" alt="Smiley face" >
-									</c:if>
-									<c:if test="${t.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-										<c:if test="${t.is_mapping == 1}">
-											<p><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
+									<div class = "prop-group-elem">
+										<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${t.uri}" /></p>
+												
+										<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${t.name}" /></p>
+										<p style="display: none;"><c:out value="${t.show_default}" /></p>
+										<c:if test="${t.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+											<img src="${t.value}}" alt="Smiley face" >
 										</c:if>
-										<c:if test="${t.is_mapping != 1}">
-											<p><c:out value="${t.value}" /></p>
-										</c:if>									
-									</c:if>		
+										<c:if test="${t.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+											<c:if test="${t.is_mapping == 1}">
+												<%-- 
+												<p><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
+												--%>
+												<c:if test="${t.label == null}">
+													<div class="prop-label-div">
+														<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
+													</div>
+												</c:if>
+												<c:if test="${t.label != null}">
+													<div class="prop-label-div">
+														<p class="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${t.label}" /></a></p>
+														<p style="display:none;"><a class="prop-label-3" ><c:out value="${t.value}" /></a></p>
+													</div>
+												</c:if>
+											</c:if>
+											<c:if test="${t.is_mapping != 1}">
+												<%-- 
+													<p><c:out value="${t.value}" /></p>
+												--%>
+												<c:if test="${t.label == null}">
+													<p><c:out value="${t.value}" /></p>
+												</c:if>
+												<c:if test="${t.label != null}">
+													<p><c:out value="${t.label}" /></p>
+												</c:if>	
+											</c:if>									
+										</c:if>	
+									</div>	
 								</li>
 							</c:if>
 							<c:if test="${t.show_default==0}">
-								<li class="list-group-item not-show-default" style="display: none;">						
-									
-									<p class="ref-uri" style = "display: none;"><c:out value="${t.uri}" /></p>
-									
-									<p><c:out value="${t.name}" /></p>
-									<p style="display: none;"><c:out value="${t.show_default}" /></p>
-									<c:if test="${t.uri == 'http://dbpedia.org/ontology/thumbnail'}">
-										<img src="${t.value}}" alt="Smiley face" >
-									</c:if>
-									<c:if test="${t.uri != 'http://dbpedia.org/ontology/thumbnail'}">
-										<c:if test="${t.is_mapping == 1}">
-											<p><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
+								<li class="list-group-item not-show-default" style="display: none;">					
+									<div class = "prop-group-elem">
+										<p class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${t.uri}" /></p>
+										
+										<p><c:out value="${t.name}" /></p>
+										<p style="display: none;"><c:out value="${t.show_default}" /></p>
+										<c:if test="${t.uri == 'http://dbpedia.org/ontology/thumbnail'}">
+											<img src="${t.value}}" alt="Smiley face" >
 										</c:if>
-										<c:if test="${t.is_mapping != 1}">
-											<p><c:out value="${t.value}" /></p>
-										</c:if>									
-									</c:if>		
+										<c:if test="${t.uri != 'http://dbpedia.org/ontology/thumbnail'}">
+											<c:if test="${t.is_mapping == 1}">
+												<%-- 
+												<p><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
+												--%>
+												<c:if test="${t.label == null}">
+													<div class="prop-label-div">
+														<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${t.value}" /></a></p>
+													</div>
+												</c:if>
+												<c:if test="${t.label != null}">
+													<div class="prop-label-div">
+														<p class="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${t.label}" /></a></p>
+														<p style="display:none;"><a class="prop-label-3" ><c:out value="${t.value}" /></a></p>
+													</div>
+												</c:if>
+											</c:if>
+											<c:if test="${t.is_mapping != 1}">
+												<%-- 
+													<p><c:out value="${t.value}" /></p>
+												--%>
+												<c:if test="${t.label == null}">
+													<p><c:out value="${t.value}" /></p>
+												</c:if>
+												<c:if test="${t.label != null}">
+													<p><c:out value="${t.label}" /></p>
+												</c:if>	
+											</c:if>									
+										</c:if>	
+									</div>	
 								</li>
 							</c:if>
 						</c:if>
@@ -154,25 +199,50 @@
 				</ul>
 				<ul id="prop-group-list" class="list-group prop-group-list">
 					<c:forEach items="${term.propertyGroups}" var="k">
-						
-						<p class="prop-group-name"><c:out value="${k.name}" /></p>
-						
-						<p class="prop-group-uri"><c:out value="${k.uri}" /></p>
- 						
-						Propiedades (valores)
-						<c:forEach items="${k.propertyList}" var="j"> 
-							<li class="list-group-item not-show-default">
-								<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
-								<!-- <p><c:out value="${i.name}" /></p>  -->
-								<p style="display: none;"><c:out value="${j.show_default}" /></p>
-								<c:if test="${j.is_mapping == 1}">
-									<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
-								</c:if>
-								<c:if test="${j.is_mapping != 1}">
-									<p><c:out value="${j.value}" /></p>
-								</c:if>
-							</li>
-						</c:forEach>
+						<div class = "prop-group-elem">
+							<p class="prop-group-name"><c:out value="${k.name}" /></p>
+							
+							<p class="prop-group-uri"><c:out value="${k.uri}" /></p>
+	 						
+							Propiedades (valores)
+							<c:forEach items="${k.propertyList}" var="j"> 
+								<li class="list-group-item not-show-default">
+										
+										<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
+										<!-- <p><c:out value="${i.name}" /></p>  -->
+										<p style="display: none;"><c:out value="${j.show_default}" /></p>
+										
+										<c:if test="${j.is_mapping == 1}">
+											<%--
+											<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
+											--%>
+											<c:if test="${j.label == null}">
+												<div class="prop-label-div">
+													<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
+												</div>
+											</c:if>
+											<c:if test="${j.label != null}">
+												<div class="prop-label-div">
+													<p class="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${j.label}" /></a></p>
+													<p style="display:none;"><a class="prop-label-3" ><c:out value="${j.value}" /></a></p>
+												</div>
+											</c:if>
+										</c:if>
+										<c:if test="${j.is_mapping != 1}">
+											<%-- 
+											<p><c:out value="${j.value}" /></p>
+											--%>
+											<c:if test="${j.label == null}">
+												<p><c:out value="${j.value}" /></p>
+											</c:if>
+											<c:if test="${j.label != null}">
+												<p><c:out value="${j.label}" /></p>
+											</c:if>	
+										</c:if>
+									
+								</li>
+							</c:forEach>
+						</div>
 						---------------------------						
 					</c:forEach>
 				</ul>
