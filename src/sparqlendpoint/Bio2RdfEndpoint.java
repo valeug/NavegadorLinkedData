@@ -15,13 +15,17 @@ import controller.InputSearchProcessor;
 import dao.ClassDAO;
 import dao.DatasetDAO;
 import dao.PropertyDAO;
+import model.Association;
 import model.Class;
 import model.Concept;
 import model.Dataset;
+import model.InferredAssociation;
 import model.Property;
 import model.PropertyGroup;
 
 public class Bio2RdfEndpoint {
+	
+	public static final String TREE_ENTRY_PROPERTY_MESH = "http://bio2rdf.org/mesh_vocabulary:mesh-tree-number";
 	
 	public static void JenaSparqlQuery(String term){		
 		
@@ -46,7 +50,7 @@ public class Bio2RdfEndpoint {
 		/*	BUSQUEDA POR COINCIDENCIA EXACTA	*/
 	/*************************************************************************/
 	
-	public static Concept searchTermByExactMatch(String cad, Dataset dataset, List<Concept> mappingList){
+	public static Concept searchTermByExactMatch(String cad, Dataset dataset, List<Concept> mappingList){ //mappingList para que no se repita concepto
 		System.out.println("DATASET : " + dataset.getName());
 		System.out.println("DATASET id: " + dataset.getId());
 		System.out.println("cad: " + cad);
@@ -89,27 +93,6 @@ public class Bio2RdfEndpoint {
 		}
 		System.out.println("inner:\n" + innerQuery);
 		
-		
-		
-			/*
-			if(dataset!=null)
-				fromQ = " FROM <" + dataset.getUri() + "> ";
-			*/
-			/*
-			 	String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
-							" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-							" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
-				" SELECT DISTINCT * " +
-				//fromQ +
-				" WHERE { "+
-				" ?s rdf:type ?type . " +
-				//"		?s ?property ?value . " + //obtener propiedades
-				" ?s <http://purl.org/dc/terms/title> ?label . " +
-				" FILTER (UCASE(str(?label)) = \"" + cad.toUpperCase() +"\") " +
-				"} "+
-				"LIMIT 10";
-			*/
-		
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 						" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 						" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
@@ -120,6 +103,7 @@ public class Bio2RdfEndpoint {
 			" } "+
 			"LIMIT 10";
 		
+		System.out.println("exact match query!!");
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
 		//QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
@@ -134,7 +118,7 @@ public class Bio2RdfEndpoint {
 		
 		
 		String uri = null;
-		String aux = null;	
+		String auxUri = null;	
 
 		
 		//List<Class> classesDataset = ClassDAO.getAllClassesByDataset(dataset.getId());
@@ -143,34 +127,44 @@ public class Bio2RdfEndpoint {
 
 		int i=0;
 		
-		List<String> uris = new ArrayList<String>();
-		List<String> types = new ArrayList<String>(); // clase del recurso
+		//List<String> uris = new ArrayList<String>();
+		//List<String> types = new ArrayList<String>(); // clase del recurso
 		
-		boolean repite;
-		
+		boolean repite = false;
+		/* SE OBTIENE URI A PARTIR DEL CUAL SE EMPIEZA NAVEGACION*/
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
 			
-			aux = qsol.get("s").toString();
+			auxUri = qsol.get("s").toString();
 			repite = false;
 			
 			for(int p=0; p<mappingList.size(); p++){
-				if(aux.compareTo(mappingList.get(p).getUri())==0){
+				if(auxUri.compareTo(mappingList.get(p).getUri())==0){
 					repite = true;
 					break;
 				}
 			}
 			
 			if(repite == false){	
-				System.out.println("exact match: no repite");
-				uris.add(aux);
-				aux = qsol.get("type").toString();
-				System.out.println("aux : "+aux);
-				types.add(aux);
+				break;
 			}
 		} 
 		
+		Concept c = null;
+		
+		System.out.println("auxUri: " + auxUri);
+		
+		if(repite == false){
+			
+			c = searchTermByExactMatchUri(auxUri, dataset); // SE CONSULTA CONCEPTO (sus props)
+			
+			System.out.println("CONCEPT!!!");
+			System.out.println("prop size: " + c.getProperties().size());
+			System.out.println("pg size: " + c.getPropertyGroups().size());
+		}
+		
+		/*
 		if(uris.size() > 0){
 			// faltaria obtener la DEFINICION del concepto -> DEPENDE DE CADA DATASET
 			System.out.println("size URIS: " + uris.size());
@@ -184,22 +178,37 @@ public class Bio2RdfEndpoint {
 			System.out.println("uris size: " + uris.size());
 			System.out.println("pList size: " + pList.size());
 			
-			List<PropertyGroup> pgList = new ArrayList<>();
-			
-			imprimirLista(pList);
-			getPropertiesValues(uris.get(posUri),pList,pgList); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
-			imprimirLista(pList);
-			
-			qexec.close();		
 			Concept c = new Concept();
+			
+			//imprimirLista(pList);			
+			System.out.println("================================");
+			System.out.println("	ANTES GETPROPERTY VALUES  ");
+			System.out.println("================================");
+			getPropertiesValues(c,uris.get(posUri),pList, dataset); // obtener valores de las propiedades (NAVEGABLES Y DE CARACTERISTICA)
+			System.out.println("================================");
+			System.out.println("	DESPUES GETPROPERTY VALUES ");
+			System.out.println("================================");
+			//imprimirLista(pList);
+			
+			List<PropertyGroup> pgList = new ArrayList<>();
+				
+			
 			c.setUri(uris.get(posUri));
 			c.setDataset(dataset.getSparqlEndpoint());
 			//c.setProperties(pList);
 			c.setProperties(pList);
 			c.setPropertyGroups(pgList);
 			
-			System.out.println("dentro exact");
-			System.out.println("pglist size*: " + pgList.size());
+			
+			regroupPropertyList(pList, pgList);
+			//c.setProperties(pList);
+			
+			c.setPropertyGroups(pgList);
+			System.out.println("** plist size: " + pList.size());
+			System.out.println("** pGlist size: " + pgList.size());
+			
+			
+			qexec.close();	
 			return c;
 		}
 		
@@ -207,7 +216,19 @@ public class Bio2RdfEndpoint {
 		
 		System.out.println("fuera exact");
 		Concept c = new Concept();
+		*/
 		return c;
+	}
+	
+	private static void printProperties(List<Property> propList){
+		
+		System.out.println("---------\n  PROPS\n---------");
+		for(int i=0; i< propList.size(); i++){
+			System.out.println(i+") ");
+			System.out.println("uri: " + propList.get(i).getUri());
+			System.out.println("consolidated: " + propList.get(i).getConsolidated());
+		}
+		
 	}
 	
 	private static String buildInnerQuery(List<Class> classesDataset, String cad){
@@ -250,10 +271,11 @@ public class Bio2RdfEndpoint {
 		for(int i=0; i<pList.size(); i++){
 			System.out.println("uri: " + pList.get(i).getUri());
 			System.out.println("value: " + pList.get(i).getValue());
+			System.out.println("label: " + pList.get(i).getLabel());
 		}
 	}
 	
-	private static void getPropertiesValues(String uri, List<Property> pList, List<PropertyGroup> pgList){
+	private static void getPropertiesValues(Concept c ,String uri, List<Property> propsClases, Dataset dataset){
 		
 		//String apQuery = appendPropertiesInQuery(uri,pList,1); // Navegables, 0:no navegables
 		
@@ -261,330 +283,109 @@ public class Bio2RdfEndpoint {
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
 									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
 			"   SELECT DISTINCT * " +
-			"   WHERE { " +		
-			"		<"+uri+"> ?property ?value ."+
-			"   } "+
-			"	LIMIT 200";
+			"   WHERE { " +	
+			"		{"+
+			"			OPTIONAL { "+
+			"					<"+uri+">  <http://purl.org/dc/terms/title> ?title . " +
+			"			}"+
+			"			OPTIONAL { "+
+			"					<"+uri+">  <http://purl.org/dc/terms/description>  ?description . " +
+			"			}"+
+			"			OPTIONAL { "+
+			"					<"+uri+">  rdfs:label ?label . " +
+			"					FILTER (langMatches(lang(?label), \"en\")) " +
+			"			}"+
+			"		}"+
+			"		UNION"+
+			"		{"+
+			"			<"+uri+"> ?property ?value . " +
+			//"			OPTIONAL { ?value <http://bio2rdf.org/bio2rdf_vocabulary:identifier> ?propidentifier . } " +
+			"			OPTIONAL { ?value <http://purl.org/dc/terms/title> ?proptitle. } " +
+			//"			OPTIONAL { ?value <http://www.w3.org/2000/01/rdf-schema#label> ?proplabel . } " +
+			"   	} "+
+			"	}"+
+			"	LIMIT 300";
 		
 		Query query = QueryFactory.create(sparqlQueryString1);
-		QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
-
+		//QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		QueryEngineHTTP qexec = new QueryEngineHTTP(dataset.getSparqlEndpoint(), query);
 		
+		System.out.println("getPropertiesValues query: " + query);
 		ResultSet results = qexec.execSelect();
 		//ResultSetFormatter.out(System.out, results, query); 
 		
-		List<String> urisList= new ArrayList<String>(), valuesList = new ArrayList<String>();
-		String propUri, propValue;
+		//List<String> urisList= new ArrayList<String>(), valuesList = new ArrayList<String>(), labelList = new ArrayList<String>();
+		List<Property> pList = new ArrayList<Property>();
+		
+		String aux, name, descr;
 		int cont=0;
 		while (results.hasNext())
 		{
 			QuerySolution qsol = results.nextSolution();	
 			
-			propUri = qsol.get("property").toString();
-			//System.out.println("|property: ");
-			//System.out.println(propUri);
-						
-			propValue = qsol.get("value").toString();
-			//System.out.println("|value: ");			
-			//System.out.println(propValue);
+			if(qsol.contains("title")){
+				aux = qsol.get("title").toString();
+				c.setName(aux);
+				name = aux;
+			}
+			else if(qsol.contains("label")){
+					aux = qsol.get("label").toString();
+					c.setName(aux);
+				 }			
+			if(qsol.contains("description")){
+				aux = qsol.get("description").toString();
+				c.setDefinition(aux);
+				descr = aux;
+			}
 			
-			urisList.add(propUri);
-			valuesList.add(propValue);
-			cont++;
-		}
-		System.out.println("wtf");
-		imprimirLista(pList);
-		for(int i=0; i < pList.size(); i++){
-			Property prop = pList.get(i);
-			for(int j=0; j < urisList.size(); j++){			
+			
+			if(qsol.contains("property") && qsol.contains("value")){	
+				//System.out.println("entro ***! ");				
+				Property p = new Property();
 				
-				if(prop.getUri().compareTo(urisList.get(j)) == 0){ //Se debe agregar la propiedad al termino
-					
-					propUri = prop.getUri();
-					propValue = prop.getValue();
-					
-					int [] res = findProperty(prop.getUri(), prop.getValue(), pList, pgList);
-					
-					System.out.println("=========================");
-					System.out.println("res 0: " + res[0]);
-					System.out.println("res 1: " + res[1]);
-					System.out.println("res 3: " + res[2]);
-					
-					if(res[0] == -1){ // no encontro la porpiedad en la lista de propiedades del concepto
-						//agrega propiedad  (PROPIEDADES QUE EL USUARIO AGREGARA SI DESEA)
-						
-						if(propUri.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){
-							if(propValue.contains("http://bio2rdf.org/")){ //podria sacar las clases de la BD para compararlas contra ellas
-								Property p = new Property();
-								p.setUri(propUri);
-								p.setValue(propValue);
-								p.setName("Agregados");
-								p.setShow_default(0);
-								p.setIs_mapping(0);
-								p.setAdd(0);
-								p.setNewProperty(1);
-								pList.add(p);
-								
-								//System.out.println("---PROPIEDAD: " + propUri);
-								//System.out.println("---Show Default: " + p.getShow_default());
-							}
-						}
-						else{
-							
-							Property p = new Property();
-							p.setUri(propUri);
-							p.setValue(propValue);
-							p.setName("Agregados");
-							p.setShow_default(0);
-							p.setIs_mapping(0);
-							p.setAdd(0);
-							p.setNewProperty(1);
-							pList.add(p);
-							
-							//System.out.println("---PROPIEDAD: "+ propUri);
-							//System.out.println("---Show Default: "+p.getShow_default());
-						}						
-												
-					}
-					else { // encontro propiedad -> se actuazlin valores
-						//pList.get(pos).setValue(propValue);
-						//if(pList.get(pos).getNewProperty() == )
-						//pList.get(pos).setShow_default(1);
-						//pList.get(pos).setAdd(0);
-						
-						if(propUri.compareTo("http://www.w3.org/2000/01/rdf-schema#label") !=0 && 
-								propUri.compareTo("http://purl.org/dc/terms/title") != 0){
-							
-							
-							//if(pos!= -1){ 
-								//if(pList.get(pos).getIs_mapping() == 0 || (pList.get(pos).getIs_mapping() == 1 && pList.get(pos).getTarget()==1)){ // DBPEDIA (ej: subject)
-
-									System.out.println("ENTRA A PROPIEDADES MAPPING - GROUP PROPERTY");
-									// se crea gouplist, para tener las propiedades que tienen el mismo uri agrupadas
-									//if(res[0] == 1 && res[1] == -1){ //NO ENCONTRO GROUP
-									if(res[0] == 1 && res[1] != -1){ 
-										String aux = pList.get(res[1]).getName();
-										if (pgList == null) pgList = new ArrayList<PropertyGroup>();
-										else {	
-												
-												if(propUri.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){
-													if(propValue.contains("http://bio2rdf.org/")){ //podria sacar las clases de la BD
-														System.out.println("entro a type :D");
-														//buscar la propiedad en los grupos
-														Property pOrig = pList.get(res[1]);											
-														Property p = new Property();
-														
-														aux = pOrig.getUri();
-														p.setUri(aux);
-														aux = pOrig.getName();
-														p.setName(aux);
-														aux = pOrig.getDescription();
-														p.setDescription(aux);
-														int n = pOrig.getId();
-														p.setId(n);
-														n = pOrig.getIs_mapping();
-														p.setIs_mapping(n);
-														n = pOrig.getTarget();
-														p.setTarget(n);	
-														n = pOrig.getConsolidated();
-														p.setConsolidated(n);
-														//getMappingUri(p,propValue);
-														p.setValue(propValue);
-														p.setAdd(0);
-														
-														// si no esta inicializado, inicializar lista de grupos
-														//if(pgList == null) pgList = new ArrayList<PropertyGroup>();
-														
-														// crear grupo
-														PropertyGroup pg = new PropertyGroup();
-														pg.setUri(p.getUri());
-														pg.setName(p.getName());
-														pg.setConsolidated(p.getConsolidated());
-														List<Property> props = new ArrayList<Property>();
-														pg.setPropertyList(props);
-														
-														// agregar a la lista de grupos
-														pg.getPropertyList().add(p);	
-														
-														Property copy = new Property();
-														copy.setId(pOrig.getId());
-														copy.setUri(pOrig.getUri());
-														copy.setName(pOrig.getName());
-														copy.setDescription(pOrig.getDescription());
-														copy.setIs_mapping(pOrig.getIs_mapping());
-														copy.setAdd(pOrig.getAdd());
-														copy.setNewProperty(pOrig.getNewProperty());
-														copy.setShow_default(pOrig.getShow_default());
-														copy.setTarget(pOrig.getTarget());
-														copy.setValue(pOrig.getValue());
-														copy.setConsolidated(pOrig.getConsolidated());
-														
-														pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
-														// REMOVER pOrig de la lissta inicial
-														System.out.println("//////pList size ANTES: "+pList.size());
-														Property removed = pList.remove(res[1]);
-														
-														System.out.println("//////pList size DESPUES: "+pList.size());
-														pgList.add(pg);
-														System.out.println("CREO GROUP PROPERTY ;)");
-													}
-													
-												}
-												else {
-													//buscar la propiedad en los grupos
-													Property pOrig = pList.get(res[1]);											
-													Property p = new Property();
-													
-													aux = pOrig.getUri();
-													p.setUri(aux);
-													aux = pOrig.getName();
-													p.setName(aux);
-													aux = pOrig.getDescription();
-													p.setDescription(aux);
-													int n = pOrig.getId();
-													p.setId(n);
-													n = pOrig.getIs_mapping();
-													p.setIs_mapping(n);
-													n = pOrig.getTarget();
-													p.setTarget(n);	
-													n = pOrig.getConsolidated();
-													p.setConsolidated(n);
-													
-													//getMappingUri(p,propValue);
-													p.setValue(propValue);
-													p.setAdd(0);
-													
-													// si no esta inicializado, inicializar lista de grupos
-													//if(pgList == null) pgList = new ArrayList<PropertyGroup>();
-													
-													// crear grupo
-													PropertyGroup pg = new PropertyGroup();
-													pg.setUri(p.getUri());
-													pg.setName(p.getName());
-													pg.setConsolidated(p.getConsolidated());
-													List<Property> props = new ArrayList<Property>();
-													pg.setPropertyList(props);
-													
-													// agregar a la lista de grupos
-													pg.getPropertyList().add(p);	
-													
-													Property copy = new Property();
-													copy.setId(pOrig.getId());
-													copy.setUri(pOrig.getUri());
-													copy.setName(pOrig.getName());
-													copy.setDescription(pOrig.getDescription());
-													copy.setIs_mapping(pOrig.getIs_mapping());
-													copy.setAdd(pOrig.getAdd());
-													copy.setNewProperty(pOrig.getNewProperty());
-													copy.setShow_default(pOrig.getShow_default());
-													copy.setTarget(pOrig.getTarget());
-													copy.setValue(pOrig.getValue());
-													copy.setConsolidated(pOrig.getConsolidated());
-													
-													pg.getPropertyList().add(copy); // mueve la propiedad que esta en la lista simple -> a un grupo
-													// REMOVER pOrig de la lissta inicial
-													System.out.println("//////pList size ANTES: "+pList.size());
-													Property removed = pList.remove(res[1]);
-													
-													System.out.println("//////pList size DESPUES: "+pList.size());
-													pgList.add(pg);
-													System.out.println("CREO GROUP PROPERTY ;)");
-												}
-											
-												
-										}
-									}
-								//}
-								
-								//if(res[0] == 2 && posPG != -1){ // encontro group
-								if(res[0] == 2){
-									/*
-									if(posP != -1){ //  encontro propiedad identica, incluso mismo valor -> no deberia agregar 
-										System.out.println("*****PROPIEDAD IDENTICA! ");
-									}
-									*/
-								}
-								if(res[0] == 3) { /* NO ENCONTRO PROPIEDAD EN EL GROUP -> crearla y agregarla */
-									// en  res[2] esta la posicion de la propiedad en la lista simple
-									
-									if(propUri.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){
-										if(propValue.contains("http://bio2rdf.org/")){ //podria sacar las clases de la BD
-											Property p = new Property();
-											Property oldy = pgList.get(res[1]).getPropertyList().get(0); // busco el 1ere elemento del grupo para copiar algo de info
-											
-											String aux = oldy.getUri();
-											p.setUri(aux);
-											aux = oldy.getName();
-											p.setName(aux);
-											aux = oldy.getDescription();
-											p.setDescription(aux);
-											int n = oldy.getId();
-											p.setId(n);
-											n = oldy.getIs_mapping();
-											p.setIs_mapping(n);
-											n = oldy.getTarget();								
-											p.setTarget(n);
-											p.setValue(propValue);
-											//getMappingUri(p,propValue);
-											p.setAdd(0);
-											p.setNewProperty(oldy.getNewProperty());
-											p.setShow_default(oldy.getShow_default());
-											
-											pgList.get(res[1]).getPropertyList().add(p);
-											
-											System.out.println("ENCONTRO GROUP, CREAR PROPERTY ;)");
-										}
-									}
-									else{
-										Property p = new Property();
-										Property oldy = pgList.get(res[1]).getPropertyList().get(0); // busco el 1ere elemento del grupo para copiar algo de info
+				aux = qsol.get("property").toString();
+				
+				//System.out.println("|property: ");
+				//System.out.println(aux);
+				p.setUri(aux);
+				
+				/*
+				if(aux.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){					
+					classTypeList.add(qsol.get("value").toString());
+				}
+				*/
+				
+				if(qsol.contains("proptitle")){
+					aux = qsol.get("proptitle").toString();
+					p.setLabel(aux);
+				}
 										
-										String aux = oldy.getUri();
-										p.setUri(aux);
-										aux = oldy.getName();
-										p.setName(aux);
-										aux = oldy.getDescription();
-										p.setDescription(aux);
-										int n = oldy.getId();
-										p.setId(n);
-										n = oldy.getIs_mapping();
-										p.setIs_mapping(n);
-										n = oldy.getTarget();								
-										p.setTarget(n);
-										p.setValue(propValue);
-										//getMappingUri(p,propValue);
-										p.setAdd(0);
-										p.setNewProperty(oldy.getNewProperty());
-										p.setShow_default(oldy.getShow_default());
-										
-										pgList.get(res[1]).getPropertyList().add(p);
-										
-										System.out.println("ENCONTRO GROUP, CREAR PROPERTY ;)");
-									}
-									
-								}
-								/*							
-								else { //no encontro group -> crear group, propiedad y agregarla (NOTA: si no encontro group, deberia estar en la lista simple)
-									
-								}
-								*/
-							//}
-						
-						}
-					}
+				aux = qsol.get("value").toString();
+				//System.out.println("|value: ");			
+				//System.out.println(aux);
+				p.setValue(aux);					
 					
-					if(pList != null) System.out.println("property: " + prop.getUri());
-					else System.out.println("plist es null D:");
-					
-					//System.out.println("valueslist: " + valuesList.get(j));
-					prop.setValue(valuesList.get(j));
-				}					
-			}			
+				p.setShow_default(0);
+				//p.setName("gg "+i);
+				pList.add(p);
+			}
+		}
+		
+		System.out.println("wtf");
+		//imprimirLista(pList);
+		System.out.println("labelList !!!");
+		for(int i=0; i < propsClases.size(); i++){
+			Property prop = pList.get(i);
+			/*
+			for(int j=0; j < urisList.size(); j++){			
+									
+			}
+			*/			
 		}
 				
 		qexec.close();
-		System.out.println("cant: " + cont);
-		System.out.println("pglist size (get function): " + pgList.size());
+		//System.out.println("cant: " + cont);
+		//System.out.println("pglist size (get function): " + pgList.size());
 	}
 		
 	
@@ -596,7 +397,7 @@ public class Bio2RdfEndpoint {
 	 * 2 -> encontro grupo y propiedad exactamente igual (con mismo valor) en el grupo
 	 * 3 -> encontro grupo, pero no propiedad
 	 * */
-	private static int [] findProperty(String puri, String propvalue, List<Property>pList, List<PropertyGroup> pgList){
+	private static int [] findProperty(String puri, String propvalue, String label, List<Property>pList, List<PropertyGroup> pgList){
 		int [] res = new int [3];
 		
 		if(pList!=null){
@@ -604,13 +405,16 @@ public class Bio2RdfEndpoint {
 			for(int i=0; i<pList.size(); i++){
 
 				Property p = pList.get(i);
-				System.out.println("i: " + i);
+				
+				//System.out.println("i: " + i);
+				
 				if(p.getUri().compareTo(puri) == 0 && p.getValue()==null){ //propiedades que no han sido recientemente agregadas
 					res[0] = 0; //  lo encontro en la lista simple de propieades, PERO VACIO
 					res[1] = -1; 
 					res[2] = -1;
 					//getMappingUri(p, propvalue);	//EVALUA SI ES QUE MAPEA O NO		
 					p.setValue(propvalue);
+					p.setLabel(label);
 					p.setAdd(0);
 					return res;
 				}
@@ -681,10 +485,11 @@ public class Bio2RdfEndpoint {
 		System.out.println(cad);
 		
 		System.out.println("DATASET : " + dataset.getName());
-		
+		/*
 		String fromQ = "";
 		if(dataset!=null)
 			fromQ = "	FROM <" + dataset.getUri() + "> ";
+		*/
 		
 			/*
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
@@ -719,7 +524,10 @@ public class Bio2RdfEndpoint {
 				"		}"+
 				"		UNION"+
 				"		{"+
-				"			<"+cad+"> ?property ?value ."+
+				"			<"+cad+"> ?property ?value . " +
+				//"			OPTIONAL { ?value <http://bio2rdf.org/bio2rdf_vocabulary:identifier> ?propidentifier . } " +
+				"			OPTIONAL { ?value <http://purl.org/dc/terms/title> ?proptitle. } " +
+				//"			OPTIONAL { ?value <http://www.w3.org/2000/01/rdf-schema#label> ?proplabel . } " +
 				"   	} "+
 				"	}"+
 				"	LIMIT 300";
@@ -776,33 +584,67 @@ public class Bio2RdfEndpoint {
 				
 				aux = qsol.get("property").toString();
 				
-				//System.out.println("|property: ");
-				//System.out.println(aux);
-				p.setUri(aux);
-				
-				if(aux.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){					
-					classTypeList.add(qsol.get("value").toString());
+				if(aux.compareTo(TREE_ENTRY_PROPERTY_MESH) == 0){
+					List<Property> treeNodes = getHerarchyElements(qsol.get("value").toString(), dataset);
+					if(pList== null ) System.out.println("wtf pList null");
+					pList.addAll(treeNodes);
+					
+				} else {
+					//System.out.println("|property: ");
+					//System.out.println(aux);
+					p.setUri(aux);
+					
+					if(aux.compareTo("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") == 0){					
+						classTypeList.add(qsol.get("value").toString());
+					}
+					
+					
+					if(qsol.contains("proptitle")){
+						aux = qsol.get("proptitle").toString();
+						p.setLabel(aux);
+					}
+											
+					aux = qsol.get("value").toString();
+					//System.out.println("|value: ");			
+					//System.out.println(aux);
+					p.setValue(aux);					
+						
+					p.setShow_default(0);
+					//p.setName("gg "+i);
+					pList.add(p);
 				}
-				aux = qsol.get("value").toString();
-				//System.out.println("|value: ");			
-				//System.out.println(aux);
-				p.setValue(aux);
-				p.setShow_default(0);
-				//p.setName("gg "+i);
-				pList.add(p);		    		    	
+				
+				
+				
 			}
 	
 			i++;
 		} 
-	
+		
+		
+		System.out.println("---------------------------------");
 		System.out.println("classTypeList size: " + classTypeList.size());
 		System.out.println("pList size: " + pList.size());
 		
-		/*
+		
 		for(int t=0; t<classTypeList.size(); t++){
 			System.out.println(t+") " + classTypeList.get(t));
+			
+			/* si la clase es de CTD  --> buscar asociacion */
+			
+			//directas
+			//List<Property> associations 
+			
+			//inferidas
+			if(classTypeList.get(t).toUpperCase().contains("DISEASE")){
+				List<Association> impAssociations = searchImplicitAssociations(cad, classTypeList.get(t));
+				System.out.println("impAssociations size: " + impAssociations.size());
+				infereAssociations(impAssociations, cad, classTypeList.get(t));
+				System.out.println("impAssociations size: " + impAssociations.size());
+				c.setAssociations(impAssociations);
+			}
 		}
-		*/
+		
 		
 		// obtener las propiedades de las clases del recurso
 		List<Property> propsClases = new ArrayList<Property>();
@@ -811,8 +653,12 @@ public class Bio2RdfEndpoint {
 			System.out.println("clase "+w +": " + classTypeList.get(w));
 			List<Property> props = PropertyDAO.getAllPropertiesByClassUri(classTypeList.get(w));
 			System.out.println("props size : " + props.size());
+			//printProperties(props);
 			propsClases.addAll(props);
 		}
+		
+		System.out.println("PROPIEDADES CLASE DAO!");
+		//printProperties(propsClases);
 		
 		System.out.println("pList size ANTES: " + pList.size());
 		System.out.println("propsTotal size DESPUES: " + propsClases.size());
@@ -853,12 +699,12 @@ public class Bio2RdfEndpoint {
 		
 		
 		System.out.println("ANTES DEL REGROUP");
-		/*
+		
 		for(int k=0; k<pList.size(); k++){
 			System.out.println(k+") uri: " + pList.get(k).getUri());
 			System.out.println(k+") show_default: " + pList.get(k).getShow_default());
 		}
-		*/
+		
 		
 		regroupPropertyList(pList, pgList);
 		c.setProperties(pList);
@@ -878,6 +724,380 @@ public class Bio2RdfEndpoint {
 		return c;
 	}
 	
+	private static List<Association> searchImplicitAssociations(String uri, String clase){
+		
+		List<Association> associations = new ArrayList<>();
+		
+		// gene
+		List<Association> genes = getGenesAssociations(uri, clase);		
+		associations.addAll(genes);
+		
+		// chemical
+		List<Association> chemicals = getChemicalsAssociations(uri, clase);
+		associations.addAll(chemicals);
+		
+		return associations;
+	}
+	
+	private static List<Association>  getChemicalsAssociations(String uri, String clase){
+		
+		List<Association> chemicals = new ArrayList<>();		
+	
+			
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+								" SELECT DISTINCT *" +
+								//fromQ +
+								" WHERE { " +
+								" 	?chemical_disease  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Disease-Association> ." +
+								"	?chemical_disease <http://bio2rdf.org/ctd_vocabulary:chemical> ?chemical . " +
+								"	?chemical_disease <http://bio2rdf.org/ctd_vocabulary:disease> <" + uri+ "> . " +
+								"	?chemical <http://purl.org/dc/terms/title> ?chemical_title . "+
+								" } " +
+								"LIMIT 3";
+	
+			System.out.println("association query getChemicalsAssociations!!");
+			System.out.println(sparqlQueryString1);
+			
+			Query query = QueryFactory.create(sparqlQueryString1);
+			
+			QueryEngineHTTP qexec = new QueryEngineHTTP("http://ctd.bio2rdf.org/sparql", query);
+			//System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+			
+			ResultSet results = qexec.execSelect();
+			
+			//ResultSetFormatter.out(System.out, results, query);    
+		
+			// Informacion del resultado				
+			String aux = null;
+
+			while (results.hasNext())
+			{
+				QuerySolution qsol = results.nextSolution();	
+				
+				if(qsol.contains("chemical") && qsol.contains("chemical_title")){
+					Association a = new Association();
+					
+					a.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Gene-Disease-Association");
+					a.setAssociation_name("Disease-Gene");
+					
+					/*
+					aux = qsol.get("action_disease_chemical").toString();						
+					a.setAction(aux);
+					*/
+					aux = qsol.get("chemical").toString();						
+					a.setConcept_uri(aux);
+					
+					aux = qsol.get("chemical_title").toString();						
+					a.setConcept_name(aux);
+					
+					a.setOrigin("DISEASE");
+					a.setTarget("CHEMICAL");
+					chemicals.add(a);
+				}
+
+			}	
+			qexec.close();
+		
+		
+		return chemicals;
+	}
+	
+	private static List<Association>  getGenesAssociations(String uri, String clase){
+		
+		List<Association> genes = new ArrayList<>();		
+	
+			
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+								" SELECT DISTINCT *" +
+								//fromQ +
+								" WHERE { " +
+								" 	?gene_disease  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Gene-Disease-Association> ." +
+								"	?gene_disease <http://bio2rdf.org/ctd_vocabulary:gene> ?gene . " +
+								"	?gene_disease <http://bio2rdf.org/ctd_vocabulary:disease> <" + uri+ "> . " +
+								"	?gene <http://purl.org/dc/terms/title> ?gene_title . "+
+								" } " +
+								"LIMIT 3";
+	
+			
+			System.out.println("association query getGenesAssociations!!");
+			System.out.println(sparqlQueryString1);
+			
+			Query query = QueryFactory.create(sparqlQueryString1);
+			
+			QueryEngineHTTP qexec = new QueryEngineHTTP("http://ctd.bio2rdf.org/sparql", query);
+			//System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+			
+			ResultSet results = qexec.execSelect();
+			
+			//ResultSetFormatter.out(System.out, results, query);    
+		
+			// Informacion del resultado				
+			String aux = null;
+
+			while (results.hasNext())
+			{
+				QuerySolution qsol = results.nextSolution();	
+				
+				if(qsol.contains("gene") && qsol.contains("gene_title")){
+					Association a = new Association();
+					
+					a.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Gene-Disease-Association");
+					a.setAssociation_name("Disease-Gene");
+					
+					/*
+					aux = qsol.get("action_disease_gene").toString();						
+					a.setAction(aux);
+					*/
+					aux = qsol.get("gene").toString();						
+					a.setConcept_uri(aux);
+					
+					aux = qsol.get("gene_title").toString();						
+					a.setConcept_name(aux);
+					a.setOrigin("DISEASE");
+					a.setTarget("GEN");
+					genes.add(a);
+				}
+
+			}	
+			qexec.close();
+		
+		
+		return genes;
+	}
+	
+	private static void infereAssociations(List<Association> associations , String uri, String clase){
+		
+		List<Property> asocList = new ArrayList<Property>();
+		String claseUpper = clase.toUpperCase();
+		
+		
+		/* Si es enfermedad */
+		
+		if(claseUpper.contains("DISEASE")){
+			
+			
+			for(int i=0; i<associations.size(); i++){
+				
+				if(associations.get(i).getTarget().compareTo("GEN")==0){  //DISEASE-GEN
+					getChemicalsFromGene(associations.get(i));
+				}
+				
+				if(associations.get(i).getTarget().compareTo("CHEMICAL")==0){//DISEASE-CHEMICAL
+					getGenesFromChemical(associations.get(i));
+				}
+				
+			}
+						
+		}
+		
+		//CREO QUE SI ES GEN O CHEMICAL -> BUSCAR !!SOLO!! ASOCIACIONES EXPLICITAS
+		
+//		/* Si es gen */
+//		
+//		if(claseUpper.contains("GEN")){
+//			
+//		}
+//		
+//		/* Si es chemical */
+//		
+//		if(claseUpper.contains("CHEMICAL")){
+//			
+//		}
+		
+	}
+	
+	private static void getChemicalsFromGene(Association gen){
+		
+		
+	
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+								" SELECT DISTINCT ?action_chemical_gene ?chemical ?chemical_title " +
+								//fromQ +
+								" WHERE { " +
+								" 	?chemical_gene <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association> . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:action> ?action_chemical_gene . "+
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:chemical> ?chemical . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:gene> <" + gen.getConcept_uri() + "> . " +
+								"	?chemical <http://purl.org/dc/terms/title> ?chemical_title . "+
+								" } " +
+								"LIMIT 1";
+	
+			System.out.println("assoctiation query getChemicalsFromGene!!");
+			System.out.println(sparqlQueryString1);
+			Query query = QueryFactory.create(sparqlQueryString1);
+
+			QueryEngineHTTP qexec = new QueryEngineHTTP("http://ctd.bio2rdf.org/sparql", query);
+			//System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+			
+			ResultSet results = qexec.execSelect();
+			
+			//ResultSetFormatter.out(System.out, results, query);    
+		
+			// Informacion del resultado				
+			String aux = null;				
+			List<InferredAssociation> infList = new ArrayList<>();	
+			
+			while (results.hasNext())
+			{
+				QuerySolution qsol = results.nextSolution();	
+				
+				if(qsol.contains("action_chemical_gene") && qsol.contains("chemical") && qsol.contains("chemical_title")){						
+					
+					InferredAssociation asso = new InferredAssociation();
+					
+					asso.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association");
+					asso.setAssociation_name("Chemical-Gene");
+					
+					aux = qsol.get("chemical").toString();
+					asso.setConcept_uri(aux);
+					aux = qsol.get("chemical_title").toString();
+					asso.setConcept_name(aux);
+					aux = qsol.get("action_chemical_gene").toString();
+					asso.setAction(aux);
+					
+					infList.add(asso);						
+					
+				}
+			}
+			
+			gen.setInferredAssociations(infList);
+			
+			qexec.close();
+		
+	
+	}
+	
+	private static void getGenesFromChemical(Association chemical){
+		
+
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+								" SELECT DISTINCT ?action_chemical_gene ?gene ?gene_title " +
+								//fromQ +
+								" WHERE { " +
+								" 	?chemical_gene <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association> . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:action> ?action_chemical_gene . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:chemical> <" + chemical.getConcept_uri() + "> . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:gene> ?gene . " +
+								"	?gene <http://purl.org/dc/terms/title> ?gene_title . " +
+								" } " +
+								"LIMIT 1";
+	
+			System.out.println("associations query getGenesFromChemical!!");
+			System.out.println(sparqlQueryString1);
+			Query query = QueryFactory.create(sparqlQueryString1);
+
+			QueryEngineHTTP qexec = new QueryEngineHTTP("http://ctd.bio2rdf.org/sparql", query);
+			//System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+			
+			ResultSet results = qexec.execSelect();
+			
+			//ResultSetFormatter.out(System.out, results, query);    
+		
+			// Informacion del resultado				
+			String aux = null;
+			List<InferredAssociation> infList = new ArrayList<>();	
+
+			while (results.hasNext())
+			{
+				QuerySolution qsol = results.nextSolution();	
+				
+				if(qsol.contains("action_chemical_gene") && qsol.contains("chemical") && qsol.contains("chemical_title")){						
+					
+					InferredAssociation asso = new InferredAssociation();
+					
+					asso.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association");
+					asso.setAssociation_name("Chemical-Gene");
+					
+					aux = qsol.get("gene").toString();
+					asso.setConcept_uri(aux);
+					aux = qsol.get("gene_title").toString();
+					asso.setConcept_name(aux);
+					aux = qsol.get("action_chemical_gene").toString();
+					asso.setAction(aux);
+					
+					infList.add(asso);						
+					
+				}
+
+			}	
+			chemical.setInferredAssociations(infList);
+			qexec.close();	
+
+	}
+	
+	
+	private static List<Property> getHerarchyElements(String treeId, Dataset dataset){
+		
+		List<Property> propsList = new ArrayList<Property>();
+		
+		String strquery = " SELECT DISTINCT * " +
+					   " WHERE { "+
+					   "	{ " +
+					   "		<"+ treeId +"> <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass . " +
+					   "    	?superclass <http://www.w3.org/2000/01/rdf-schema#label> ?superlabel . "+
+					   "	}" +
+					   "	UNION"+
+					   "	{ " +
+					   "		?subclass <http://www.w3.org/2000/01/rdf-schema#subClassOf> <"+ treeId +"> . " +
+					   "    	?subclass <http://www.w3.org/2000/01/rdf-schema#label> ?sublabel . "+
+					   "	}" +
+					   " } ";
+		
+					   
+		System.out.println("tree query!!");
+		System.out.println(strquery);
+		
+		Query query = QueryFactory.create(strquery);
+		//QueryEngineHTTP qexec = new QueryEngineHTTP("http://bio2rdf.org/sparql/", query);
+		QueryEngineHTTP qexec = new QueryEngineHTTP(dataset.getSparqlEndpoint(), query);
+		System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+		
+		ResultSet results = qexec.execSelect();
+		
+		//ResultSetFormatter.out(System.out, results, query);  
+		
+		String aux;
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			if(qsol.contains("superclass") && qsol.contains("superlabel")){
+				
+				Property p = new Property();
+				aux = qsol.get("superclass").toString();
+				p.setUri(aux);
+				aux = qsol.get("superlabel").toString();
+				p.setLabel(aux);
+				p.setShow_default(1);
+				p.setInverseRelation(0);
+				
+				propsList.add(p);
+			}
+			
+			if(qsol.contains("subclass") && qsol.contains("sublabel")){
+				
+				Property p = new Property();
+				aux = qsol.get("subclass").toString();
+				p.setUri(aux);
+				aux = qsol.get("sublabel").toString();
+				p.setLabel(aux);
+				p.setShow_default(1);
+				p.setInverseRelation(1);
+				
+				propsList.add(p);
+			}
+		}
+				
+		return propsList;
+	}
 	
 	private static void regroupPropertyList(List<Property> pList, List<PropertyGroup> pgList){
 

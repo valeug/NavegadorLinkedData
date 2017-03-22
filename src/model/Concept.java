@@ -13,8 +13,14 @@ public class Concept {
 	private List<PropertyGroup> propertyGroups; // list of list of properties	
 	private List<Concept> linkedTerms;
 	private List<Concept> similarTerms;
+	private List<Association> associations;
 	
-	
+	public List<Association> getAssociations() {
+		return associations;
+	}
+	public void setAssociations(List<Association> associations) {
+		this.associations = associations;
+	}
 	public String getDataset() {
 		return dataset;
 	}

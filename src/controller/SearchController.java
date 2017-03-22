@@ -89,11 +89,7 @@ public class SearchController {
 					posBio[cant++] = i;
 				}
 			}
-			
-			
-			
-			if(cant>0){ // Se seleccionaron datasets de Bio2RDF
-				
+			if(cant>0){ // Se seleccionaron datasets de Bio2RDF				
 				List <Concept> termsMappingList = new ArrayList<Concept>();		
 				List <Concept> similarTerms = new ArrayList<Concept>();
 				List <Concept> exactTerms = new ArrayList<Concept>();
@@ -149,10 +145,11 @@ public class SearchController {
 		}
 		else {
 			System.out.println("BUSCA URI!");
-			flagUri = 1;			
-			
+						
+			flagUri = 1;
 			
 			if(input.contains("purl.org/dc/terms/subject") || input.contains("www.w3.org/1999/02/22-rdf-syntax-ns#type")){  /* el URI es rdf:type y subject */
+				
 				return 2;
 			}
 			
@@ -184,8 +181,13 @@ public class SearchController {
 			}
 			else if(input.contains("dbpedia.org/")){
 				//SI ES TERMINO
-				if(request.getParameter("property-uri")!=null) return 1;
+				System.out.println("ENTRO DBPedia URI");
+				
+				if(request.getParameter("property-uri").compareTo("") != 0) return 1; //porque es categoria/clase
+				
+				System.out.println("buscar DBPedia URI");
 				term = DbpediaEndpoint.searchByUri(input);
+				flagUri = 1;
 				//termList.add(term);
 				//SI ES CLASE
 			}
@@ -588,6 +590,7 @@ public class SearchController {
 				System.out.println("list pg size: " + c.getPropertyGroups().size());
 				for(int i=0; i<c.getPropertyGroups().size(); i++){
 					System.out.println(i+") Group uri: " + c.getPropertyGroups().get(i).getUri());
+					System.out.println(i+") Show_default: " + c.getPropertyGroups().get(i).getShow_default());
 					System.out.println(i+") Group consolidated: " + c.getPropertyGroups().get(i).getConsolidated());
 					System.out.println("pg size: " + c.getPropertyGroups().get(i).getPropertyList().size());
 					for(int k=0; k < c.getPropertyGroups().get(i).getPropertyList().size() ; k++){
@@ -614,6 +617,15 @@ public class SearchController {
 				}
 			}
 			else System.out.println("Linked terms null :/");
+			
+			if(c.getAssociations() != null){
+				System.out.println("Associations ");
+				for(int i=0; i<c.getAssociations().size(); i++){
+					System.out.println(i+") " + c.getAssociations().get(i).getConcept_uri());
+				}
+			}
+			else System.out.println("Associations null :/");
+			
 		}
 	}
 	

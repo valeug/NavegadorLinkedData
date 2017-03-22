@@ -16,10 +16,16 @@ public class Property {
 	int newProperty;
 	int consolidated;
 	int dataset;
-	
+	int inverseRelation;	
 	int instances;
 	
 	
+	public int getInverseRelation() {
+		return inverseRelation;
+	}
+	public void setInverseRelation(int inverseRelation) {
+		this.inverseRelation = inverseRelation;
+	}
 	public int getInstances() {
 		return instances;
 	}

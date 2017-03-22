@@ -59,7 +59,7 @@
 					<div class="result-col">
 			            <div class="input-group" id="adv-search">
 			                <input id="searchbox" name="concept" type="text" class="form-control" placeholder="Search" />
-			                <input id="property-uri-input" name="property-uri" value = "yolo" type="hidden" />
+			                <input id="property-uri-input" name="property-uri" value = "" type="hidden" />
 			                <div class="input-group-btn">	                    
 		                        <button id="search-button-results" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 		                    </div>
@@ -107,10 +107,18 @@
 			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >			
 				<c:forEach items="${termsConsolidated}" var="z">
 					<br> URI <br>
+					<%-- 
 					<p>
 					<a class="ref-value" href="#" onclick=""><c:out value="${z.uri}" /></a>
 					</p>
+					--%>
 					
+					---------------------
+					<div class="see-detail-div">
+						<p><a class="label-detail  prop-label" href="#" onclick="">Ver a detalle</a></p>
+						<p style="display:none;"><a class="concept-detail-uri" ><c:out value="${z.uri}" /></a></p>
+					</div>
+					---------------------
 					<p>
 					<a class="ref-value" href="#" onclick=""><c:out value="${z.dataset}" /></a>
 					</p>
@@ -132,10 +140,10 @@
 										<div class = "prop-group-elem">
 											<li class="list-group-item show-default">
 												
-												<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${i.uri}" /></p>
-														
+												<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${i.uri}" /></p>														
 												<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${i.name}" /></p>
 												<p style="display: none;"><c:out value="${i.show_default}" /></p>
+												
 												<c:if test="${i.uri == 'http://dbpedia.org/ontology/thumbnail'}">
 													<img src="${i.value}}" alt="Smiley face" >
 												</c:if>
@@ -174,13 +182,15 @@
 					
 					<c:if test="${z.propertyGroups != null}">
 						<ul id="prop-group-list" class="list-group prop-group-list">
+							
 							<!--  <p>PROPIEDADES AGRUPADAS</p> -->
 							<c:forEach items="${z.propertyGroups}" var="j">	
 								<%-- --%>
 								<c:if test="${j.consolidated == 1}"> 
-									<div class = "prop-group-elem">						
-										<p class="prop-group-name"><c:out value="${j.name}" /></p>							
-										<p class="prop-group-uri"><c:out value="${j.uri}" /></p>	 						
+									<div class = "prop-group-elem">	
+										<br>nombre:<br>					
+										<p class="prop-group-name" style = "font-size: 16px; font-weight: bold;"><c:out value="${j.name}" /></p>						
+										<p class="prop-group-uri" style = "display: none;"><c:out value="${j.uri}" /></p>	 						
 										<c:forEach items="${j.propertyList}" var="k"> 
 											<li class="list-group-item not-show-default">
 												<p class="ref-uri" style = "display: none;"><c:out value="${k.uri}" /></p>

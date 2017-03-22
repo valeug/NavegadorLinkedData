@@ -59,11 +59,10 @@
 					<div class="result-col">
 			            <div class="input-group" id="adv-search">
 			                <input id="searchbox" name="concept" type="text" class="form-control" placeholder="Search" />
-			                <input id="property-uri-input" name="property-uri" value = "yolo" type="hidden" />
+			                <input id="property-uri-input" name="property-uri" value = "" type="hidden" />
 			                <div class="input-group-btn">	                    
 		                        <button id="search-button-results" type="submit" class="btn"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-		                    </div>
-			                
+		                    </div>			                
 			            </div>
 			          
 			        </div>			
@@ -103,6 +102,7 @@
 			</div>
 		</div>
 		-->
+	<c:if test="${term.properties != null || term.propertyGroups !=null}">
 		<div class = "row"> 
 			<div style= "padding: 30px;" class="col-md-12 desc-info-row" >
 				<p class="subtitle">Propiedades</p>
@@ -112,10 +112,10 @@
 						<c:if test="${t.value != null}">							
 							<c:if test="${t.show_default==1}">
 								<li class="list-group-item show-default">
-									<div class = "prop-group-elem">
-										<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${t.uri}" /></p>
-												
+									<div class = "prop-group-elem">										
+										<p  class="ref-uri prop-group-uri" style = "display: none;"><c:out value="${t.uri}" /></p>	
 										<p style = "font-size: 16px; font-weight: bold;" ><c:out value="${t.name}" /></p>
+										
 										<p style="display: none;"><c:out value="${t.show_default}" /></p>
 										<c:if test="${t.uri == 'http://dbpedia.org/ontology/thumbnail'}">
 											<img src="${t.value}}" alt="Smiley face" >
@@ -197,57 +197,106 @@
 						</c:if>
 					</c:forEach>
 				</ul>
+				
 				<ul id="prop-group-list" class="list-group prop-group-list">
 					<c:forEach items="${term.propertyGroups}" var="k">
-						<div class = "prop-group-elem">
-							<p class="prop-group-name"><c:out value="${k.name}" /></p>
-							
-							<p class="prop-group-uri"><c:out value="${k.uri}" /></p>
-	 						
-							Propiedades (valores)
-							<c:forEach items="${k.propertyList}" var="j"> 
-								<li class="list-group-item not-show-default">
-										
-										<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
-										<!-- <p><c:out value="${i.name}" /></p>  -->
-										<p style="display: none;"><c:out value="${j.show_default}" /></p>
-										
-										<c:if test="${j.is_mapping == 1}">
-											<%--
-											<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
-											--%>
-											<c:if test="${j.label == null}">
-												<div class="prop-label-div">
-													<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
-												</div>
+						<c:if test="${k.show_default==1}">
+							<div class = "prop-group-elem">
+								<p class="prop-group-name"><c:out value="${k.name}" /></p>
+								
+								<p class="prop-group-uri" style="display: none;"><c:out value="${k.uri}" /></p>
+		 														
+								<c:forEach items="${k.propertyList}" var="j"> 
+									<li class="list-group-item not-show-default">
+											
+											<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
+											<!-- <p><c:out value="${i.name}" /></p>  -->
+											<p style="display: none;"><c:out value="${j.show_default}" /></p>
+											
+											<c:if test="${j.is_mapping == 1}">
+												<%--
+												<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
+												--%>
+												<c:if test="${j.label == null}">
+													<div class="prop-label-div">
+														<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
+													</div>
+												</c:if>
+												<c:if test="${j.label != null}">
+													<div class="prop-label-div">
+														<p class="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${j.label}" /></a></p>
+														<p style="display:none;"><a class="prop-label-3" ><c:out value="${j.value}" /></a></p>
+													</div>
+												</c:if>
 											</c:if>
-											<c:if test="${j.label != null}">
-												<div class="prop-label-div">
-													<p class="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${j.label}" /></a></p>
-													<p style="display:none;"><a class="prop-label-3" ><c:out value="${j.value}" /></a></p>
-												</div>
-											</c:if>
-										</c:if>
-										<c:if test="${j.is_mapping != 1}">
-											<%-- 
-											<p><c:out value="${j.value}" /></p>
-											--%>
-											<c:if test="${j.label == null}">
+											<c:if test="${j.is_mapping != 1}">
+												<%-- 
 												<p><c:out value="${j.value}" /></p>
+												--%>
+												<c:if test="${j.label == null}">
+													<p><c:out value="${j.value}" /></p>
+												</c:if>
+												<c:if test="${j.label != null}">
+													<p><c:out value="${j.label}" /></p>
+												</c:if>	
 											</c:if>
-											<c:if test="${j.label != null}">
-												<p><c:out value="${j.label}" /></p>
-											</c:if>	
-										</c:if>
-									
-								</li>
-							</c:forEach>
-						</div>
-						---------------------------						
+										
+									</li>
+								</c:forEach>
+							</div>
+						</c:if>
+						----------------------------------------------------------------------------------------------------------------
+						<c:if test="${k.show_default==0}">
+							<div class = "prop-group-elem" style="display: none;">
+								<p class="prop-group-name"><c:out value="${k.name}" /></p>
+								
+								<p class="prop-group-uri" style="display: none;"><c:out value="${k.uri}" /></p>
+		 														
+								<c:forEach items="${k.propertyList}" var="j"> 
+									<li class="list-group-item not-show-default">
+											
+											<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
+											<!-- <p><c:out value="${i.name}" /></p>  -->
+											<p style="display: none;"><c:out value="${j.show_default}" /></p>
+											
+											<c:if test="${j.is_mapping == 1}">
+												<%--
+												<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
+												--%>
+												<c:if test="${j.label == null}">
+													<div class="prop-label-div">
+														<p class="prop-label-1"><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
+													</div>
+												</c:if>
+												<c:if test="${j.label != null}">
+													<div class="prop-label-div">
+														<p class="prop-label-2"><a  class="ref-value  prop-label" href="#" onclick=""><c:out value="${j.label}" /></a></p>
+														<p style="display:none;"><a class="prop-label-3" ><c:out value="${j.value}" /></a></p>
+													</div>
+												</c:if>
+											</c:if>
+											<c:if test="${j.is_mapping != 1}">
+												<%-- 
+												<p><c:out value="${j.value}" /></p>
+												--%>
+												<c:if test="${j.label == null}">
+													<p><c:out value="${j.value}" /></p>
+												</c:if>
+												<c:if test="${j.label != null}">
+													<p><c:out value="${j.label}" /></p>
+												</c:if>	
+											</c:if>
+										
+									</li>
+								</c:forEach>
+							</div>
+						</c:if>					
 					</c:forEach>
 				</ul>
 			</div>
 		</div>
+	</c:if>	
+		
 		<%-- 
 		<div class = "row"> 
 			<div class="col-md-12 ref-info-row" >
@@ -282,35 +331,46 @@
 			</div>
 		</div>
 		--%>
-		<div class = "row"> 
-			<div style= "padding: 30px;" class="col-md-12 sim-info-row" >
-				<p class="subtitle">Terminos similares:</p> 
-				<ul class="list-group">
-					<c:forEach items="${term.similarTerms}" var="i">
-						<li class="list-group-item">
-							<a href="#" style="display: none;" class="linked-t-uris" ><c:out value="${i.uri}" /><br></a>
-							<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
-						</li>
-					</c:forEach>
-				</ul>
-				<div id="mydiv"></div>
+		<c:if test="${term.similarTerms != null}">
+			<div class = "row"> 
+				<div style= "padding: 30px;" class="col-md-12 sim-info-row" >
+					<p class="subtitle">Terminos similares:</p> 
+					<ul class="list-group">
+						<c:forEach items="${term.similarTerms}" var="i">
+							<li class="list-group-item">
+								<div class="term-list-item">
+									<p style="display: none;" ><a href="#" class="term-item-uri" ><c:out value="${i.uri}" /></a></p>
+									<p><a href="#" class="term-item-name" ><c:out value="${i.name}" /></a></p>
+									<!--  <p><c:out value="${i.definition}" /></p>  -->
+								</div>
+							</li>
+						</c:forEach>
+					</ul>
+					<div id="mydiv"></div>
+				</div>
 			</div>
-		</div>
+		</c:if>
 		
-		<div class = "row"> 
-			<div class="col-md-12 ref-info-row" >
-				Instancias de la clase<br>
-				
-				<c:forEach items="${instances}" var="i">
-					<a href="#" class="term" ><c:out value="${i.uri}" /></a><br>
-					<a href="#" class="term" ><c:out value="${i.name}" /></a><br>
-				</c:forEach>
-							
-				<br>
-				<br>
+		<c:if test="${instances != null}">
+			<div class = "row"> 
+				<div class="col-md-12 ref-info-row" >
+					Instancias de la clase<br>
+					<ul class="list-group">
+						<c:forEach items="${instances}" var="i">
+							<li class="list-group-item">
+								<div class="term-list-item">
+									<p class="term-item-uri" style="display: none;"><a><c:out value="${i.uri}" /></a></p>
+									<p class="term-item-name" ><a><c:out value="${i.name}" /></a></p>
+									<p><c:out value="${i.definition}" /></p>
+								</div>
+							</li>
+						</c:forEach>
+					</ul>	
+					<br>
+					<br>
+				</div>
 			</div>
-		</div>
-		
+		</c:if>
 	</div>
 	
 	<script type="text/javascript">
@@ -327,6 +387,22 @@
 	// Get the button that opens the modal
 	var btn = document.getElementById("confBtn");
 	
+	
+	/*
+		$(".term-item-name").click(function(){
+			var div_parent = $(this).parents("div .term-list-item");
+		    console.log("div_parent");
+			console.log(div_parent);
+			var prop_uri = div_parent.find('.term-item-uri');
+			console.log("prop_uri");
+			console.log(prop_uri.text());
+			$("#searchbox").val(prop_uri.text());		
+			console.log(prop_uri.text());
+		    $("#search-button-results").click();
+		});
+	
+	
+	*/
 	$("#confBtn").on( "click", function() {
 	    modal.style.display = "block";
 	    //
@@ -341,11 +417,11 @@
 		//alert('no entro');
 		//alert("gg");
 		var list = document.getElementById('prop-list');
-		console.log("LIST")
+		console.log("LIST");
 		console.log(list);
-		console.log("FIN LIST")
+		console.log("FIN LIST");
 		var elements = list.children;
-		//console.log(elements);
+		console.log(elements);
 		var cont = 1;
 		//console.log('for each');
 		$.each(elements, function(key, value){

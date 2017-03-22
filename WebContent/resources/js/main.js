@@ -27,6 +27,7 @@ $(document).ready(function() {
 	
 	//Para iniciar navegacion a terminos parecidos
 	// al dar click, se agrega el termino a la barra de busqueda 
+	/*
 	$(".term").click(function(){
 	    alert("The term was clicked.");
 		var parent = $(this).parent();
@@ -36,7 +37,19 @@ $(document).ready(function() {
 	    $("#searchbox").val(sib.text());
 	    $("#search-button-results").click();
 	});
-	
+	*/
+	//
+	$(".term-item-name").click(function(){
+		var div_parent = $(this).parents("div .term-list-item");
+	    console.log("div_parent");
+		console.log(div_parent);
+		var prop_uri = div_parent.find('.term-item-uri');
+		console.log("prop_uri");
+		console.log(prop_uri.text());
+		$("#searchbox").val(prop_uri.text());		
+		console.log(prop_uri.text());
+	    $("#search-button-results").click();
+	});
 	
 	$(".ref-value").click(function(){
 	    alert("The term was clicked.");
@@ -72,11 +85,25 @@ $(document).ready(function() {
 		console.log(div_parent);
 		var prop_uri = div_parent.find('.prop-group-uri');
 		console.log("prop_uri");
-		console.log(prop_uri);
+		console.log(prop_uri.text());
 		$("#property-uri-input").val(prop_uri.text());		
 		console.log(prop_uri.text());
 	    $("#search-button-results").click();
 	});
+	
+	
+	$(".label-detail").click(function(){
+		var div_parent = $(this).parents("div .see-detail-div");
+	    console.log("div_parent");
+		console.log(div_parent);
+		var prop_uri = div_parent.find('.concept-detail-uri');
+		console.log("prop_uri");
+		console.log(prop_uri.text());
+		$("#searchbox").val(prop_uri.text());		
+		//console.log(prop_uri.text());
+	    $("#search-button-results").click();
+	});
+	
 	
 	//save selected ontologies
 	$("#saveOntoBtn").click(function(){

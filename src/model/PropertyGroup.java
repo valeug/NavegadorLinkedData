@@ -6,10 +6,17 @@ public class PropertyGroup {
 
 	String name;
 	String uri;
+	int show_default;	
 	int consolidated;
 	List<Property> propertyList;
 	
 	
+	public int getShow_default() {
+		return show_default;
+	}
+	public void setShow_default(int show_default) {
+		this.show_default = show_default;
+	}
 	public String getName() {
 		return name;
 	}

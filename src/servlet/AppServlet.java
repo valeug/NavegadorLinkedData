@@ -51,13 +51,15 @@ public class AppServlet extends HttpServlet {
 			int esUri = -1;
 			
 			int id_dataset = 0;
-			if(request.getParameter("property-uri")!=null){
-				String aux = request.getParameter("property-uri");
-				System.out.println("property-uri: " + aux);
-				
-				System.out.println("concept: " + request.getParameter("concept"));
-				
-				id_dataset = SearchController.is_class(request);
+			if(request.getParameter("property-uri")!=null){ 
+				if(request.getParameter("property-uri").toString().compareTo("") != 0){ //tiene texto
+					String aux = request.getParameter("property-uri");
+					
+					//System.out.println("property-uri: " + aux);				
+					//System.out.println("concept: " + request.getParameter("concept"));
+					
+					id_dataset = SearchController.is_class(request);
+				}
 			}
 			
 			esUri = SearchController.searchConcept(request, termList);
@@ -65,7 +67,7 @@ public class AppServlet extends HttpServlet {
 			
 			System.out.println("es URI value: " + esUri);
 			if(esUri ==-1) System.out.println("tf");
-			if(esUri == 1 || esUri ==2){
+			if(esUri == 1){
 				System.out.println("esURI");
 				
 				/*
@@ -77,6 +79,7 @@ public class AppServlet extends HttpServlet {
 					id_dataset = SearchController.is_class(request);
 				}
 				*/
+				
 				/* VERIFICAR SI ES UNA CLASE DEL DOMINIO (que este en la BD)*/
 				/* EN EL CASO DE DBPDIA, al darle click a "CATEGORY" tambien devuelve sus instancias*/
 				//int datasetId = 1;
