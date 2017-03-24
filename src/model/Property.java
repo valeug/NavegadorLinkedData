@@ -18,8 +18,16 @@ public class Property {
 	int dataset;
 	int inverseRelation;	
 	int instances;
+	int id_class;
 	
 	
+	
+	public int getId_class() {
+		return id_class;
+	}
+	public void setId_class(int id_class) {
+		this.id_class = id_class;
+	}
 	public int getInverseRelation() {
 		return inverseRelation;
 	}

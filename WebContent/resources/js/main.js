@@ -127,11 +127,29 @@ $(document).ready(function() {
 	    });
 	});
 	
+	
+	
 	// actualizar propiedades
 	$("#savePropBtn").click(function(){
-		var arr = [];
+		
 		//alert('post !!!!')
-		$("input:checkbox[name=checkboxPList]:checked").each(function(){
+		
+		//		
+		var rows = $('input:checkbox[name=checkboxPList]');
+		var dataset = $("#dataset-Prop").val();
+		var clase = $("#class-Prop").val();
+		
+		var selected1 = rows.filter(".dataset-"+dataset);			
+		console.log('SELECCIONADAS 1!');
+		console.log(selected1);
+		
+	    var selected2 = selected1.filter(".class-"+clase);			
+	    console.log('SELECCIONADAS 2!');
+		console.log(selected2);
+		//		
+		
+		/*
+		$("input"+" ."+clase+" ."+dataset+":checkbox[name=checkboxPList]:checked").each(function(){
 			var element = $(this);
 			console.log($(this));
 			arr.push(element.attr('id'));
@@ -139,6 +157,31 @@ $(document).ready(function() {
 			//alert(element.attr('class'));
 			//alert('asd');
 		});
+		*/
+		var arr = [];
+		console.log("LISTO PARA EL UPDATE!");
+		selected2.each(function(){
+			var element = $(this);
+			var clases = element.attr('class').split(' ');
+			//var dataset = clases[0].split('-');
+			var clase = clases[1].split('-');
+			
+			/*
+			var prop = {id_property:element.attr('id'), id_clase:clase[1]};	
+			*/
+			var check = 0;
+			if(element.is(':checked')){
+				check = 1;
+			} else {
+				check = 0;
+			}
+			
+			var prop = ""+element.attr('id')+" "+clase[1]+ " "+check; // "id_property id_class is_checked"
+			console.log(prop);
+			//var car = {type:"Fiat", model:"500", color:"white"};
+			arr.push(prop);
+		});
+		
 		//alert('ontoBtn');
 		console.log("arreglo");
 		console.log(arr);
@@ -150,6 +193,7 @@ $(document).ready(function() {
 			data:{arr:arr},
 	        success : function(data){
 	            alert('success post');
+	            console.log('EXITOO');
 	        }
 	    });
 	});

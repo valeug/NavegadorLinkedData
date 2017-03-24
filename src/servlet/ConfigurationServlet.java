@@ -31,8 +31,7 @@ public class ConfigurationServlet extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		
+				
 		System.out.println( "para 1: "+ request.getParameter("dataset"));
 		System.out.println( "para 2: "+ request.getParameter("class"));
 		System.out.println( "para 3: "+ request.getParameter("uriInputProperty"));

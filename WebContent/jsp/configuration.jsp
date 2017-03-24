@@ -32,14 +32,15 @@
 	     	<div class="modal-content">
 	       	<div class="modal-header">
 	         		<button type="button" class="close" data-dismiss="modal">&times;</button>
-	         		<h4 class="modal-title">Seleccionar Propiedades/h4>
+	         		<h4 class="modal-title">Seleccionar Propiedades</h4>
 	       	</div>
 	       	
 	       	<div class="modal-body">
 	       		<div class="form-group">
-					<label for="dataset-sel">Seleccionar dataset</label>
-					<select name="dataset" id="dataset-Prop" class="form-control">
-					</select>
+					<label for="dataset-sel">Seleccionar datasetxxx</label>
+					<select name="dataset" id="dataset-Prop" class="form-control"></select>
+					<label for="class-sel">Seleccionar clase</label>
+					<select name="class" id="class-Prop" class="form-control"></select>
 				</div>
 	         	<div id="propertydiv" >
 					<table class="table table-p" cellspacing="0" id="propertytable">
@@ -96,7 +97,7 @@
 						
 						<div class = "row">	
 							<div class="col-md-8 home-page-modal">		
-								<button id="myBtn-prop" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myPropModal">Propiedades a mostrar</button>
+								<button id="myBtn-prop" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myPropModal">Propiedades consolidadas</button>
 							</div>
 						</div>
 						
@@ -242,31 +243,45 @@
 		    //alert('x1');
 		    $("#propertydiv").hide();
 		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
-		    $.get('UpdateProperty',function(responseJson){
-		    	//alert('x2');
+		    	
+		    
+		    $.get('Configuration/Property/Update',function(responseJson){
+		    //$.get('UpdateProperty',function(responseJson){
+		    	
+		    	alert('UpdateProperty x2');
 				if(responseJson!=null){					
 					$("#propertytable").find("tr:gt(0)").remove();
 					var table = $("#propertytable");
 					//alert('no entro');
-					//alert("gg");
+					alert("UpdateProperty gg");
 					var cont = 1;
+					
+					alert(responseJson);
+					console.log(responseJson);
 					$.each(responseJson, function(key, value){
-						/*
-						var rowNew = $("<tr><td></td><td></td></tr>");
-						alert(value['name']);
-						rowNew.children().eq(0).text(value['name']);
-						rowNew.children().eq(1).text(value['description']);
-						rowNew.appendTo(table);
-						*/
-						//alert('entro each');
-						//alert(value['name']);
-						var row = $("<tr class="+ value['dataset']+" />");
+						
+						var class_dataset = "dataset-" + value['dataset'];
+	                    var class_class = "class-" + value['id_class'];
+	                    
+	                    
+						var row = $('<tr class="'+ class_dataset + ' ' + class_class +'" />');
 	                    $("<td />").text(value['uri']).appendTo(row);
 	                    $("<td />").text(value['name']).appendTo(row);
-	                    var inpStr = '<input type="checkbox" class="' + value['dataset'] + '" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+	                    
+	                    	                    
+	                    var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+	                    
 	                    if(value['consolidated']==1){
-	                    	var inpStr = '<input type="checkbox" class="' + value['dataset'] + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
+	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
 	                    }
+	                    
+	                    /*
+						var inpStr = '<input type="checkbox" class="' + class_dataset +'" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+	                    
+	                    if(value['consolidated']==1){
+	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
+	                    }
+	                    */
 	                    $("<td />").html(inpStr).appendTo(row);
 	                    //alert("prop id: " + value['id']);
 	                    row.appendTo(table);
@@ -300,13 +315,82 @@
 			var dataset = $("#dataset-Prop").val();
 			
 			alert("dataset: " + dataset);
+					    
+		    /* FILTRAR CLASES */
+		    $.ajax({        
+                type: "GET",   
+                url: 'RetrieveDatasetClasses',
+                dataType : "JSON",
+                data: {
+                    idDataset: dataset,
+                },
+                success: function(responseJson){
+                	console.log(responseJson);
+                	if(responseJson!=null){		
 			
-			var selected = rows.filter("."+dataset).show();
-			console.log('SELECCIONADAS!');
+    					$('#class-Prop').empty();
+                        $('#class-Prop').append('<option value="">--Seleccione--</option>');
+                        
+						$.each(responseJson, function(key, value){
+							console.log('class:');
+							console.log(value);
+                            $('#class-Prop').append("<option value='"  +  value['idClass'] + "'>" +  value['name'] + "</option>");
+
+    					});					
+    				}                       
+                },
+                error: function (e) {
+                    console.log('Ocurrio un error');
+                 	//console.log(e.responseText);
+                },
+
+            });
+		    
+		    /*
+		    var class_dataset = "dataset-" + dataset;                
+		    var selected = rows.filter("."+class_dataset).show();
+			console.log('SELECCIONADAS click dataset!');
 			console.log(selected);
 		    rows.not( selected ).hide();
+		    */
 		    
 		    $(".table-head").show();
+		});
+		
+		$('#class-Prop').change(function(){
+			
+			var rows = $('table.table-p tr');
+			console.log('TODAS class!');
+			console.log(rows);
+			
+			var clase = $("#class-Prop").val();
+			var dataset = $("#dataset-Prop").val();
+			
+			alert("clase: " + clase);
+			console.log("CLASE!!");
+			console.log(clase);
+			
+			alert("dataset: " + dataset);
+			console.log("dataset!!");
+			console.log(dataset);
+			
+			var class_dataset = "dataset-" + dataset; 
+			console.log("clase dataset: ");
+			console.log(class_dataset);
+			var class_clase = "class-" + clase; 
+			console.log("clase clase: ");
+			console.log(class_clase);
+			
+
+			var selected = rows.filter("."+class_dataset);			
+			console.log('SELECCIONADAS 1!');
+			console.log(selected);
+			
+		    var selected2 = selected.filter("."+class_clase).show();			
+		    console.log('SELECCIONADAS 2!');
+			console.log(selected2);
+			
+		    rows.not( selected2 ).hide();
 		});
 		
 	});

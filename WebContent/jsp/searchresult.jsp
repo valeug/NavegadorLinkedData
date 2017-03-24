@@ -202,17 +202,16 @@
 					<c:forEach items="${term.propertyGroups}" var="k">
 						<c:if test="${k.show_default==1}">
 							<div class = "prop-group-elem">
-								<p class="prop-group-name"><c:out value="${k.name}" /></p>
-								
+								<p class="prop-group-name"><c:out value="${k.name}" /></p>								
 								<p class="prop-group-uri" style="display: none;"><c:out value="${k.uri}" /></p>
-		 														
+		 						<p style="display: none;"><c:out value="${k.show_default}" /></p>							
 								<c:forEach items="${k.propertyList}" var="j"> 
 									<li class="list-group-item not-show-default">
-											
-											<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
-											<!-- <p><c:out value="${i.name}" /></p>  -->
-											<p style="display: none;"><c:out value="${j.show_default}" /></p>
-											
+											<div>
+												<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
+												<!-- <p><c:out value="${i.name}" /></p>  -->
+												<p style="display: none;"><c:out value="${j.show_default}" /></p>
+											</div>
 											<c:if test="${j.is_mapping == 1}">
 												<%--
 												<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
@@ -248,17 +247,18 @@
 						----------------------------------------------------------------------------------------------------------------
 						<c:if test="${k.show_default==0}">
 							<div class = "prop-group-elem" style="display: none;">
-								<p class="prop-group-name"><c:out value="${k.name}" /></p>
-								
+							
+								<p class="prop-group-name"><c:out value="${k.name}" /></p>								
 								<p class="prop-group-uri" style="display: none;"><c:out value="${k.uri}" /></p>
-		 														
+		 						<p style="display: none;"><c:out value="${k.show_default}" /></p>	
+		 													
 								<c:forEach items="${k.propertyList}" var="j"> 
 									<li class="list-group-item not-show-default">
 											
 											<p class="ref-uri" style = "display: none;"><c:out value="${j.uri}" /></p>
 											<!-- <p><c:out value="${i.name}" /></p>  -->
 											<p style="display: none;"><c:out value="${j.show_default}" /></p>
-											
+										
 											<c:if test="${j.is_mapping == 1}">
 												<%--
 												<p><a class="ref-value" href="#" onclick=""><c:out value="${j.value}" /></a></p>
@@ -359,9 +359,13 @@
 						<c:forEach items="${instances}" var="i">
 							<li class="list-group-item">
 								<div class="term-list-item">
-									<p class="term-item-uri" style="display: none;"><a><c:out value="${i.uri}" /></a></p>
+									<p class="term-item-uri" style="display: none;"><a><c:out value="${i.uri}" /></a></p>									 
 									<p class="term-item-name" ><a><c:out value="${i.name}" /></a></p>
+									<!--
 									<p><c:out value="${i.definition}" /></p>
+									-->
+									<div class="flip-instance"><a href="#">VER DEF-></a></div>
+									<div class="panel-comment"><p><c:out value="${i.definition}" /></p></div>
 								</div>
 							</li>
 						</c:forEach>
@@ -374,6 +378,17 @@
 	</div>
 	
 	<script type="text/javascript">
+	$(document).ready(function(){
+		alert('entro');
+		console.log("entro panel slidedown");
+		$(".panel-comment").slideUp();
+	});
+	
+	$(".flip-instance").click(function(){
+		var div_parent = $(this).parents("div .term-list-item");
+		var panel = div_parent.find('.panel-comment');
+		panel.slideToggle("slow");
+    });
 	
 	// Get the modal
 	var modal = document.getElementById('confModal');
@@ -405,7 +420,7 @@
 	*/
 	$("#confBtn").on( "click", function() {
 	    modal.style.display = "block";
-	    //
+
 	    //alert('x1');
 	    $("#propertydiv").hide();
 	    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
@@ -421,28 +436,34 @@
 		console.log(list);
 		console.log("FIN LIST");
 		var elements = list.children;
+		//var elements = list.find('.prop-group-elem');
 		console.log(elements);
 		var cont = 1;
 		//console.log('for each');
 		$.each(elements, function(key, value){
-			/*
-			var rowNew = $("<tr><td></td><td></td></tr>");
-			alert(value['name']);
-			rowNew.children().eq(0).text(value['name']);
-			rowNew.children().eq(1).text(value['description']);
-			rowNew.appendTo(table);
-			*/
-			//alert('entro each');
-			//alert(value['name']);
 			var row = $("<tr />");
-			//console.log(value);
-			//console.log('p');
-			//console.log(value.children[0].innerHTML);
-			//console.log(value.children[0]);
-			//alert(value.children[0].innerHTML)
-            $("<td />").text(value.children[0].innerHTML).appendTo(row); // URI
+			
+			console.log("value: ");
+			console.log(value);
+			
+			var div = value.children[0];
+			
+			console.log("div m1");
+			console.log(div);
+			//var x = value.find('.prop-group-elem');
+			
+			var uri = div.children[0].innerHTML; //parrafo uri
+			console.log("uri: ");
+			console.log(uri);
+
+			var show_default = div.children[2].innerHTML; //parrafo show default
+			console.log("show_default: ");
+			console.log(show_default);
+
+			
+            $("<td />").text(uri).appendTo(row); // URI
             //$("<td />").text(value.children[3]}).appendTo(row); //FALTARIA INDICAR EL NOMBRE DEL DATASET   
-            var show_default = value.children[2].innerHTML;
+           
             if(show_default == 1){
             	//console.log('muestra');
             	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList" checked="checked" />'; 
@@ -460,14 +481,15 @@
 		
 		//prop-group-list
 		var list = document.getElementById('prop-group-list');
-		var elementsP = list.getElementsByClassName("prop-group-uri");
+		//var elementsP = list.getElementsByClassName("prop-group-uri");
+		var divs = list.children; //div
 		
 		console.log('lista agrupadaaaaaa');
 		console.log(list);
 		console.log("fin");
 		
 		console.log("elementos");
-		console.log(elementsP);
+		console.log(divs);
 		console.log("fin");
 		
 		/*
@@ -476,16 +498,43 @@
 		console.log('lista hijooooos');
 		console.log(elementsG);
 		*/
-		$.each(elementsP, function(key, value){
+		$.each(divs, function(key, value){
 
 			var row = $("<tr />");
+			
+			console.log("value PROP GROUP");
 			console.log(value);
 			
-            $("<td />").text(value.innerHTML).appendTo(row); // URI
+			var uri = value.children[1].innerHTML; //parrafo uri
+			console.log("uri 2 : ");
+			console.log(uri);
+
+			var show_default = value.children[2].innerHTML; //parrafo show default
+			console.log("show_default 2 : ");
+			console.log(show_default);
+
+			
+            $("<td />").text(uri).appendTo(row); // URI
+            
             //prueba
+            if(show_default == 1){
+            	//console.log('muestra');
+            	var inpStr = '<input type="checkbox" id="'+ cont +'" name="old_checkboxList" checked="checked" />'; 
+            	$("<td />").html(inpStr).appendTo(row);
+            }
+            else {
+            	//console.log('no muestra');
+            	var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
+            	$("<td />").html(inpStr).appendTo(row);
+            }
+            
+            /*
             var inpStr = '<input type="checkbox" id="'+ cont +'" name="new_checkboxList"/>'; 
             	$("<td />").html(inpStr).appendTo(row);
-            	
+            */
+            
+            
+            
             row.appendTo(table);
             cont = cont + 1;
 		});

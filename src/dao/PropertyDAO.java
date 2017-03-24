@@ -9,6 +9,7 @@ import java.util.List;
 
 import db.JDBCMySQLConnection;
 import model.Class;
+import model.Class_x_Property;
 import model.Dataset;
 import model.Property;
 
@@ -48,6 +49,7 @@ public class PropertyDAO {
 				p.setUri(myres.getString("uri"));
 				p.setIs_mapping(myres.getInt("is_mapping"));	
 				p.setTarget(myres.getInt("target"));
+				p.setInstances(myres.getInt("instances"));
 				//p.setConsolidated(myres.getInt("consolidated"));
 				
 				//AQUI BUSCAR EL VALOR DE CONSOLIDATED DE CADA CLASE X PROPIEDADES
@@ -211,8 +213,7 @@ public class PropertyDAO {
     		else {
     			sql = "INSERT INTO property " + 
 						" (id_property, name, description, uri, consolidated) " +
-						" values ('" + p.getId() +"', '" + p.getName() +"', '" + p.getDescription() +"', '" + p.getUri() +  "', '"  + p.getConsolidated() +"') ";
-			
+						" values ('" + p.getId() +"', '" + p.getName() +"', '" + p.getDescription() +"', '" + p.getUri() +  "', '"  + p.getConsolidated() +"') ";			
     		}			
 			System.out.println("query:\n"+sql);
 			
@@ -233,25 +234,29 @@ public class PropertyDAO {
 	}
     
     
-    public static List<Property> getAllPropertyGroupedByDataset(){
+    public static List<Property> getAllPropertyGroupedByDataset(){ /* CODIGO HORRIBLE, CAMBIARLO!*/
 		//SELECT MAX(id) FROM tablename;
     	String query = "SELECT id_dataset FROM dataset";
     	
     	System.out.println("QUERY DAO: " + query);
-    	List<String> datasetList = new ArrayList<String>();
+    	int [] datasetList = new int [10];
+    	int cantDataset = 0; 
+    	
+    	//List<String> datasetList = new ArrayList<String>();
 		try {    		
 			myConnec = getConnection();
 			myStat = myConnec.createStatement();
 			ResultSet myres = myStat.executeQuery(query);
 			
-			int cant =0;
+			cantDataset = 0;
 			while(myres.next()){
-				int s = myres.getInt("id_dataset");	
-				System.out.println("idddd: " + s);
-				datasetList.add(""+s);
-				cant++;
+				int aux = myres.getInt("id_dataset");	
+				System.out.println("idddd: " + aux);
+				//datasetList.add(""+s);
+				datasetList[cantDataset] = aux;
+				cantDataset++;
 			}
-			System.out.println("cant: "+ cant);
+			System.out.println("cantList: "+ cantDataset);
 			myres.close();			
 			myConnec.close();
 			
@@ -259,18 +264,17 @@ public class PropertyDAO {
 			e.printStackTrace();
 		}
     	
-		System.out.println("dataset size: "+datasetList.size());
+		//System.out.println("dataset size: "+datasetList.size());
 		
 		List<Property> pList = new ArrayList<Property>();
-		for(int i=0; i<datasetList.size(); i++){	
-			query = " SELECT *" +
-					" FROM property" +
-					" WHERE id_property IN (SELECT id_property " +
-						 					" FROM class_x_property" +
-						 					" WHERE id_class IN (SELECT id_class" +
-						 										" FROM class" +
-						 										" WHERE id_dataset = " + datasetList.get(i) +                                     
-						 										" ));";
+		List<Class_x_Property> cxpList = new ArrayList<>();
+		
+		for(int i=0; i<cantDataset; i++){	
+			query = " SELECT * " +
+ 					" FROM class_x_property" +
+ 					" WHERE id_class IN (SELECT id_class" +
+ 										" FROM class" +
+ 										" WHERE id_dataset = " + datasetList[i] + " );";
 			
 	    	try {    		
 	    		myConnec = getConnection();
@@ -278,18 +282,21 @@ public class PropertyDAO {
 				ResultSet myres = myStat.executeQuery(query);
 				
 				while(myres.next()){
-					Property p = new Property();
-					p.setId(myres.getInt("id_property"));
-					p.setName(myres.getString("name"));
-					p.setUri(myres.getString("uri"));
-					p.setIs_mapping(myres.getInt("is_mapping"));	
-					p.setTarget(myres.getInt("target"));
+					/*
+					Class_x_Property cxp = new Class_x_Property();
+					cxp.setId_class_x_property(myres.getInt("id_class_x_property"));
+					cxp.setId_class(myres.getInt("id_class"));
+					cxp.setId_property(myres.getInt("id_property"));
+					cxp.setConsolidated(myres.getInt("consolidated"));					
+					*/
 					
+					Property p = getPropertyById(myres.getInt("id_property"));	
 					
-					p.setConsolidated(myres.getInt("consolidated"));
-					p.setDataset(datasetList.get(i).charAt(0)-'0');
+					p.setConsolidated(myres.getInt("consolidated"));		
+					System.out.println("dataset id: " + datasetList[i]);
+					p.setDataset(datasetList[i]);
+					p.setId_class(myres.getInt("id_class"));
 					pList.add(p);
-
 				}
 				myres.close();			
 				myConnec.close();
@@ -299,19 +306,21 @@ public class PropertyDAO {
 				e.printStackTrace();
 			}
 		}
-
+		
+		//getPropertiesConsolidated(pList);
+		
     	return pList;
 	}
     
-    public static void updateConsolidate(int idProperty, int idDataset, int flag){
+   
+    
+    public static void updateConsolidated(int idProperty, int idClass, int flag){
 		
 		String query = "  UPDATE class_x_property " +
 						" SET consolidated=" + flag +
-						" WHERE id_property="+idProperty +" AND id_class IN ( SELECT id_class " + 
-																		     " FROM class "+
-																		     " WHERE id_dataset="+idDataset+
-																			" )";
+						" WHERE id_property="+idProperty +" AND id_class = "+idClass+";";
 		
+		System.out.println("query update consolidated: "+query);
 		try {
     		myConnec = getConnection();
     		myStat = myConnec.createStatement();    		
@@ -345,6 +354,41 @@ public class PropertyDAO {
 				p.setTarget(myres.getInt("target"));
 				//p.setConsolidated(myres.getInt("consolidated"));
 				System.out.println("inst: " + myres.getInt("instances"));
+				p.setInstances(myres.getInt("instances"));
+				break;
+			}
+			
+			myres.close();			
+			myConnec.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return p;	    	
+    }
+    
+    public static Property getPropertyById (int id_property){
+    	String query = "SELECT * "+
+				"FROM property "+ 
+				"WHERE id_property = " + id_property+ "; ";
+
+		Property p = new Property();		    	
+		try {
+			
+			myConnec = getConnection();
+			myStat = myConnec.createStatement();
+			ResultSet myres = myStat.executeQuery(query);
+		
+			while(myres.next()){
+				p.setId(myres.getInt("id_property"));
+				p.setName(myres.getString("name"));
+				p.setUri(myres.getString("uri"));
+				p.setIs_mapping(myres.getInt("is_mapping"));	
+				p.setTarget(myres.getInt("target"));
+				//p.setConsolidated(myres.getInt("consolidated"));
+				//System.out.println("inst: " + myres.getInt("instances"));
 				p.setInstances(myres.getInt("instances"));
 				break;
 			}
