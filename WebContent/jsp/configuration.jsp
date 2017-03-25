@@ -24,84 +24,56 @@
 </head>
 <body>
 
-	<!-- Modal -->
-	<div class="modal fade" id="myPropModal" role="dialog">
-	 	<div class="modal-dialog modal-lg">
-	 
-	    	<!-- Modal content-->
-	     	<div class="modal-content">
-	       	<div class="modal-header">
-	         		<button type="button" class="close" data-dismiss="modal">&times;</button>
-	         		<h4 class="modal-title">Seleccionar Propiedades</h4>
-	       	</div>
-	       	
-	       	<div class="modal-body">
-	       		<div class="form-group">
-					<label for="dataset-sel">Seleccionar datasetxxx</label>
-					<select name="dataset" id="dataset-Prop" class="form-control"></select>
-					<label for="class-sel">Seleccionar clase</label>
-					<select name="class" id="class-Prop" class="form-control"></select>
-				</div>
-	         	<div id="propertydiv" >
-					<table class="table table-p" cellspacing="0" id="propertytable">
-						<tr class="table-head">
-							<th scope="col">Name</th>
-							<th scope="col">Description</th>
-							<th scope="col">Select</th>
-						</tr>
-					</table>	    
-		   		</div>	
-	       	</div>
-	       	<div class="modal-footer">
-	         		<button type="submit" class="btn btn-default" id="savePropBtn">Aceptar</button>
-	         		<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-	       	</div>
-	     	</div>					      
-	  	</div>
-	</div>
+
 					 	
 	<div class="tabbable"> <!-- Only required for left/right tabs -->
-		<ul class="nav nav-tabs" style="background-color: white;">
-	    	<%-- <li class="active"><a href="#tab1" data-toggle="tab">Clases</a></li> --%>
-	    	<li><a href="#tab2" data-toggle="tab">Propiedades</a></li>
+		<ul class="nav nav-tabs" style="background-color: #ADD9E4; border:0;">
+			<li class="active"><a href="#tab1" data-toggle="tab">Propiedades</a></li>
+			<li><a href="#tab2" data-toggle="tab">Agregar nueva propiedad</a></li>
+	    		    	
 	  	</ul>
-	  	<div class="tab-content">
-	  		<%-- 
-	    	<div class="tab-pane active" id="tab1">	    	
-	      		<form action="Configuration" method="post">
-					<div class="container" style="margin-top:100px;">	
-						<div class="form-group">
-						    <label for="uri-prop">Ingresar URI de la clase:</label>
-						    <input type="text" class="form-control" id="uriInputProperty-class" name="uriInputProperty-class" placeholder="URI">		
-						</div>
-						<div class="form-group">
-						    <label for="name-prop">Ingresar nombre de la clase:</label>
-						    <input type="text" class="form-control" id="nameInputProperty" name="nameInputProperty" placeholder="Nombre">		
-						</div>
-						<div class="form-group">
-							<label for="dataset-sel">Seleccionar dataset</label>
-							<select name="dataset" id="dataset" class="form-control">
-							</select>
-						</div>
-						<div style="margin-top:50px;">
-							<button style = "margin-right: 20px; " type="submit" class="btn btn-primary">Guardar</button>
-							<a href="/NavegadorLinkedData" class="btn btn-primary">Salir</a>
-						</div>						
-					</div>		
-				</form>
-	    	</div>
-	    	--%>
-	    	<div class="tab-pane" id="tab2">
+	  	<div class="tab-content">	
+	  		<div id="tab1" class="tab-pane fade in active">
+				<div class="container" style="margin-top:100px;">
+		       		<div class="form-group">
+						<label for="dataset-cons-sel">Seleccionar dataset</label>
+						<select name="dataset" id="dataset-Prop" class="form-control"></select>
+					</div>
+					<div class="form-group">
+						<label for="class-cons-sel">Seleccionar clase</label>
+						<select name="class" id="class-Prop" class="form-control"></select>
+					</div>
+					
+					<div class = "form-group">	
+						<label for="class-cons-sel">Tabla de propiedades</label>
+			         	<div id="propertydiv" style="background-color:white;">
+							<table class="table table-p" cellspacing="0" id="propertytable">
+								<tr id="propertytable-head" class="table-head">
+									<th scope="col">Name</th>
+									<th scope="col">Description</th>
+									<th scope="col">Consolidated</th>
+								</tr>
+							</table>	    
+				   		</div>	
+			   		</div>
+			   		<div style="margin-top:50px;">
+						<button style = "margin-right: 20px; " type="submit" class="btn btn-primary" id="savePropBtn">Guardar</button>
+		         		<button type="button" class="btn btn-primary" data-dismiss="modal">Salir</button>
+					</div>
+		       	</div>
+		    </div>  		
+	    	<div id="tab2" class="tab-pane fade" >
 	      		<form action="Configuration" method="post">
 					<div class="container" style="margin-top:100px;">
 						
+						<!--  
 						<div class = "row">	
 							<div class="col-md-8 home-page-modal">		
 								<button id="myBtn-prop" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myPropModal">Propiedades consolidadas</button>
 							</div>
 						</div>
-						
-						
+						-->
+										
 						<div class="form-group">
 							<label for="dataset-sel">Seleccionar dataset</label>
 							<select name="dataset" id="dataset" class="form-control">
@@ -125,13 +97,17 @@
 						    <input type="text" class="form-control" id="descriptionInputProperty" name="descriptionInputProperty" placeholder="Descripcion">		
 						</div>
 						<div class="form-check">
-			    			<label class="form-check-label">
-			      			<input id = "checkbox-mapping" name="checkbox-mapping" class="form-check-input" type="checkbox"> Mapeo
+			    			<label class="form-check-label">Mapeo</label>
+			      			<input id = "checkbox-mapping" name="checkbox-mapping" class="form-check-input" type="checkbox">
 						</div>
 						<div class="form-group">
 							<label for="dataset-sel">Seleccionar dataset objetivo</label>
 							<select name="datasetMapping" id="datasetMapping" class="form-control">
 							</select>
+						</div>
+						<div class="form-check">
+			    			<label class="form-check-label">Obtener instancias</label>
+			      			<input id = "checkbox-mapping" name="checkbox-mapping" class="form-check-input" type="checkbox">
 						</div>
 						<!--
 						<div class="form-group">
@@ -147,6 +123,7 @@
 					</div>	
 				</form>
 	    	</div>
+	  		
 	  	</div>
 	</div>
 	
@@ -155,6 +132,59 @@
 
 	<script type="text/javascript">
 	$( document ).ready(function() {
+		
+			/*	TAB 2 CONSOLIDATED */
+
+			$("#propertydiv").hide();
+		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
+
+		    $.get('Configuration/Property/Update',function(responseJson){
+		    //$.get('UpdateProperty',function(responseJson){
+		    	
+		    	//alert('UpdateProperty x2');
+				if(responseJson!=null){					
+					$("#propertytable").find("tr:gt(0)").remove();
+					var table = $("#propertytable");
+					//alert('no entro');
+					//alert("UpdateProperty gg");
+					var cont = 1;					
+					//alert(responseJson);
+					
+					console.log(responseJson);
+					$.each(responseJson, function(key, value){
+						
+						var class_dataset = "dataset-" + value['dataset'];
+	                    var class_class = "class-" + value['id_class'];
+	                    	                    
+						var row = $('<tr class="'+ class_dataset + ' ' + class_class +'" />');
+	                    $("<td />").text(value['uri']).appendTo(row);
+	                    $("<td />").text(value['name']).appendTo(row);
+	                    
+	                    	                    
+	                    var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+	                    
+	                    if(value['consolidated']==1){
+	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
+	                    }
+	                    
+	                    /*
+						var inpStr = '<input type="checkbox" class="' + class_dataset +'" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+	                    
+	                    if(value['consolidated']==1){
+	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
+	                    }
+	                    */
+	                    $("<td />").html(inpStr).appendTo(row);
+	                    //alert("prop id: " + value['id']);
+	                    row.appendTo(table);
+	                    cont = cont + 1;
+					});					
+					//alert('wp');
+				}			
+			});
+			//$("#propertydiv").show();
+		
+			/* TAB 1 */
 			$.get('RetrieveOntologies',function(responseJson){
 				if(responseJson!=null){		
 					
@@ -228,83 +258,83 @@
 		/*modal propiedades*/
 				
 		// Get the modal
-		var modal = document.getElementById('myPropModal');
+		//var modal = document.getElementById('myPropModal');
 		
 		// Get the button that opens the modal
-		var btn = document.getElementById("myBtn-prop");
+		//var btn = document.getElementById("myBtn-prop");
 		
 		// Get the <span> element that closes the modal
-		var span = document.getElementsByClassName("close")[0];
+		//var span = document.getElementsByClassName("close")[0];
 		
-		// When the user clicks the button, open the modal
-		btn.onclick = function() {
-		    modal.style.display = "block";
+		
+// 		// When the user clicks the button, open the modal
+// 		btn.onclick = function() {
+// 		    modal.style.display = "block";
 		    
-		    //alert('x1');
-		    $("#propertydiv").hide();
-		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
+// 		    //alert('x1');
+// 		    $("#propertydiv").hide();
+// 		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
+
+// 		    $.get('Configuration/Property/Update',function(responseJson){
+// 		    //$.get('UpdateProperty',function(responseJson){
 		    	
-		    
-		    $.get('Configuration/Property/Update',function(responseJson){
-		    //$.get('UpdateProperty',function(responseJson){
-		    	
-		    	alert('UpdateProperty x2');
-				if(responseJson!=null){					
-					$("#propertytable").find("tr:gt(0)").remove();
-					var table = $("#propertytable");
-					//alert('no entro');
-					alert("UpdateProperty gg");
-					var cont = 1;
+// 		    	alert('UpdateProperty x2');
+// 				if(responseJson!=null){					
+// 					$("#propertytable").find("tr:gt(0)").remove();
+// 					var table = $("#propertytable");
+// 					//alert('no entro');
+// 					alert("UpdateProperty gg");
+// 					var cont = 1;
 					
-					alert(responseJson);
-					console.log(responseJson);
-					$.each(responseJson, function(key, value){
+// 					alert(responseJson);
+// 					console.log(responseJson);
+// 					$.each(responseJson, function(key, value){
 						
-						var class_dataset = "dataset-" + value['dataset'];
-	                    var class_class = "class-" + value['id_class'];
+// 						var class_dataset = "dataset-" + value['dataset'];
+// 	                    var class_class = "class-" + value['id_class'];
 	                    
 	                    
-						var row = $('<tr class="'+ class_dataset + ' ' + class_class +'" />');
-	                    $("<td />").text(value['uri']).appendTo(row);
-	                    $("<td />").text(value['name']).appendTo(row);
+// 						var row = $('<tr class="'+ class_dataset + ' ' + class_class +'" />');
+// 	                    $("<td />").text(value['uri']).appendTo(row);
+// 	                    $("<td />").text(value['name']).appendTo(row);
 	                    
 	                    	                    
-	                    var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+// 	                    var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList"/>'; 
 	                    
-	                    if(value['consolidated']==1){
-	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
-	                    }
+// 	                    if(value['consolidated']==1){
+// 	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
+// 	                    }
 	                    
-	                    /*
-						var inpStr = '<input type="checkbox" class="' + class_dataset +'" id="'+ value['id'] +'" name="checkboxPList"/>'; 
+// 	                    /*
+// 						var inpStr = '<input type="checkbox" class="' + class_dataset +'" id="'+ value['id'] +'" name="checkboxPList"/>'; 
 	                    
-	                    if(value['consolidated']==1){
-	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
-	                    }
-	                    */
-	                    $("<td />").html(inpStr).appendTo(row);
-	                    //alert("prop id: " + value['id']);
-	                    row.appendTo(table);
-	                    cont = cont + 1;
-					});					
-					//alert('wp');
-				}			
-			});
-			$("#propertydiv").show();
+// 	                    if(value['consolidated']==1){
+// 	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
+// 	                    }
+// 	                    */
+// 	                    $("<td />").html(inpStr).appendTo(row);
+// 	                    //alert("prop id: " + value['id']);
+// 	                    row.appendTo(table);
+// 	                    cont = cont + 1;
+// 					});					
+// 					//alert('wp');
+// 				}			
+// 			});
+// 			$("#propertydiv").show();
 			
-		}
+// 		}
 		
-		// When the user clicks on <span> (x), close the modal
-		span.onclick = function() {
-		    modal.style.display = "none";
-		}
+// 		// When the user clicks on <span> (x), close the modal
+// 		span.onclick = function() {
+// 		    modal.style.display = "none";
+// 		}
 		
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function(event) {
-		    if (event.target == modal) {
-		        modal.style.display = "none";
-		    }
-		}
+// 		// When the user clicks anywhere outside of the modal, close it
+// 		window.onclick = function(event) {
+// 		    if (event.target == modal) {
+// 		        modal.style.display = "none";
+// 		    }
+// 		}
 		
 		
 		$("#dataset-Prop").change(function(){
@@ -391,6 +421,9 @@
 			console.log(selected2);
 			
 		    rows.not( selected2 ).hide();
+		    $("#propertytable-head").show();
+		    
+		    $("#propertydiv").show();
 		});
 		
 	});

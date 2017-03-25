@@ -56,8 +56,6 @@ public class UpdatePropertyServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		
-		//System.out.println(request.getParameterValues("arr"));
 		String[] results = request.getParameterValues("arr[]");		
 		
 		int id_property, id_class, checked;
@@ -77,9 +75,6 @@ public class UpdatePropertyServlet extends HttpServlet {
 		    PropertyDAO.updateConsolidated(id_property, id_class, checked);
 		}	
 		
-		
-		
-
 	}
 
 }
