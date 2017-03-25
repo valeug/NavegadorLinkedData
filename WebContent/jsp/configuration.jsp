@@ -23,8 +23,6 @@
 	
 </head>
 <body>
-
-
 					 	
 	<div class="tabbable"> <!-- Only required for left/right tabs -->
 		<ul class="nav nav-tabs" style="background-color: #ADD9E4; border:0;">
