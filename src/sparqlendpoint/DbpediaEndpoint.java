@@ -855,33 +855,7 @@ public class DbpediaEndpoint {
 	public static Concept searchByUri(String uriInput){
 
 		System.out.println("URI buscado: " + uriInput);
-		/*
-		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
-									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
-									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
-				"   SELECT DISTINCT * " +
-				"   WHERE { " +		
-				"		{	"+
-				"       	<" + uriInput + "> rdfs:label ?label . " +	
-				"		}	"+
-				"		UNION	" +
-				"		{	"+
-				"			<" + uriInput + "> rdf:type ?class . "+
-				//owl thing
-				"		}	"+
-				"		UNION	" +
-				"		{	"+
-				"			<" + uriInput + "> <http://dbpedia.org/ontology/wikiPageRedirects> ?redirected . "+
-				"			?redirected rdf:type ?class . "+
-				"		}	"+
-				"		UNION	" +
-				"		{	"+
-				"			<" + uriInput + "> <http://dbpedia.org/ontology/wikiPageDisambiguates> ?amb . "+
-				"			?amb rdf:type ?type ."+
-				"			FILTER (CONTAINS(str(?type), \"http://dbpedia.org/ontology/\" ))"+		//http://dbpedia.org/ontology/Disease
-				"		}"+
-				"   } ";
-		*/
+
 		String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 									"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
 									"PREFIX owl: <http://www.w3.org/2002/07/owl#> "+
@@ -1059,7 +1033,7 @@ public class DbpediaEndpoint {
 		
 		//c.setProperties(pList);
 		//c.setPropertyGroups(pgList);
-		
+		c.setDataset("DBPedia");
 		return c;
 	}
 	
