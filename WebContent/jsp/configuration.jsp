@@ -134,8 +134,10 @@
 			/*	TAB 2 CONSOLIDATED */
 
 			$("#propertydiv").hide();
-		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
 
+		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
+			
+		    
 		    $.get('Configuration/Property/Update',function(responseJson){
 		    //$.get('UpdateProperty',function(responseJson){
 		    	
@@ -252,87 +254,6 @@
 		        }    
 		    })
 		    
-		
-		/*modal propiedades*/
-				
-		// Get the modal
-		//var modal = document.getElementById('myPropModal');
-		
-		// Get the button that opens the modal
-		//var btn = document.getElementById("myBtn-prop");
-		
-		// Get the <span> element that closes the modal
-		//var span = document.getElementsByClassName("close")[0];
-		
-		
-// 		// When the user clicks the button, open the modal
-// 		btn.onclick = function() {
-// 		    modal.style.display = "block";
-		    
-// 		    //alert('x1');
-// 		    $("#propertydiv").hide();
-// 		    //$.get('/NavegadorLinkedData/RetrieveOntologies',function(responseJson){
-
-// 		    $.get('Configuration/Property/Update',function(responseJson){
-// 		    //$.get('UpdateProperty',function(responseJson){
-		    	
-// 		    	alert('UpdateProperty x2');
-// 				if(responseJson!=null){					
-// 					$("#propertytable").find("tr:gt(0)").remove();
-// 					var table = $("#propertytable");
-// 					//alert('no entro');
-// 					alert("UpdateProperty gg");
-// 					var cont = 1;
-					
-// 					alert(responseJson);
-// 					console.log(responseJson);
-// 					$.each(responseJson, function(key, value){
-						
-// 						var class_dataset = "dataset-" + value['dataset'];
-// 	                    var class_class = "class-" + value['id_class'];
-	                    
-	                    
-// 						var row = $('<tr class="'+ class_dataset + ' ' + class_class +'" />');
-// 	                    $("<td />").text(value['uri']).appendTo(row);
-// 	                    $("<td />").text(value['name']).appendTo(row);
-	                    
-	                    	                    
-// 	                    var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList"/>'; 
-	                    
-// 	                    if(value['consolidated']==1){
-// 	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + ' ' + class_class + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
-// 	                    }
-	                    
-// 	                    /*
-// 						var inpStr = '<input type="checkbox" class="' + class_dataset +'" id="'+ value['id'] +'" name="checkboxPList"/>'; 
-	                    
-// 	                    if(value['consolidated']==1){
-// 	                    	var inpStr = '<input type="checkbox" class="' + class_dataset + '" id="'+ value['id'] +'" name="checkboxPList" checked="checked" />'; 
-// 	                    }
-// 	                    */
-// 	                    $("<td />").html(inpStr).appendTo(row);
-// 	                    //alert("prop id: " + value['id']);
-// 	                    row.appendTo(table);
-// 	                    cont = cont + 1;
-// 					});					
-// 					//alert('wp');
-// 				}			
-// 			});
-// 			$("#propertydiv").show();
-			
-// 		}
-		
-// 		// When the user clicks on <span> (x), close the modal
-// 		span.onclick = function() {
-// 		    modal.style.display = "none";
-// 		}
-		
-// 		// When the user clicks anywhere outside of the modal, close it
-// 		window.onclick = function(event) {
-// 		    if (event.target == modal) {
-// 		        modal.style.display = "none";
-// 		    }
-// 		}
 		
 		
 		$("#dataset-Prop").change(function(){

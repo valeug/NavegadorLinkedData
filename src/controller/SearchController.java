@@ -104,7 +104,9 @@ public class SearchController {
 						System.out.println("term properties: " + term.getProperties().size());
 						System.out.println("dataset LIST: " + datasetList.size());
 						*/
-						termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
+						
+						/* ELIMINAR ESTO?? mapping: */
+						//termsMappingList = Bio2RdfEndpoint.getMappingPropertiesValues(term, datasetList); //conceptos con sus propiedades (para enriquecer propiedades del termino en contrado en DBPedia)
 						System.out.println("\n---------------------\n---------------------\n IMPRIMELO 2\n---------------------\n---------------------");
 						printConcept(term);
 						similarTerms = Bio2RdfEndpoint.searchTermBySimilarName_Datasets(input, datasetList); // solo nombres de los conceptos (sin mostrar propiedades)
@@ -257,9 +259,9 @@ public class SearchController {
 		 * */
 		
 		pg = new PropertyGroup();
-		pg.setName("Type");
+		pg.setName("Es del tipo");
 		pg.setUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-		pg.setConsolidated(0);
+		pg.setConsolidated(1);
 		pg.setShow_default(1);
 		
 		pList = new ArrayList<>();
@@ -296,10 +298,10 @@ public class SearchController {
 		 */
 		
 		p = new Property();
-		p.setName("Title");
+		p.setName("Nombre");
 		p.setUri("http://purl.org/dc/terms/title");
 		p.setValue("Alzheimer Disease@en");
-		p.setConsolidated(1);
+		p.setConsolidated(0);
 		p.setShow_default(1);
 		propertyList.add(p);
 		
@@ -312,7 +314,7 @@ public class SearchController {
 		*/
 		
 		p = new Property();
-		p.setName("Scope note");
+		p.setName("Descripción breve");
 		p.setUri("http://bio2rdf.org/mesh_vocabulary:mesh-scope-note");
 		p.setValue("A degenerative disease of the BRAIN characterized by the insidious onset of DEMENTIA. Impairment of MEMORY, judgment, attention span, and problem solving skills are followed by severe APRAXIAS and a global loss of cognitive abilities. The condition primarily occurs after age 60, and is marked pathologically by severe cortical atrophy and the triad of SENILE PLAQUES; NEUROFIBRILLARY TANGLES; and NEUROPIL THREADS. (From Adams et al., Principles of Neurology, 6th ed, pp1049-57)");
 		p.setShow_default(1);
@@ -392,16 +394,21 @@ public class SearchController {
 	
 	private static int findUriOrigin(String input){
 		
-		if(input.contains("http://bio2rdf.org/mesh")){			
+		System.out.println("input: "+input);
+		if(input.contains("bio2rdf.org/mesh")){	
+			System.out.println("es mesh :)");
 			return 2;
 		}
-		else if(input.contains("http://bio2rdf.org/pharmgkb")){
-			return 3;
+		else if(input.contains("bio2rdf.org/omim")){
+			System.out.println("es omim :)");
+			return 7;
 		}
-		else if(input.contains("http://bio2rdf.org/uniprot") || input.contains("http://bio2rdf.org/go") || input.contains("http://bio2rdf.org/goa")){
+		else if(input.contains("bio2rdf.org/uniprot") || input.contains("bio2rdf.org/go") || input.contains("bio2rdf.org/goa")){
+			System.out.println("es de goa :)");
 			return 4;
 		}
-		else if(input.contains("http://bio2rdf.org/ncbigene")){
+		else if(input.contains("bio2rdf.org/ncbigene")){
+			System.out.println("es ncbigene :)");
 			return 5;
 		}
 		

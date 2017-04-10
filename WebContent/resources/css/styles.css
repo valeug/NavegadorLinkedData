@@ -194,6 +194,8 @@ body {
 
 .prop-group-elem {
 	margin-bottom: 25px;
+	text-align: justify;
+    text-justify: inter-word;
 }
 
 .prop-group-name, .property-name{
@@ -255,4 +257,14 @@ body {
 .list-element-instance {
 	margin-bottom: 10px;
 }
+
+/* estilos para imagen */
+
+img {
+	width: 100%;
+	display: block;
+	margin: auto;
+}
+
+
 

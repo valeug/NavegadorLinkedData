@@ -79,8 +79,9 @@
 							<!--  
 							<p class="concept-dataset"><c:out value="${z.dataset}"/></p>
 							-->							
-							<p class="concept-title"><c:out value="${z.name}"/> (<c:out value="${z.dataset}"/>)</p>
-							<p class="concept-detail"><a class="label-detail  prop-label" href="#" onclick="">See all >></a></p>
+							<p class="concept-title"><c:out value="${z.name}"/></p>
+							<p class="concept-title" style="color: #ADD9E4;">Fuente: <c:out value="${z.dataset}"/></p>
+							<p class="concept-detail"><a class="label-detail  prop-label" href="#" onclick="">Ver más    >></a></p>
 							<p style="display:none;"><a class="concept-detail-uri" ><c:out value="${z.uri}" /></a></p>
 						</div>
 												
@@ -162,7 +163,7 @@
 														<c:if test="${k.is_mapping == 1}">													
 															<c:if test="${k.label == null}">
 																<div class="prop-label-div">
-																	<p class="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" />  >> </a></p>
+																	<p class="prop-label-4"><a  class="ref-value" href="#" onclick=""><c:out value="${k.value}" /></a><span class="glyphicon glyphicon-chevron-right span-icon"></span></p>
 																</div>
 															</c:if>
 															<c:if test="${k.label != null}">
