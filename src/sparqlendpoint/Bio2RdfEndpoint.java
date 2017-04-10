@@ -119,7 +119,6 @@ public class Bio2RdfEndpoint {
 		
 		String uri = null;
 		String auxUri = null;	
-
 		
 		//List<Class> classesDataset = ClassDAO.getAllClassesByDataset(dataset.getId());
 		
