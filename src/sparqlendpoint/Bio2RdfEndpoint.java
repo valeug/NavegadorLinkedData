@@ -113,9 +113,8 @@ public class Bio2RdfEndpoint {
 		ResultSet results = qexec.execSelect();
 		
 		//ResultSetFormatter.out(System.out, results, query);    
-	
-		// Informacion del resultado		
-		
+
+		// Informacion del resultado				
 		
 		String uri = null;
 		String auxUri = null;	
