@@ -107,6 +107,39 @@
 			<div style="background-color: #4E4E56; padding: 50px; margin-bottom: 100px;" class="col-md-12 desc-info-row" >
 				<p class="subtitle"><c:out value="${term.name}" /></p>
 				<p class="subtitle"><c:out value="${term.dataset}" /></p>
+				
+				<c:if test="${term.associations != null}">
+					<div>
+						<ul class="list-group">
+							
+							<c:forEach items="${term.associations}" var="a">
+								<li class="list-group-item">
+									<p><c:out value="${a.association_name}" /></p>
+									<p style="display: none;"><c:out value="${a.association_uri}" /></p>
+									
+									<p><c:out value="${a.concept_name}" /></p>
+									<p style="display: none;"><c:out value="${a.concept_uri}" /></p>
+									
+									<p><c:out value="${a.origin}" /> - <c:out value="${a.target}" /></p>
+									
+									<c:if test="${a.inferredAssociations != null}">
+										<div>
+											<ul class="list-group">												
+												<c:forEach items="${a.inferredAssociations}" var="i">
+													<li class="list-group-item">
+														<p>action: <c:out value="${i.action}" /></p>
+														<p>concept: <c:out value="${i.concept_name}" /></p>
+													</li>
+												</c:forEach>
+											</ul>
+										</div>
+									</c:if>
+								</li>
+							</c:forEach>
+							
+						</ul>
+					</div>
+				</c:if>
 				<ul id="prop-list" class="list-group">
 					<c:forEach items="${term.properties}" var="t">
 						
@@ -394,7 +427,7 @@
 				</div>
 			</div>
 		</c:if>
-		
+			
 		<c:if test="${instances != null}">
 			<div class = "row"> 
 				<div class="col-md-12 ref-info-row" style="padding: 50px;">

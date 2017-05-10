@@ -161,7 +161,7 @@ public class Bio2RdfEndpoint {
 			System.out.println("prop size: " + c.getProperties().size());
 			System.out.println("pg size: " + c.getPropertyGroups().size());
 		}
-		
+				
 		/*
 		if(uris.size() > 0){
 			// faltaria obtener la DEFINICION del concepto -> DEPENDE DE CADA DATASET
@@ -503,32 +503,32 @@ public class Bio2RdfEndpoint {
 			"	LIMIT 100";
 			*/
 		
-			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
-									" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-									" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
-				"   SELECT DISTINCT * " +
-				"   WHERE { " +	
-				"		{"+
-				"			OPTIONAL { "+
-				"					<"+cad+">  <http://purl.org/dc/terms/title> ?title . " +
-				"			}"+
-				"			OPTIONAL { "+
-				"					<"+cad+">  <http://purl.org/dc/terms/description>  ?description . " +
-				"			}"+
-				"			OPTIONAL { "+
-				"					<"+cad+">  rdfs:label ?label . " +
-				"					FILTER (langMatches(lang(?label), \"en\")) " +
-				"			}"+
-				"		}"+
-				"		UNION"+
-				"		{"+
-				"			<"+cad+"> ?property ?value . " +
-				//"			OPTIONAL { ?value <http://bio2rdf.org/bio2rdf_vocabulary:identifier> ?propidentifier . } " +
-				"			OPTIONAL { ?value <http://purl.org/dc/terms/title> ?proptitle. } " +
-				//"			OPTIONAL { ?value <http://www.w3.org/2000/01/rdf-schema#label> ?proplabel . } " +
-				"   	} "+
-				"	}"+
-				"	LIMIT 300";
+		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+								" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+								" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+			"   SELECT DISTINCT * " +
+			"   WHERE { " +	
+			"		{"+
+			"			OPTIONAL { "+
+			"					<"+cad+">  <http://purl.org/dc/terms/title> ?title . " +
+			"			}"+
+			"			OPTIONAL { "+
+			"					<"+cad+">  <http://purl.org/dc/terms/description>  ?description . " +
+			"			}"+
+			"			OPTIONAL { "+
+			"					<"+cad+">  rdfs:label ?label . " +
+			"					FILTER (langMatches(lang(?label), \"en\")) " +
+			"			}"+
+			"		}"+
+			"		UNION"+
+			"		{"+
+			"			<"+cad+"> ?property ?value . " +
+			//"			OPTIONAL { ?value <http://bio2rdf.org/bio2rdf_vocabulary:identifier> ?propidentifier . } " +
+			"			OPTIONAL { ?value <http://purl.org/dc/terms/title> ?proptitle. } " +
+			//"			OPTIONAL { ?value <http://www.w3.org/2000/01/rdf-schema#label> ?proplabel . } " +
+			"   	} "+
+			"	}"+
+			"	LIMIT 300";
 		
 		System.out.println(sparqlQueryString1);
 		Query query = QueryFactory.create(sparqlQueryString1);
@@ -583,7 +583,7 @@ public class Bio2RdfEndpoint {
 				aux = qsol.get("property").toString();
 				
 				if(aux.compareTo(TREE_ENTRY_PROPERTY_MESH) == 0){
-					List<Property> treeNodes = getHerarchyElements(qsol.get("value").toString(), dataset);
+					List<Property> treeNodes = getHerarchyElements(aux, qsol.get("value").toString(), dataset);
 					if(pList== null ) System.out.println("wtf pList null");
 					pList.addAll(treeNodes);
 					
@@ -650,13 +650,19 @@ public class Bio2RdfEndpoint {
 		for(int w=0; w < classTypeList.size(); w++){
 			System.out.println("clase "+w +": " + classTypeList.get(w));
 			List<Property> props = PropertyDAO.getAllPropertiesByClassUri(classTypeList.get(w));
-			System.out.println("props size : " + props.size());
+			//System.out.println("props size : " + props.size());
 			//printProperties(props);
 			propsClases.addAll(props);
 		}
 		
 		System.out.println("PROPIEDADES CLASE DAO!");
 		//printProperties(propsClases);
+		/*
+		System.out.println("props names !!");
+		for(int t=0; t< propsClases.size(); t++){
+			System.out.println("name: " + propsClases.get(t).getName());
+		}
+		*/
 		
 		System.out.println("pList size ANTES: " + pList.size());
 		System.out.println("propsTotal size DESPUES: " + propsClases.size());
@@ -673,6 +679,7 @@ public class Bio2RdfEndpoint {
 					//System.out.println("pUri: " + pUri);
 					//System.out.println("prop(h): "+propsClases.get(h).getUri());					
 					pList.get(k).setIs_mapping(propsClases.get(h).getIs_mapping()); //mapping
+					//System.out.println("prop name: " + propsClases.get(h).getName());
 					pList.get(k).setName(propsClases.get(h).getName()); //name
 					//pFinal.add(pList.get(k));
 					pList.get(k).setShow_default(1);
@@ -688,21 +695,27 @@ public class Bio2RdfEndpoint {
 			found = false;
 			*/
 		}
-
+		/*
+		System.out.println("props names !!");
+		for(int t=0; t< propsClases.size(); t++){
+			System.out.println("name: " + propsClases.get(t).getName());
+		}
+		*/
 		System.out.println("pList size DESPUES: " + pList.size());
 		System.out.println("pFinal size DESPUES: " + pFinal.size());
 		qexec.close();			
 		//c.setProperties(pFinal);
 		List<PropertyGroup> pgList = new ArrayList<PropertyGroup>();
 		
-		
+		/*
 		System.out.println("ANTES DEL REGROUP");
 		
 		for(int k=0; k<pList.size(); k++){
 			System.out.println(k+") uri: " + pList.get(k).getUri());
+			System.out.println(k+") name: " + pList.get(k).getName());
 			System.out.println(k+") show_default: " + pList.get(k).getShow_default());
 		}
-		
+		*/
 		
 		regroupPropertyList(pList, pgList);
 		c.setProperties(pList);
@@ -727,21 +740,76 @@ public class Bio2RdfEndpoint {
 		List<Association> associations = new ArrayList<>();
 		
 		// gene
-		List<Association> genes = getGenesAssociations(uri, clase);		
+		List<Association> genes = getGenesAssociations(uri, clase);	//genes associated with the disease	
+		getGenesChemicalsNames(genes);
 		associations.addAll(genes);
 		
 		// chemical
-		List<Association> chemicals = getChemicalsAssociations(uri, clase);
+		List<Association> chemicals = getChemicalsAssociations(uri, clase); //chemicals associated with the disease
+		getGenesChemicalsNames(chemicals);
 		associations.addAll(chemicals);
+		
+		System.out.println("ASSOCIATION implicit LIST");
+		for(int i=0; i<associations.size(); i++){
+			System.out.println("concept_name: " + associations.get(i).getConcept_name());
+			System.out.println("action: " + associations.get(i).getAction());
+		}
 		
 		return associations;
 	}
 	
+	private static String concatenatenames_innerquery(List<Association> associations){
+		String query = "";
+		
+		for(int i=0; i<associations.size(); i++){
+			query += " <" + associations.get(i).getConcept_uri() + "> <http://purl.org/dc/terms/title> ?title_" + i + " . ";
+		}
+		
+		return query;
+	}	
+	
+	private static void getGenesChemicalsNames(List<Association> associations){
+		
+			String innerQuery = concatenatenames_innerquery(associations);
+			
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+					" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+					" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+			" SELECT DISTINCT *" +
+			//fromQ +
+			" WHERE { " +
+			innerQuery +
+			" } ";
+
+			System.out.println("association inner query GETNAMES!!");
+			System.out.println(sparqlQueryString1);
+			
+			Query query = QueryFactory.create(sparqlQueryString1);			
+			QueryEngineHTTP qexec = new QueryEngineHTTP("http://ctd.bio2rdf.org/sparql", query);			
+			ResultSet results = qexec.execSelect();
+			
+		
+			while (results.hasNext())
+			{
+				QuerySolution qsol = results.nextSolution();	
+				
+				for(int j=0; j<associations.size(); j++){
+					Association a = associations.get(j);														
+					a.setConcept_name(qsol.get("title_"+j).toString());			
+					System.out.println("title) " + qsol.get("title_"+j).toString());
+				}
+				
+				break;
+				
+			}	
+			qexec.close();
+	}
+	
 	private static List<Association>  getChemicalsAssociations(String uri, String clase){
 		
-		List<Association> chemicals = new ArrayList<>();		
+			List<Association> chemicals = new ArrayList<>();		
 	
-			
+			/*
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
@@ -754,7 +822,21 @@ public class Bio2RdfEndpoint {
 								"	?chemical <http://purl.org/dc/terms/title> ?chemical_title . "+
 								" } " +
 								"LIMIT 3";
-	
+			*/
+			
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+					" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+					" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+			" SELECT DISTINCT ?chemical_disease ?chemical " +
+			//fromQ +
+			" WHERE { " +
+			" 	?chemical_disease  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Disease-Association> . " +
+			"	?chemical_disease <http://bio2rdf.org/ctd_vocabulary:chemical> ?chemical . " +
+			"	?chemical_disease <http://bio2rdf.org/ctd_vocabulary:disease> <" + uri+ "> . " +
+			"	?chemical <http://purl.org/dc/terms/title> ?chemical_title . "+
+			" } " +
+			"LIMIT 3";
+		
 			System.out.println("association query getChemicalsAssociations!!");
 			System.out.println(sparqlQueryString1);
 			
@@ -765,6 +847,7 @@ public class Bio2RdfEndpoint {
 			
 			ResultSet results = qexec.execSelect();
 			
+			//System.out.println("ASOCIACIONES!!");
 			//ResultSetFormatter.out(System.out, results, query);    
 		
 			// Informacion del resultado				
@@ -774,11 +857,11 @@ public class Bio2RdfEndpoint {
 			{
 				QuerySolution qsol = results.nextSolution();	
 				
-				if(qsol.contains("chemical") && qsol.contains("chemical_title")){
+				if(qsol.contains("chemical")){
 					Association a = new Association();
 					
-					a.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Gene-Disease-Association");
-					a.setAssociation_name("Disease-Gene");
+					a.setAssociation_uri(qsol.get("chemical_disease").toString());
+					a.setAssociation_name("Disease-Chemical");
 					
 					/*
 					aux = qsol.get("action_disease_chemical").toString();						
@@ -787,8 +870,11 @@ public class Bio2RdfEndpoint {
 					aux = qsol.get("chemical").toString();						
 					a.setConcept_uri(aux);
 					
-					aux = qsol.get("chemical_title").toString();						
+					/*
+					aux = qsol.get("chemical_title").toString();	
+					System.out.println("chemical_title: " + aux);
 					a.setConcept_name(aux);
+					*/
 					
 					a.setOrigin("DISEASE");
 					a.setTarget("CHEMICAL");
@@ -805,8 +891,8 @@ public class Bio2RdfEndpoint {
 	private static List<Association>  getGenesAssociations(String uri, String clase){
 		
 		List<Association> genes = new ArrayList<>();		
-	
-			
+
+			/*
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
@@ -819,7 +905,19 @@ public class Bio2RdfEndpoint {
 								"	?gene <http://purl.org/dc/terms/title> ?gene_title . "+
 								" } " +
 								"LIMIT 3";
-	
+			*/
+			
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+					" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+					" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+			" SELECT DISTINCT ?gene_disease ?gene " +
+			//fromQ +
+			" WHERE { " +
+			" 	?gene_disease  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Gene-Disease-Association> ." +
+			"	?gene_disease <http://bio2rdf.org/ctd_vocabulary:gene> ?gene . " +
+			"	?gene_disease <http://bio2rdf.org/ctd_vocabulary:disease> <" + uri+ "> . " +
+			" } " +
+			"LIMIT 3";
 			
 			System.out.println("association query getGenesAssociations!!");
 			System.out.println(sparqlQueryString1);
@@ -840,21 +938,18 @@ public class Bio2RdfEndpoint {
 			{
 				QuerySolution qsol = results.nextSolution();	
 				
-				if(qsol.contains("gene") && qsol.contains("gene_title")){
+				if(qsol.contains("gene")){
 					Association a = new Association();
 					
-					a.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Gene-Disease-Association");
+					a.setAssociation_uri(qsol.get("gene_disease").toString());
+					// Deberia ser type
+					//a.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Gene-Disease-Association");
 					a.setAssociation_name("Disease-Gene");
-					
-					/*
-					aux = qsol.get("action_disease_gene").toString();						
-					a.setAction(aux);
-					*/
 					aux = qsol.get("gene").toString();						
 					a.setConcept_uri(aux);
 					
-					aux = qsol.get("gene_title").toString();						
-					a.setConcept_name(aux);
+					//aux = qsol.get("gene_title").toString();						
+					//a.setConcept_name(aux);
 					a.setOrigin("DISEASE");
 					a.setTarget("GEN");
 					genes.add(a);
@@ -867,55 +962,210 @@ public class Bio2RdfEndpoint {
 		return genes;
 	}
 	
-	private static void infereAssociations(List<Association> associations , String uri, String clase){
+	private static String chemicalsInfo_innerQuery(Association association){
+		
+		List<InferredAssociation> infs = association.getInferredAssociations();
+		String query = "";
+		
+		for(int i=0; i < infs.size(); i++){
+			query += " <" + infs.get(i).association_uri + "> <http://bio2rdf.org/ctd_vocabulary:action> ?action_chemical_gene_"+ i +" . "+
+					 //" <" + infs.get(i).association_uri + "> <http://bio2rdf.org/ctd_vocabulary:chemical> ?chemical . " +
+					 //"	?chemical <http://purl.org/dc/terms/title> ?chemical_title_" + i + " . ";
+					 " <" + infs.get(i).getConcept_uri() + "> <http://purl.org/dc/terms/title> ?chemical_title_" + i + " . ";
+		}
+		
+		return query;
+	}
+	
+	private static void getChemicalsInfo(Association association){
+		
+
+		String innerQuery = chemicalsInfo_innerQuery(association);
+		
+		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+				" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+				" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+		" SELECT DISTINCT * " +
+		//" SELECT DISTINCT *" +
+		//fromQ +
+		" WHERE { " +
+		innerQuery +
+		" } ";
+		//"LIMIT 3";
+		
+		System.out.println(" query getChemicalsInfo!!");
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);
+
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://ctd.bio2rdf.org/sparql", query);
+		//System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+		
+		ResultSet results = qexec.execSelect();		
+		//ResultSetFormatter.out(System.out, results, query);    
+	
+		// Informacion del resultado				
+		String aux = null;				
+		//List<InferredAssociation> infList = new ArrayList<>();	
+		List<InferredAssociation> infLis = association.getInferredAssociations();
+		
+				
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			for(int i=0; i < infLis.size(); i++){
+				
+				if(qsol.contains("action_chemical_gene_"+i) && qsol.contains("chemical_title_"+i)){				
+					
+					InferredAssociation asso = infLis.get(i);
+		
+					asso.setAction(qsol.get("action_chemical_gene_"+i).toString());
+					asso.setConcept_name(qsol.get("chemical_title_"+i).toString());										
+				}
+			}
+			
+		}
+				
+		qexec.close();
+		
+	}
+		
+	private static String genesInfo_innerQuery(Association association){
+		
+		List<InferredAssociation> infs = association.getInferredAssociations();
+		String query = "";
+		
+		for(int i=0; i < infs.size(); i++){
+			query += " <" + infs.get(i).association_uri + "> <http://bio2rdf.org/ctd_vocabulary:action> ?action_chemical_gene_"+ i +" . "+
+					 //" <" + infs.get(i).association_uri + "> <http://bio2rdf.org/ctd_vocabulary:chemical> ?chemical . " +
+					 //"	?chemical <http://purl.org/dc/terms/title> ?chemical_title_" + i + " . ";
+					 " <" + infs.get(i).getConcept_uri() + "> <http://purl.org/dc/terms/title> ?gene_title_" + i + " . ";
+		}
+		
+		return query;
+	}
+	
+	private static void getGenesInfo(Association association){
+		
+
+		String innerQuery = genesInfo_innerQuery(association);
+		
+		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+				" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+				" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+		" SELECT DISTINCT * " +
+		//" SELECT DISTINCT *" +
+		//fromQ +
+		" WHERE { " +
+		innerQuery +
+		" } " +
+		"LIMIT 3";
+		
+		System.out.println("assoctiation query getChemicalsFromGene!!");
+		System.out.println(sparqlQueryString1);
+		Query query = QueryFactory.create(sparqlQueryString1);
+
+		QueryEngineHTTP qexec = new QueryEngineHTTP("http://ctd.bio2rdf.org/sparql", query);
+		//System.out.println("endpoint: " + dataset.getSparqlEndpoint());
+		
+		ResultSet results = qexec.execSelect();		
+		//ResultSetFormatter.out(System.out, results, query);    
+	
+		// Informacion del resultado				
+		String aux = null;				
+		List<InferredAssociation> infList = association.getInferredAssociations();	
+		
+		while (results.hasNext())
+		{
+			QuerySolution qsol = results.nextSolution();	
+			
+			for(int i=0; i < infList.size(); i++){
+				
+				if(qsol.contains("action_chemical_gene_"+i) && qsol.contains("gene_title_"+i)){				
+					
+					InferredAssociation asso = infList.get(i);
+		
+					asso.setAction(qsol.get("action_chemical_gene_"+i).toString());
+					asso.setConcept_name(qsol.get("gene_title_"+i).toString());										
+				}
+			}
+			
+		}
+				
+		qexec.close();
+		
+	}
+
+	private static void infereAssociations(List<Association> associations, String uri, String clase){
 		
 		List<Property> asocList = new ArrayList<Property>();
 		String claseUpper = clase.toUpperCase();
-		
-		
+				
 		/* Si es enfermedad */
 		
 		if(claseUpper.contains("DISEASE")){
-			
-			
+						
 			for(int i=0; i<associations.size(); i++){
 				
 				if(associations.get(i).getTarget().compareTo("GEN")==0){  //DISEASE-GEN
 					getChemicalsFromGene(associations.get(i));
+					getChemicalsInfo(associations.get(i));
 				}
 				
 				if(associations.get(i).getTarget().compareTo("CHEMICAL")==0){//DISEASE-CHEMICAL
 					getGenesFromChemical(associations.get(i));
-				}
-				
+					getGenesInfo(associations.get(i));
+				}				
 			}
 						
 		}
 		
+		//IMPRIMIR
+		printAssociations(associations);
+		
 		//CREO QUE SI ES GEN O CHEMICAL -> BUSCAR !!SOLO!! ASOCIACIONES EXPLICITAS
 		
 //		/* Si es gen */
-//		
-//		if(claseUpper.contains("GEN")){
-//			
+//		if(claseUpper.contains("GEN")){			
 //		}
 //		
 //		/* Si es chemical */
-//		
-//		if(claseUpper.contains("CHEMICAL")){
-//			
+//		if(claseUpper.contains("CHEMICAL")){ 		
 //		}
 		
 	}
 	
-	private static void getChemicalsFromGene(Association gen){
+	private static void printAssociations(List<Association> associations){
 		
+		//http://bio2rdf.org/mesh:D009474
 		
+		System.out.println("ALL Associations printAssociations: ");
+		for(int i=0; i<associations.size(); i++){
+			System.out.println("\n\n===============================");
+			System.out.println("association uri: " + associations.get(i).getAssociation_uri());
+			System.out.println("action: " + associations.get(i).getAction());
+			System.out.println("concept_uri: " + associations.get(i).getConcept_uri());
+			System.out.println("concept_name: " + associations.get(i).getConcept_name());			
+			
+			List<InferredAssociation> infs = associations.get(i).getInferredAssociations();
+			
+			System.out.println("\n**InferredAssociation: \n");
+			for(int k=0; k<infs.size(); k++){
+				System.out.println("inf uri: " + infs.get(k).getAssociation_uri());
+				System.out.println("action: " + infs.get(k).getAction());
+				System.out.println("concept_name: " + infs.get(k).getConcept_name());				
+			}
+		}
+	}
 	
+	private static void getChemicalsFromGene(Association gen){
+			
+			/*
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
 								" SELECT DISTINCT ?action_chemical_gene ?chemical ?chemical_title " +
+								//" SELECT DISTINCT *" +
 								//fromQ +
 								" WHERE { " +
 								" 	?chemical_gene <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association> . " +
@@ -924,9 +1174,25 @@ public class Bio2RdfEndpoint {
 								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:gene> <" + gen.getConcept_uri() + "> . " +
 								"	?chemical <http://purl.org/dc/terms/title> ?chemical_title . "+
 								" } " +
-								"LIMIT 1";
-	
-			System.out.println("assoctiation query getChemicalsFromGene!!");
+								"LIMIT 3";
+			*/
+			
+			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+					" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+					" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+			" SELECT DISTINCT ?chemical_gene ?chemical" + //title tambien?
+			//" SELECT DISTINCT *" +
+			//fromQ +
+			" WHERE { " +
+			" 	?chemical_gene <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association> . " +
+			"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:action> ?action_chemical_gene . "+
+			"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:chemical> ?chemical . " +
+			"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:gene> <" + gen.getConcept_uri() + "> . " +
+			"	?chemical <http://purl.org/dc/terms/title> ?chemical_title . "+
+			" } " +
+			"LIMIT 3";
+		
+			System.out.println("query getChemicalsFromGene!!");
 			System.out.println(sparqlQueryString1);
 			Query query = QueryFactory.create(sparqlQueryString1);
 
@@ -945,20 +1211,25 @@ public class Bio2RdfEndpoint {
 			{
 				QuerySolution qsol = results.nextSolution();	
 				
-				if(qsol.contains("action_chemical_gene") && qsol.contains("chemical") && qsol.contains("chemical_title")){						
-					
+				//if(qsol.contains("action_chemical_gene") && qsol.contains("chemical") && qsol.contains("chemical_title")){					
+				
+				if(qsol.contains("chemical_gene")){	
 					InferredAssociation asso = new InferredAssociation();
 					
-					asso.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association");
+					//asso.setAssociation_uri(qsol.get("chemical_gene").toString());
+					// Deberia ser type
+					asso.setAssociation_uri(qsol.get("chemical_gene").toString());
+					System.out.println("chemical_gene uri: " + qsol.get("chemical_gene").toString());
 					asso.setAssociation_name("Chemical-Gene");
-					
+					asso.setConcept_uri(qsol.get("chemical").toString());
+					/*
 					aux = qsol.get("chemical").toString();
 					asso.setConcept_uri(aux);
 					aux = qsol.get("chemical_title").toString();
 					asso.setConcept_name(aux);
 					aux = qsol.get("action_chemical_gene").toString();
 					asso.setAction(aux);
-					
+					*/
 					infList.add(asso);						
 					
 				}
@@ -967,27 +1238,40 @@ public class Bio2RdfEndpoint {
 			gen.setInferredAssociations(infList);
 			
 			qexec.close();
-		
-	
 	}
 	
 	private static void getGenesFromChemical(Association chemical){
 		
-
+			/*
 			String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
 										" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
 										" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
 								" SELECT DISTINCT ?action_chemical_gene ?gene ?gene_title " +
 								//fromQ +
 								" WHERE { " +
-								" 	?chemical_gene <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association> . " +
+								" 	?c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association> . " +
 								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:action> ?action_chemical_gene . " +
 								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:chemical> <" + chemical.getConcept_uri() + "> . " +
 								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:gene> ?gene . " +
 								"	?gene <http://purl.org/dc/terms/title> ?gene_title . " +
 								" } " +
-								"LIMIT 1";
-	
+								"LIMIT 3";
+			*/
+			
+		String sparqlQueryString1 =	" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+									" PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+									" PREFIX owl: <http://www.w3.org/2002/07/owl#> " +
+								" SELECT DISTINCT ?chemical_gene ?gene " +
+								//fromQ +
+								" WHERE { " +
+								" 	?c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association> . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:action> ?action_chemical_gene . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:chemical> <" + chemical.getConcept_uri() + "> . " +
+								"	?chemical_gene <http://bio2rdf.org/ctd_vocabulary:gene> ?gene . " +
+								"	?gene <http://purl.org/dc/terms/title> ?gene_title . " +
+								" } " +
+								"LIMIT 3";
+		
 			System.out.println("associations query getGenesFromChemical!!");
 			System.out.println(sparqlQueryString1);
 			Query query = QueryFactory.create(sparqlQueryString1);
@@ -1007,24 +1291,19 @@ public class Bio2RdfEndpoint {
 			{
 				QuerySolution qsol = results.nextSolution();	
 				
-				if(qsol.contains("action_chemical_gene") && qsol.contains("chemical") && qsol.contains("chemical_title")){						
+				if(qsol.contains("gene") && qsol.contains("chemical_gene")){						
 					
 					InferredAssociation asso = new InferredAssociation();
 					
-					asso.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association");
+					asso.setAssociation_uri(qsol.get("chemical_gene").toString());
+					// Deberia ser type
+					//asso.setAssociation_uri("http://bio2rdf.org/ctd_vocabulary:Chemical-Gene-Association");
 					asso.setAssociation_name("Chemical-Gene");
-					
-					aux = qsol.get("gene").toString();
-					asso.setConcept_uri(aux);
-					aux = qsol.get("gene_title").toString();
-					asso.setConcept_name(aux);
-					aux = qsol.get("action_chemical_gene").toString();
-					asso.setAction(aux);
+					asso.setConcept_uri(qsol.get("gene").toString());
 					
 					infList.add(asso);						
 					
 				}
-
 			}	
 			chemical.setInferredAssociations(infList);
 			qexec.close();	
@@ -1032,24 +1311,28 @@ public class Bio2RdfEndpoint {
 	}
 	
 	
-	private static List<Property> getHerarchyElements(String treeId, Dataset dataset){
+	private static List<Property> getHerarchyElements(String property, String treeId, Dataset dataset){
 		
 		List<Property> propsList = new ArrayList<Property>();
+		
+		System.out.println("entro a getHerarchyElements!");
 		
 		String strquery = " SELECT DISTINCT * " +
 					   " WHERE { "+
 					   "	{ " +
-					   "		<"+ treeId +"> <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass . " +
-					   "    	?superclass <http://www.w3.org/2000/01/rdf-schema#label> ?superlabel . "+
+					   "		<"+ treeId +"> <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superclass_entry . " +
+					   "    	?superclass_entry <http://www.w3.org/2000/01/rdf-schema#label> ?superlabel . "+
+					   " 		?superclass <http://bio2rdf.org/mesh_vocabulary:mesh-tree-number> ?superclass_entry . "+
 					   "	}" +
 					   "	UNION"+
 					   "	{ " +
-					   "		?subclass <http://www.w3.org/2000/01/rdf-schema#subClassOf> <"+ treeId +"> . " +
-					   "    	?subclass <http://www.w3.org/2000/01/rdf-schema#label> ?sublabel . "+
+					   "		?subclass_entry <http://www.w3.org/2000/01/rdf-schema#subClassOf> <"+ treeId +"> . " +
+					   "    	?subclass_entry <http://www.w3.org/2000/01/rdf-schema#label> ?sublabel . "+
+					   " 		?subclass <http://bio2rdf.org/mesh_vocabulary:mesh-tree-number> ?subclass_entry . "+
 					   "	}" +
 					   " } ";
 		
-					   
+		
 		System.out.println("tree query!!");
 		System.out.println(strquery);
 		
@@ -1070,12 +1353,23 @@ public class Bio2RdfEndpoint {
 			if(qsol.contains("superclass") && qsol.contains("superlabel")){
 				
 				Property p = new Property();
-				aux = qsol.get("superclass").toString();
+				/*
+				aux = qsol.get("superclass_entry").toString();
 				p.setUri(aux);
+				*/
+				p.setUri(property);
+				/*
 				aux = qsol.get("superlabel").toString();
 				p.setLabel(aux);
+				*/
+				p.setName("Superclases");
+				aux = qsol.get("superlabel").toString();
+				p.setLabel(aux);
+				aux = qsol.get("superclass").toString();
+				p.setValue(aux);
+				
 				p.setShow_default(1);
-				p.setInverseRelation(0);
+				p.setInverseRelation(0); //indica es superClass
 				
 				propsList.add(p);
 			}
@@ -1083,12 +1377,23 @@ public class Bio2RdfEndpoint {
 			if(qsol.contains("subclass") && qsol.contains("sublabel")){
 				
 				Property p = new Property();
-				aux = qsol.get("subclass").toString();
+				/*
+				aux = qsol.get("subclass_entry").toString();
 				p.setUri(aux);
+				*/
+				p.setUri(property);
+				/*
 				aux = qsol.get("sublabel").toString();
 				p.setLabel(aux);
+				*/
+				p.setName("Subclases");
+				aux = qsol.get("sublabel").toString();
+				p.setLabel(aux);
+				aux = qsol.get("subclass").toString();
+				p.setValue(aux);
+				
 				p.setShow_default(1);
-				p.setInverseRelation(1);
+				p.setInverseRelation(1); //indica es subClass
 				
 				propsList.add(p);
 			}
@@ -1116,9 +1421,20 @@ public class Bio2RdfEndpoint {
 				System.out.println("p uri: " + p.getUri());
 				System.out.println("aux: " + auxList.get(j));
 				*/
-				if(p.getUri().compareTo(pList.get(j).getUri()) ==0 ){
-					repite = true;
-					break;
+				
+				
+				if(p.getName() != null ){
+					//System.out.println("name: " + p.getName());
+					if(p.getUri().compareTo(pList.get(j).getUri()) ==0 && p.getName().compareTo(pList.get(j).getName()) ==0){
+						repite = true;
+						break;
+					}
+				}
+				else {
+					if(p.getUri().compareTo(pList.get(j).getUri()) ==0){
+						repite = true;
+						break;
+					}
 				}
 			}
 			
@@ -1142,9 +1458,18 @@ public class Bio2RdfEndpoint {
 				int k;
 				agrupada = false;
 				for(k=0; k < pgList.size(); k++){
-					if(p.getUri().compareTo(pgList.get(k).getUri()) == 0){
-						agrupada = true;
-						break;
+					//if(p.getUri().compareTo(pgList.get(k).getUri()) == 0){
+					if(p.getName() != null){					
+						if(p.getUri().compareTo(pgList.get(k).getUri()) == 0 && p.getName().compareTo(pgList.get(k).getName()) ==0){						
+							agrupada = true;
+							break;
+						}
+					}
+					else {
+						if(p.getUri().compareTo(pgList.get(k).getUri()) == 0){						
+							agrupada = true;
+							break;
+						}
 					}
 				}
 				

@@ -41,11 +41,13 @@ public class PropertyDAO {
     		myStat = myConnec.createStatement();
 			ResultSet myres = myStat.executeQuery(query);
 
+			System.out.println("PROPERTY DAO: ");
 			while(myres.next()){
 				
 				p = new Property();
 				p.setId(myres.getInt("id_property"));
 				p.setName(myres.getString("name"));
+				//System.out.println("prop name: " + myres.getString("name"));
 				p.setUri(myres.getString("uri"));
 				p.setIs_mapping(myres.getInt("is_mapping"));	
 				p.setTarget(myres.getInt("target"));
